@@ -1,6 +1,6 @@
-import { createServerClient, type AppSupabaseClient } from '@/lib/supabase/server'
+import { createServerClient, createServiceClient, type AppSupabaseClient } from '@/lib/supabase/server'
 import { DomainError } from '@/types/errors'
-import type { RosterEntry } from './types'
+import type { RosterEntry, CoachDirectoryEntry } from './types'
 
 /** Lista de atletas de la organización — RLS resuelve qué ve cada rol (manager: todos, coach: solo los suyos). */
 export async function getRoster(
@@ -75,4 +75,27 @@ export async function getMyActiveMembership(
 
   if (error || !data) return null
   return { id: data.id, organizationId: data.organization_id, role: data.role }
+}
+
+/**
+ * Lista de coaches disponibles para que un atleta elija al registrarse —
+ * ANTES de tener sesión (por eso usa service_role, no el cliente normal
+ * que depende de auth). Solo expone nombre + organización, nada sensible.
+ */
+export async function getPublicCoachDirectory(): Promise<CoachDirectoryEntry[]> {
+  const supabase = createServiceClient()
+
+  const { data, error } = await supabase
+    .from('memberships')
+    .select('id, organization_id, people(first_name, last_name), organizations(name)')
+    .eq('role', 'coach')
+    .eq('status', 'activo')
+
+  if (error) throw new DomainError('NOT_FOUND', error.message)
+
+  return (data ?? []).map((row: any) => ({
+    membershipId: row.id,
+    name: `${row.people?.first_name ?? ''} ${row.people?.last_name ?? ''}`.trim(),
+    organizationName: row.organizations?.name ?? '—',
+  }))
 }

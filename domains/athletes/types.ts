@@ -47,3 +47,33 @@ export interface DeactivateMemberInput {
   membershipId: string
   organizationId: string
 }
+
+export interface SignUpManagerInput {
+  email: string
+  password: string
+  firstName: string
+  lastName: string
+  organizationName: string
+}
+
+export interface SignUpCoachInput {
+  email: string
+  password: string
+  firstName: string
+  lastName: string
+  joinCode: string
+}
+
+export interface SignUpAthleteInput {
+  email: string
+  password: string
+  firstName: string
+  lastName: string
+  coachMembershipId: string
+}
+
+export interface CoachDirectoryEntry {
+  membershipId: string
+  name: string
+  organizationName: string
+}
