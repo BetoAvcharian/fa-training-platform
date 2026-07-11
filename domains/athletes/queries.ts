@@ -63,7 +63,13 @@ export async function getMyActiveMembership(
   client?: AppSupabaseClient
 ): Promise<{ id: string; organizationId: string; role: string } | null> {
   const supabase = client ?? (await createServerClient())
-  const { data: { user } } = await supabase.auth.getUser()
+  let user
+  try {
+    const result = await supabase.auth.getUser()
+    user = result.data.user
+  } catch {
+    return null // sesión corrupta/vencida -> tratar como "no autenticado"
+  }
   if (!user) return null
 
   const { data, error } = await supabase
