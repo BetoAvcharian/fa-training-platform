@@ -48,20 +48,71 @@ export async function createObservable(input: CreateObservableInput, client?: Ap
   return data
 }
 
-/** Oculta un ítem GLOBAL para esta organización — nunca modifica el ítem en sí. Exclusivo de manager. */
+/** Edita un Observable PROPIO de la organización (nunca uno global). */
+export async function updateObservable(
+  input: { id: string; organizationId: string; name?: string; unitId?: string; isPerformance?: boolean },
+  client?: AppSupabaseClient
+) {
+  const supabase = client ?? (await createServerClient())
+  const actor = await requireRole(input.organizationId, ['manager', 'coach'], supabase)
+
+  const patch: Record<string, unknown> = {}
+  if (input.name !== undefined) patch.name = input.name
+  if (input.unitId !== undefined) patch.unit_id = input.unitId
+  if (input.isPerformance !== undefined) patch.is_performance = input.isPerformance
+
+  const { error } = await supabase
+    .from('observables')
+    .update(patch)
+    .eq('id', input.id)
+    .eq('organization_id', input.organizationId)
+
+  if (error) throw new DomainError('CONFLICT', error.message)
+
+  await logAudit({
+    organizationId: input.organizationId,
+    actorMembershipId: actor.id,
+    action: 'catalog.observable_create',
+    entityType: 'observable',
+    entityId: input.id,
+    metadata: patch,
+  })
+}
+
+/** Vuelve a mostrar un ítem global que se había ocultado. Exclusivo de manager. */
+export async function unhideGlobalItem(input: HideGlobalItemInput, client?: AppSupabaseClient) {
+  const supabase = client ?? (await createServerClient())
+  const actor = await requireRole(input.organizationId, ['manager'], supabase)
+
+  const { error } = await supabase
+    .from('catalog_visibility_overrides')
+    .delete()
+    .eq('organization_id', input.organizationId)
+    .eq('entity_type', input.entityType)
+    .eq('entity_id', input.entityId)
+
+  if (error) throw new DomainError('CONFLICT', error.message)
+
+  await logAudit({
+    organizationId: input.organizationId,
+    actorMembershipId: actor.id,
+    action: 'catalog.item_hidden',
+    entityType: input.entityType,
+    entityId: input.entityId,
+    metadata: { hidden: false },
+  })
+}
+
+
 export async function hideGlobalItem(input: HideGlobalItemInput, client?: AppSupabaseClient) {
   const supabase = client ?? (await createServerClient())
   const actor = await requireRole(input.organizationId, ['manager'], supabase)
 
-  const { error } = await supabase.from('catalog_visibility_overrides').upsert(
-    {
-      organization_id: input.organizationId,
-      entity_type: input.entityType,
-      entity_id: input.entityId,
-      hidden: true,
-    },
-    { onConflict: 'organization_id,entity_type,entity_id' }
-  )
+  const { error } = await supabase.rpc('hide_catalog_item', {
+    p_organization_id: input.organizationId,
+    p_entity_type: input.entityType,
+    p_entity_id: input.entityId,
+  })
 
   if (error) {
     throw new DomainError('CONFLICT', error.message)
