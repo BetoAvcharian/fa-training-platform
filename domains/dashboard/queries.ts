@@ -182,7 +182,7 @@ export async function getAttendanceSeries(
   return series
 }
 
-
+export interface AthleteAlert {
   athleteMembershipId: string
   athleteName: string
 }
