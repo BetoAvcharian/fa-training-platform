@@ -82,7 +82,7 @@ export async function getObservationsForEvent(
   }))
 }
 
-
+export async function getObservationContext(
   observationId: string,
   client?: AppSupabaseClient
 ): Promise<Record<string, number | string | boolean>> {
