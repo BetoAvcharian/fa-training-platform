@@ -1,6 +1,7 @@
 import { getMyActiveMembership, getRoster } from '@/domains/athletes/queries'
 import { getEventsForRange, getSessionExercises } from '@/domains/events/queries'
 import { EventCard } from './event-card'
+import { EventCompareCard } from './event-compare-card'
 import { createEventAction } from './actions'
 
 export const dynamic = 'force-dynamic'
@@ -23,9 +24,10 @@ function toISO(d: Date) {
 export default async function CalendarioPage({
   searchParams,
 }: {
-  searchParams: Promise<{ week?: string }>
+  searchParams: Promise<{ week?: string; mode?: string }>
 }) {
   const params = await searchParams
+  const mode = params.mode === 'ver' ? 'ver' : 'planificar'
   const membership = await getMyActiveMembership()
   if (!membership) return null
 
@@ -57,31 +59,49 @@ export default async function CalendarioPage({
       <div className="flex items-center justify-between mb-6 flex-wrap gap-3">
         <div>
           <p className="text-xs uppercase tracking-wider text-gold font-medium">Calendario</p>
-          <h1 className="font-display text-2xl font-bold text-navy">Planificar</h1>
+          <h1 className="font-display text-2xl font-bold text-navy">{mode === 'ver' ? 'Ver' : 'Planificar'}</h1>
         </div>
-        <div className="flex items-center gap-2 text-sm">
-          <a href={`?week=${prevWeek}`} className="px-3 py-1.5 rounded-md border border-gray-300">◀</a>
-          <span className="text-status-neutral">{weekStartStr} — {weekEndStr}</span>
-          <a href={`?week=${nextWeek}`} className="px-3 py-1.5 rounded-md border border-gray-300">▶</a>
+        <div className="flex items-center gap-3">
+          <div className="flex rounded-lg border border-gray-200 overflow-hidden text-xs">
+            <a
+              href={`?week=${weekStartStr}&mode=planificar`}
+              className={`px-3 py-1.5 ${mode === 'planificar' ? 'bg-navy text-white' : 'bg-white text-navy'}`}
+            >
+              Planificar
+            </a>
+            <a
+              href={`?week=${weekStartStr}&mode=ver`}
+              className={`px-3 py-1.5 ${mode === 'ver' ? 'bg-navy text-white' : 'bg-white text-navy'}`}
+            >
+              Ver
+            </a>
+          </div>
+          <div className="flex items-center gap-2 text-sm">
+            <a href={`?week=${prevWeek}&mode=${mode}`} className="px-3 py-1.5 rounded-md border border-gray-300">◀</a>
+            <span className="text-status-neutral">{weekStartStr} — {weekEndStr}</span>
+            <a href={`?week=${nextWeek}&mode=${mode}`} className="px-3 py-1.5 rounded-md border border-gray-300">▶</a>
+          </div>
         </div>
       </div>
 
-      <details className="mb-6 max-w-md">
-        <summary className="cursor-pointer text-sm font-medium text-navy">+ Nuevo entrenamiento</summary>
-        <form action={createEventAction} className="mt-3 space-y-2 bg-white border border-gray-200 rounded-xl p-4">
-          <input name="title" placeholder="Título (ej: Series de pista)" required className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm" />
-          <input name="date" type="date" required defaultValue={weekStartStr} className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm" />
-          <select name="athleteId" required className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm">
-            <option value="">Elegí un atleta</option>
-            {roster.map((a) => (
-              <option key={a.id} value={a.id}>
-                {a.person?.firstName} {a.person?.lastName}
-              </option>
-            ))}
-          </select>
-          <button type="submit" className="w-full bg-navy text-white rounded-md py-2 text-sm font-medium">Crear</button>
-        </form>
-      </details>
+      {mode === 'planificar' && (
+        <details className="mb-6 max-w-md">
+          <summary className="cursor-pointer text-sm font-medium text-navy">+ Nuevo entrenamiento</summary>
+          <form action={createEventAction} className="mt-3 space-y-2 bg-white border border-gray-200 rounded-xl p-4">
+            <input name="title" placeholder="Título (ej: Series de pista)" required className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm" />
+            <input name="date" type="date" required defaultValue={weekStartStr} className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm" />
+            <select name="athleteId" required className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm">
+              <option value="">Elegí un atleta</option>
+              {roster.map((a) => (
+                <option key={a.id} value={a.id}>
+                  {a.person?.firstName} {a.person?.lastName}
+                </option>
+              ))}
+            </select>
+            <button type="submit" className="w-full bg-navy text-white rounded-md py-2 text-sm font-medium">Crear</button>
+          </form>
+        </details>
+      )}
 
       <div className="grid grid-cols-1 md:grid-cols-7 gap-3">
         {days.map((day, i) => {
@@ -93,9 +113,13 @@ export default async function CalendarioPage({
                 {DAY_NAMES[i]} {day.getDate()}
               </p>
               <div className="space-y-2">
-                {dayEvents.map(({ event, lines }) => (
-                  <EventCard key={event.id} event={event} lines={lines} />
-                ))}
+                {dayEvents.map(({ event, lines }) =>
+                  mode === 'ver' ? (
+                    <EventCompareCard key={event.id} event={event} roster={roster} />
+                  ) : (
+                    <EventCard key={event.id} event={event} lines={lines} />
+                  )
+                )}
                 {dayEvents.length === 0 && <div className="text-[11px] text-gray-300">—</div>}
               </div>
             </div>

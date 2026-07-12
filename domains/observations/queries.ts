@@ -53,6 +53,35 @@ export async function getVigentObservations(
   return (data ?? []).map(mapObservation)
 }
 
+/**
+ * Observaciones ejecutadas de un Event puntual, para el modo "Ver" del
+ * calendario (comparar planificado vs. real). Clave de lookup:
+ * athlete_membership_id + observable_id, porque no hay FK directa de
+ * SessionExercise a Observation (spec 3.3: una línea puede compartirse
+ * entre varios atletas vía EventAssignment).
+ */
+export async function getObservationsForEvent(
+  eventId: string,
+  client?: AppSupabaseClient
+): Promise<Array<{ athleteMembershipId: string; observableId: string; value: number; state: string }>> {
+  const supabase = client ?? (await createServerClient())
+
+  const { data, error } = await supabase
+    .from('observations')
+    .select('athlete_membership_id, observable_id, value, state')
+    .eq('event_id', eventId)
+    .is('superseded_by', null)
+
+  if (error) throw new DomainError('NOT_FOUND', error.message)
+
+  return (data ?? []).map((row) => ({
+    athleteMembershipId: row.athlete_membership_id,
+    observableId: row.observable_id,
+    value: row.value,
+    state: row.state,
+  }))
+}
+
 export async function getObservationContext(
   observationId: string,
   client?: AppSupabaseClient
