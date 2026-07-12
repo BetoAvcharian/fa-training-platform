@@ -18,6 +18,8 @@ export type AuditAction =
   | 'objective.create'
   | 'objective.achieve'
   | 'group.create'
+  | 'video.create'
+  | 'video.delete'
 
 export interface AuditLogInput {
   organizationId: string
