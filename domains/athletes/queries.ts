@@ -37,7 +37,30 @@ export async function getGroups(organizationId: string, client?: AppSupabaseClie
   }))
 }
 
-/** Lista de atletas de la organización — RLS resuelve qué ve cada rol (manager: todos, coach: solo los suyos). */
+/** Todas las membresías de la organización (staff + atletas + invitados pendientes), para Configuración → Personas. */
+export async function getAllMembers(organizationId: string, client?: AppSupabaseClient) {
+  const supabase = client ?? (await createServerClient())
+
+  const { data, error } = await supabase
+    .from('memberships')
+    .select('id, role, status, coach_membership_id, invited_email, person:people(first_name, last_name, email)')
+    .eq('organization_id', organizationId)
+    .order('status')
+
+  if (error) throw new DomainError('NOT_FOUND', error.message)
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return (data ?? []).map((row: any) => ({
+    id: row.id,
+    role: row.role as string,
+    status: row.status as string,
+    coachMembershipId: row.coach_membership_id as string | null,
+    email: row.person?.email ?? row.invited_email ?? null,
+    name: row.person ? `${row.person.first_name} ${row.person.last_name}` : null,
+  }))
+}
+
+
 export async function getRoster(
   organizationId: string,
   client?: AppSupabaseClient

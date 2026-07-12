@@ -53,9 +53,9 @@ export default async function ConfiguracionPage() {
 
       <section className="space-y-2">
         <h2 className="text-sm font-semibold text-navy">Personas</h2>
-        <p className="text-xs text-status-neutral">
-          Invitar entrenadores/atletas y asignarlos a grupos todavía no está construido acá — queda para la próxima etapa.
-        </p>
+        <a href="/atletas" className="text-sm text-navy underline">
+          Invitar entrenadores/atletas y asignarlos →
+        </a>
       </section>
     </div>
   )
