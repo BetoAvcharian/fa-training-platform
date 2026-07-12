@@ -9,7 +9,7 @@ import { SignOutButton } from '@/components/ui/sign-out-button'
 // "próximamente" — más honesto que esconder la navegación planeada.
 const NAV_ITEMS = [
   { href: '/resumen', label: 'Resumen', ready: true },
-  { href: '/atletas', label: 'Atletas', ready: false },
+  { href: '/atletas', label: 'Atletas', ready: true },
   { href: '/calendario', label: 'Calendario', ready: true },
   { href: '/rendimiento', label: 'Rendimiento', ready: true },
   { href: '/salud', label: 'Salud', ready: true },
