@@ -35,7 +35,10 @@ export default async function RegistrosPage() {
         <h1 className="font-display text-2xl font-bold text-navy">Cargar un resultado</h1>
       </div>
 
-      <RecordForm roster={roster} observables={observables} />
+      <RecordForm
+        roster={roster}
+        observables={observables.map((o) => ({ id: o.id, name: o.name, unitSymbol: unitById.get(o.unitId)?.symbol ?? null }))}
+      />
 
       <section className="space-y-2">
         <h2 className="text-sm font-semibold text-navy">Últimos registros</h2>
