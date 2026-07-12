@@ -20,6 +20,7 @@ export function VideoCard({
   sourceType,
   url,
   canManage,
+  taggedAthletes,
 }: {
   id: string
   title: string
@@ -27,6 +28,7 @@ export function VideoCard({
   sourceType: 'upload' | 'link'
   url: string
   canManage: boolean
+  taggedAthletes: Array<{ id: string; name: string }>
 }) {
   const [pending, startTransition] = useTransition()
   const [hidden, setHidden] = useState(false)
@@ -66,6 +68,15 @@ export function VideoCard({
           )}
         </div>
         {description && <p className="text-xs text-status-neutral mt-1">{description}</p>}
+        {taggedAthletes.length > 0 && (
+          <div className="flex flex-wrap gap-1 mt-2">
+            {taggedAthletes.map((a) => (
+              <span key={a.id} className="text-[10px] bg-gold/10 text-navy rounded-full px-2 py-0.5">
+                {a.name}
+              </span>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   )

@@ -4,7 +4,13 @@ import { useState, useTransition } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { createVideoAction } from './actions'
 
-export function VideoForm({ organizationId }: { organizationId: string }) {
+export function VideoForm({
+  organizationId,
+  roster,
+}: {
+  organizationId: string
+  roster: Array<{ id: string; person: { firstName: string; lastName: string } | null }>
+}) {
   const [open, setOpen] = useState(false)
   const [mode, setMode] = useState<'link' | 'upload'>('link')
   const [pending, startTransition] = useTransition()
@@ -15,6 +21,7 @@ export function VideoForm({ organizationId }: { organizationId: string }) {
     setError(null)
     const title = String(formData.get('title') ?? '')
     const description = String(formData.get('description') ?? '')
+    const athleteIds = formData.getAll('athleteIds').map(String)
 
     if (!title.trim()) {
       setError('Falta el título')
@@ -32,6 +39,7 @@ export function VideoForm({ organizationId }: { organizationId: string }) {
       fd.set('description', description)
       fd.set('sourceType', 'link')
       fd.set('url', url)
+      athleteIds.forEach((id) => fd.append('athleteIds', id))
       startTransition(async () => {
         const result = await createVideoAction(fd)
         if (result?.error) setError(result.error)
@@ -67,6 +75,7 @@ export function VideoForm({ organizationId }: { organizationId: string }) {
       fd.set('description', description)
       fd.set('sourceType', 'upload')
       fd.set('url', publicUrl.publicUrl)
+      athleteIds.forEach((id) => fd.append('athleteIds', id))
       startTransition(async () => {
         const result = await createVideoAction(fd)
         if (result?.error) setError(result.error)
@@ -118,6 +127,20 @@ export function VideoForm({ organizationId }: { organizationId: string }) {
         <input name="url" placeholder="https://youtube.com/..." className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm" />
       ) : (
         <input name="file" type="file" accept="video/*" className="w-full text-sm" />
+      )}
+
+      {roster.length > 0 && (
+        <div>
+          <p className="text-xs text-status-neutral mb-1">Etiquetar atletas</p>
+          <div className="flex flex-wrap gap-2 max-h-28 overflow-y-auto">
+            {roster.map((r) => (
+              <label key={r.id} className="flex items-center gap-1 text-xs bg-gray-50 rounded-full px-2 py-1">
+                <input type="checkbox" name="athleteIds" value={r.id} />
+                {r.person ? `${r.person.firstName} ${r.person.lastName}` : '—'}
+              </label>
+            ))}
+          </div>
+        </div>
       )}
 
       {error && <p className="text-xs text-status-critical">{error}</p>}
