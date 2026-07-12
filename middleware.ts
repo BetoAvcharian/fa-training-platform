@@ -21,7 +21,22 @@ export async function middleware(request: NextRequest) {
     }
   )
 
-  const { data: { user } } = await supabase.auth.getUser()
+  let user = null
+  try {
+    const { data } = await supabase.auth.getUser()
+    user = data.user
+  } catch (error) {
+    // Invalid/expired refresh token or any other auth verification failure:
+    // treat as unauthenticated instead of crashing the whole app. Clear the
+    // stale session cookies so the client stops sending a dead token.
+    console.error('middleware: auth.getUser() failed, treating as unauthenticated', error)
+    request.cookies.getAll().forEach((cookie) => {
+      if (cookie.name.startsWith('sb-')) {
+        response.cookies.delete(cookie.name)
+      }
+    })
+    user = null
+  }
 
   const isAuthRoute = request.nextUrl.pathname.startsWith('/login') || request.nextUrl.pathname.startsWith('/signup')
   if (!user && !isAuthRoute) {
