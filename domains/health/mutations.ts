@@ -79,7 +79,7 @@ export async function updateHealthEpisode(
   })
 }
 
-
+export async function resolveHealthEpisode(
   id: string,
   organizationId: string,
   client?: AppSupabaseClient
