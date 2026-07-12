@@ -1,5 +1,7 @@
 import { getMyActiveMembership } from '@/domains/athletes/queries'
 import { getSports, getObservables, getUnits } from '@/domains/catalog/queries'
+import { ObservableForm } from './observable-form'
+import { HideButton } from './hide-button'
 
 export const dynamic = 'force-dynamic'
 
@@ -15,15 +17,19 @@ export default async function BibliotecaPage() {
 
   const unitById = new Map(units.map((u) => [u.id, u]))
   const sportById = new Map(sports.map((s) => [s.id, s]))
+  const isManager = membership.role === 'manager'
 
   return (
     <div className="space-y-6">
-      <div>
-        <p className="text-xs uppercase tracking-wider text-gold font-medium">Biblioteca</p>
-        <h1 className="font-display text-2xl font-bold text-navy">Ejercicios y pruebas</h1>
-        <p className="text-xs text-status-neutral mt-1">
-          {observables.length} ítems del catálogo{membership.role !== 'manager' ? ' — solo lectura' : ''}
-        </p>
+      <div className="flex items-start justify-between gap-3 flex-wrap">
+        <div>
+          <p className="text-xs uppercase tracking-wider text-gold font-medium">Biblioteca</p>
+          <h1 className="font-display text-2xl font-bold text-navy">Ejercicios y pruebas</h1>
+          <p className="text-xs text-status-neutral mt-1">
+            {observables.length} ítems del catálogo{!isManager ? ' — solo lectura' : ''}
+          </p>
+        </div>
+        {isManager && <ObservableForm sports={sports} units={units} />}
       </div>
 
       {sports.map((sport) => {
@@ -38,11 +44,14 @@ export default async function BibliotecaPage() {
                 <div key={obs.id} className="rounded-xl border border-gray-100 bg-white p-4 shadow-sm">
                   <div className="flex items-start justify-between gap-2">
                     <p className="font-medium text-navy text-sm">{obs.name}</p>
-                    {obs.isPerformance && (
-                      <span className="text-[10px] uppercase tracking-wide text-gold font-semibold shrink-0">
-                        Récord
-                      </span>
-                    )}
+                    <div className="flex items-center gap-2 shrink-0">
+                      {obs.isPerformance && (
+                        <span className="text-[10px] uppercase tracking-wide text-gold font-semibold">
+                          Récord
+                        </span>
+                      )}
+                      {isManager && !obs.organizationId && <HideButton id={obs.id} />}
+                    </div>
                   </div>
                   <p className="text-xs text-status-neutral mt-1">
                     {unitById.get(obs.unitId)?.symbol ?? ''}
