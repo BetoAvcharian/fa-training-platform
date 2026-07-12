@@ -11,7 +11,7 @@ const NAV_ITEMS = [
   { href: '/hoy', label: 'Hoy', ready: true },
   { href: '/mi-calendario', label: 'Calendario', ready: false },
   { href: '/mi-rendimiento', label: 'Rendimiento', ready: true },
-  { href: '/mi-salud', label: 'Salud', ready: false },
+  { href: '/mi-salud', label: 'Salud', ready: true },
   { href: '/perfil', label: 'Perfil', ready: false },
 ]
 

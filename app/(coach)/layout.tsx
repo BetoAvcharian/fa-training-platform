@@ -12,7 +12,7 @@ const NAV_ITEMS = [
   { href: '/atletas', label: 'Atletas', ready: false },
   { href: '/calendario', label: 'Calendario', ready: true },
   { href: '/rendimiento', label: 'Rendimiento', ready: true },
-  { href: '/salud', label: 'Salud', ready: false },
+  { href: '/salud', label: 'Salud', ready: true },
   { href: '/planificacion', label: 'Planificación', ready: false },
   { href: '/biblioteca', label: 'Biblioteca', ready: false },
   { href: '/configuracion', label: 'Configuración', ready: false },
