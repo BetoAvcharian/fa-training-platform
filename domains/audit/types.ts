@@ -11,6 +11,9 @@ export type AuditAction =
   | 'session_exercise.exception_create'
   | 'observation.create'
   | 'observation.correct'
+  | 'health_episode.create'
+  | 'health_episode.update'
+  | 'health_episode.resolve'
 
 export interface AuditLogInput {
   organizationId: string
