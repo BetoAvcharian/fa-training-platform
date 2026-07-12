@@ -1,21 +1,25 @@
 import { getMyHealthEpisodes } from '@/domains/health/queries'
+import { getMyActiveMembership } from '@/domains/athletes/queries'
+import { getAnthropometryObservables, getAnthropometryHistory } from '@/domains/observations/anthropometry'
 import { HealthForm } from './health-form'
-import { ResolveButton } from './resolve-button'
+import { EditableHealthCard } from './editable-health-card'
+import { AnthropometryForm } from './anthropometry-form'
 
 export const dynamic = 'force-dynamic'
-
-const TYPE_LABELS: Record<string, string> = {
-  lesion: 'Lesión',
-  medicacion: 'Medicación',
-  ciclo_menstrual: 'Ciclo menstrual',
-}
 
 function formatDate(date: string) {
   return new Date(date + 'T00:00:00').toLocaleDateString('es-AR', { day: 'numeric', month: 'short', year: 'numeric' })
 }
 
 export default async function MiSaludPage() {
-  const episodes = await getMyHealthEpisodes()
+  const membership = await getMyActiveMembership()
+  if (!membership) return null
+
+  const [episodes, observables, history] = await Promise.all([
+    getMyHealthEpisodes(),
+    getAnthropometryObservables(membership.organizationId),
+    getAnthropometryHistory(membership.id),
+  ])
   const activos = episodes.filter((e) => e.status === 'activo')
   const resueltos = episodes.filter((e) => e.status === 'resuelto')
 
@@ -40,17 +44,7 @@ export default async function MiSaludPage() {
         )}
         <div className="space-y-2">
           {activos.map((e) => (
-            <div key={e.id} className="rounded-2xl border border-gray-100 bg-white p-4 shadow-sm">
-              <div className="flex items-start justify-between gap-2">
-                <div>
-                  <p className="text-xs uppercase tracking-wide text-gold font-semibold">{TYPE_LABELS[e.type]}</p>
-                  <p className="font-medium text-navy">{e.title}</p>
-                  <p className="text-xs text-status-neutral mt-0.5">Desde {formatDate(e.startDate)}</p>
-                  {e.notes && <p className="text-sm text-navy mt-2">{e.notes}</p>}
-                </div>
-                <ResolveButton id={e.id} />
-              </div>
-            </div>
+            <EditableHealthCard key={e.id} episode={e} />
           ))}
         </div>
       </section>
@@ -61,7 +55,7 @@ export default async function MiSaludPage() {
           <div className="space-y-2">
             {resueltos.map((e) => (
               <div key={e.id} className="rounded-2xl border border-gray-100 bg-white p-4 opacity-60">
-                <p className="text-xs uppercase tracking-wide text-status-neutral font-semibold">{TYPE_LABELS[e.type]}</p>
+                <p className="text-xs uppercase tracking-wide text-status-neutral font-semibold">{e.type}</p>
                 <p className="font-medium text-navy">{e.title}</p>
                 <p className="text-xs text-status-neutral mt-0.5">
                   {formatDate(e.startDate)} — {e.endDate ? formatDate(e.endDate) : ''}
@@ -71,6 +65,30 @@ export default async function MiSaludPage() {
           </div>
         </section>
       )}
+
+      <section className="space-y-3">
+        <h2 className="text-sm font-semibold text-navy">Antropometría y signos vitales</h2>
+        <AnthropometryForm observables={observables} />
+        {history.length === 0 && (
+          <div className="rounded-2xl border border-gray-100 bg-white p-4 text-sm text-status-neutral">
+            Todavía no cargaste nada.
+          </div>
+        )}
+        <div className="rounded-2xl border border-gray-100 bg-white shadow-sm divide-y divide-gray-50">
+          {history.map((h) => (
+            <div key={h.id} className="p-4 flex items-center justify-between">
+              <div>
+                <p className="font-medium text-navy text-sm">{h.observableName}</p>
+                <p className="text-xs text-status-neutral">{formatDate(h.date)}</p>
+              </div>
+              <p className="font-semibold text-navy">
+                {h.value}
+                {h.unitSymbol ? ` ${h.unitSymbol}` : ''}
+              </p>
+            </div>
+          ))}
+        </div>
+      </section>
     </div>
   )
 }

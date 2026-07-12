@@ -53,6 +53,32 @@ export async function createHealthEpisode(
   return { id: data.id }
 }
 
+export async function updateHealthEpisode(
+  input: { id: string; organizationId: string; title?: string; notes?: string; startDate?: string },
+  client?: AppSupabaseClient
+): Promise<void> {
+  const supabase = client ?? (await createServerClient())
+  const membership = await getMyActiveMembership(supabase)
+  if (!membership) throw new DomainError('PERMISSION', 'No autenticado')
+
+  const patch: Record<string, unknown> = {}
+  if (input.title !== undefined) patch.title = input.title
+  if (input.notes !== undefined) patch.notes = input.notes
+  if (input.startDate !== undefined) patch.start_date = input.startDate
+
+  const { error } = await supabase.from('health_episodes').update(patch).eq('id', input.id)
+  if (error) throw new DomainError('CONFLICT', error.message)
+
+  await logAudit({
+    organizationId: input.organizationId,
+    actorMembershipId: membership.id,
+    action: 'health_episode.update',
+    entityType: 'health_episode',
+    entityId: input.id,
+    metadata: patch,
+  })
+}
+
 export async function resolveHealthEpisode(
   id: string,
   organizationId: string,
