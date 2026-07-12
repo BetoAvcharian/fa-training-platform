@@ -49,7 +49,7 @@ export async function removeAthleteFromGroup(
   if (error) throw new DomainError('CONFLICT', error.message)
 }
 
-
+export async function createGroup(input: CreateGroupInput, client?: AppSupabaseClient): Promise<{ id: string }> {
   const supabase = client ?? (await createServerClient())
   const actor = await requireRole(input.organizationId, ['manager', 'coach'], supabase)
 
