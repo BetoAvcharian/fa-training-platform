@@ -13,8 +13,8 @@ const NAV_ITEMS = [
   { href: '/calendario', label: 'Calendario', ready: true },
   { href: '/rendimiento', label: 'Rendimiento', ready: true },
   { href: '/salud', label: 'Salud', ready: true },
-  { href: '/planificacion', label: 'Planificación', ready: false },
-  { href: '/biblioteca', label: 'Biblioteca', ready: false },
+  { href: '/planificacion', label: 'Planificación', ready: true },
+  { href: '/biblioteca', label: 'Biblioteca', ready: true },
   { href: '/configuracion', label: 'Configuración', ready: false },
 ]
 

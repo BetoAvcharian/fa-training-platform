@@ -14,6 +14,9 @@ export type AuditAction =
   | 'health_episode.create'
   | 'health_episode.update'
   | 'health_episode.resolve'
+  | 'plan.create'
+  | 'objective.create'
+  | 'objective.achieve'
 
 export interface AuditLogInput {
   organizationId: string
