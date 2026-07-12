@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { getMyActiveMembership } from '@/domains/athletes/queries'
 import { redirect } from 'next/navigation'
-import { SignOutButton } from '@/components/ui/sign-out-button'
+import { createServerClient } from '@/lib/supabase/server'
 
 // 5 ítems de la Fase 7. Diseñado mobile-first a propósito (Fase 9,
 // "rol-first": el atleta vive en el celular, uso diario, gesto rápido —
@@ -9,11 +9,18 @@ import { SignOutButton } from '@/components/ui/sign-out-button'
 // desktop).
 const NAV_ITEMS = [
   { href: '/hoy', label: 'Hoy', ready: true },
-  { href: '/mi-calendario', label: 'Calendario', ready: false },
+  { href: '/mi-calendario', label: 'Calendario', ready: true },
   { href: '/mi-rendimiento', label: 'Rendimiento', ready: true },
   { href: '/mi-salud', label: 'Salud', ready: true },
-  { href: '/perfil', label: 'Perfil', ready: false },
+  { href: '/perfil', label: 'Perfil', ready: true },
 ]
+
+async function signOutAction() {
+  'use server'
+  const supabase = await createServerClient()
+  await supabase.auth.signOut()
+  redirect('/login')
+}
 
 export default async function AthleteLayout({ children }: { children: React.ReactNode }) {
   const membership = await getMyActiveMembership()
@@ -25,7 +32,11 @@ export default async function AthleteLayout({ children }: { children: React.Reac
     <div className="min-h-screen bg-cream pb-20">
       <header className="px-5 pt-5 pb-3 flex items-center justify-between">
         <p className="font-display font-bold text-navy">ENTRENAME</p>
-        <SignOutButton />
+        <form action={signOutAction}>
+          <button type="submit" className="text-xs text-status-neutral">
+            Cerrar sesión
+          </button>
+        </form>
       </header>
 
       <main className="max-w-md mx-auto px-5 pt-2 pb-6">{children}</main>
