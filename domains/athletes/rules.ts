@@ -35,7 +35,13 @@ export async function requireRole(
 
   const {
     data: { user },
-  } = await supabase.auth.getUser()
+  } = await (async () => {
+    try {
+      return await supabase.auth.getUser()
+    } catch {
+      return { data: { user: null } }
+    }
+  })()
 
   if (!user) {
     throw new DomainError('PERMISSION', 'No autenticado')
