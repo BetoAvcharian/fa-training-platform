@@ -14,7 +14,8 @@ const NAV_ITEMS = [
   { href: '/rendimiento', label: 'Rendimiento', ready: true },
   { href: '/salud', label: 'Salud', ready: true },
   { href: '/planificacion', label: 'Planificación', ready: true },
-  { href: '/biblioteca', label: 'Biblioteca', ready: true },
+  { href: '/registros', label: 'Registros', ready: true },
+  { href: '/videos', label: 'Videos', ready: true },
   { href: '/configuracion', label: 'Configuración', ready: true },
 ]
 

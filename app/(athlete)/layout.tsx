@@ -12,6 +12,7 @@ const NAV_ITEMS = [
   { href: '/mi-calendario', label: 'Calendario', ready: true },
   { href: '/mi-rendimiento', label: 'Rendimiento', ready: true },
   { href: '/mi-salud', label: 'Salud', ready: true },
+  { href: '/mis-videos', label: 'Videos', ready: true },
   { href: '/perfil', label: 'Perfil', ready: true },
 ]
 

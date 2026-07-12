@@ -100,6 +100,27 @@ export async function getObservables(
     }))
 }
 
+/** Ítems globales que esta organización ocultó — para poder deshacerlo. */
+export async function getHiddenObservables(
+  organizationId: string,
+  client?: AppSupabaseClient
+): Promise<Array<{ id: string; name: string }>> {
+  const supabase = client ?? (await createServerClient())
+  const { data: hiddenIds } = await supabase
+    .from('catalog_visibility_overrides')
+    .select('entity_id')
+    .eq('organization_id', organizationId)
+    .eq('entity_type', 'observable')
+    .eq('hidden', true)
+
+  const ids = (hiddenIds ?? []).map((row) => row.entity_id as string)
+  if (ids.length === 0) return []
+
+  const { data, error } = await supabase.from('observables').select('id, name').in('id', ids)
+  if (error) throw new DomainError('NOT_FOUND', error.message)
+  return data ?? []
+}
+
 export async function getContextKeys(
   organizationId: string,
   sportId?: string,
