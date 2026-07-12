@@ -1,6 +1,176 @@
 import { createServerClient, type AppSupabaseClient } from '@/lib/supabase/server'
 import { DomainError } from '@/types/errors'
 import { requireRole } from '@/domains/athletes/rules'
+import { getMyActiveMembership } from '@/domains/athletes/queries'
+
+export interface MyRecord {
+  id: string
+  observableId: string
+  observableName: string
+  unitSymbol: string | null
+  higherIsBetter: boolean
+  recordType: 'oficial' | 'entrenamiento'
+  value: number
+  achievedDate: string
+}
+
+export interface MyResultRow {
+  id: string
+  observableId: string
+  observableName: string
+  unitSymbol: string | null
+  value: number
+  date: string
+  sourceType: string
+  validationStatus: string
+  wasCorrected: boolean
+}
+
+/**
+ * Récords del atleta autenticado (oficial + entrenamiento) — 100% derivado,
+ * lee directo de `personal_records` (nunca se calcula acá, ver spec 3.4:
+ * la tabla la mantiene el trigger de la base).
+ */
+export async function getMyRecords(client?: AppSupabaseClient): Promise<MyRecord[]> {
+  const supabase = client ?? (await createServerClient())
+  const membership = await getMyActiveMembership(supabase)
+  if (!membership) throw new DomainError('PERMISSION', 'No autenticado')
+
+  const { data, error } = await supabase
+    .from('personal_records')
+    .select('id, observable_id, record_type, value, achieved_date, observables(name, higher_is_better, units(symbol))')
+    .eq('athlete_membership_id', membership.id)
+    .order('achieved_date', { ascending: false })
+
+  if (error) throw new DomainError('NOT_FOUND', error.message)
+
+  return (data ?? []).map((row: any) => ({
+    id: row.id,
+    observableId: row.observable_id,
+    observableName: row.observables?.name ?? '—',
+    unitSymbol: row.observables?.units?.symbol ?? null,
+    higherIsBetter: row.observables?.higher_is_better ?? false,
+    recordType: row.record_type,
+    value: row.value,
+    achievedDate: row.achieved_date,
+  }))
+}
+
+/**
+ * Todos los resultados de rendimiento del atleta autenticado — fusiona
+ * tests y competencias, diferenciados por `source_type` (spec 5, pantalla
+ * Rendimiento: "tabla única que fusiona tests y competencias"). Solo
+ * ejecutadas y vigentes (`state = 'ejecutado'`, `superseded_by is null`);
+ * las corregidas se marcan vía `wasCorrected` mirando si algo las
+ * reemplazó en algún momento (join contra sí misma por el lado inverso
+ * no aplica acá porque ya filtramos por vigente — wasCorrected queda
+ * para una futura vista de historial completo).
+ */
+export async function getMyResults(
+  limit = 50,
+  client?: AppSupabaseClient
+): Promise<MyResultRow[]> {
+  const supabase = client ?? (await createServerClient())
+  const membership = await getMyActiveMembership(supabase)
+  if (!membership) throw new DomainError('PERMISSION', 'No autenticado')
+
+  const { data, error } = await supabase
+    .from('observations')
+    .select(
+      'id, observable_id, value, date, source_type, validation_status, observables!inner(name, is_performance, units(symbol))'
+    )
+    .eq('athlete_membership_id', membership.id)
+    .eq('state', 'ejecutado')
+    .eq('observables.is_performance', true)
+    .is('superseded_by', null)
+    .order('date', { ascending: false })
+    .limit(limit)
+
+  if (error) throw new DomainError('NOT_FOUND', error.message)
+
+  return (data ?? []).map((row: any) => ({
+    id: row.id,
+    observableId: row.observable_id,
+    observableName: row.observables?.name ?? '—',
+    unitSymbol: row.observables?.units?.symbol ?? null,
+    value: row.value,
+    date: row.date,
+    sourceType: row.source_type,
+    validationStatus: row.validation_status,
+    wasCorrected: false,
+  }))
+}
+
+/**
+ * Igual que getMyRecords pero para que un coach/manager vea los récords de
+ * un atleta puntual de su organización. La membership del atleta la valida
+ * RLS (coach solo ve los suyos, manager ve todos) — acá solo confirmamos
+ * que quien pregunta tiene uno de esos dos roles en la organización.
+ */
+export async function getAthleteRecords(
+  athleteMembershipId: string,
+  organizationId: string,
+  client?: AppSupabaseClient
+): Promise<MyRecord[]> {
+  const supabase = client ?? (await createServerClient())
+  await requireRole(organizationId, ['manager', 'coach'], supabase)
+
+  const { data, error } = await supabase
+    .from('personal_records')
+    .select('id, observable_id, record_type, value, achieved_date, observables(name, higher_is_better, units(symbol))')
+    .eq('athlete_membership_id', athleteMembershipId)
+    .order('achieved_date', { ascending: false })
+
+  if (error) throw new DomainError('NOT_FOUND', error.message)
+
+  return (data ?? []).map((row: any) => ({
+    id: row.id,
+    observableId: row.observable_id,
+    observableName: row.observables?.name ?? '—',
+    unitSymbol: row.observables?.units?.symbol ?? null,
+    higherIsBetter: row.observables?.higher_is_better ?? false,
+    recordType: row.record_type,
+    value: row.value,
+    achievedDate: row.achieved_date,
+  }))
+}
+
+/** Igual que getMyResults pero para un atleta puntual, vista coach/manager. */
+export async function getAthleteResults(
+  athleteMembershipId: string,
+  organizationId: string,
+  limit = 50,
+  client?: AppSupabaseClient
+): Promise<MyResultRow[]> {
+  const supabase = client ?? (await createServerClient())
+  await requireRole(organizationId, ['manager', 'coach'], supabase)
+
+  const { data, error } = await supabase
+    .from('observations')
+    .select(
+      'id, observable_id, value, date, source_type, validation_status, observables!inner(name, is_performance, units(symbol))'
+    )
+    .eq('athlete_membership_id', athleteMembershipId)
+    .eq('state', 'ejecutado')
+    .eq('observables.is_performance', true)
+    .is('superseded_by', null)
+    .order('date', { ascending: false })
+    .limit(limit)
+
+  if (error) throw new DomainError('NOT_FOUND', error.message)
+
+  return (data ?? []).map((row: any) => ({
+    id: row.id,
+    observableId: row.observable_id,
+    observableName: row.observables?.name ?? '—',
+    unitSymbol: row.observables?.units?.symbol ?? null,
+    value: row.value,
+    date: row.date,
+    sourceType: row.source_type,
+    validationStatus: row.validation_status,
+    wasCorrected: false,
+  }))
+}
 
 export interface AthleteSeries {
   athleteMembershipId: string

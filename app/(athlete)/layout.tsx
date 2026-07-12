@@ -10,7 +10,7 @@ import { SignOutButton } from '@/components/ui/sign-out-button'
 const NAV_ITEMS = [
   { href: '/hoy', label: 'Hoy', ready: true },
   { href: '/mi-calendario', label: 'Calendario', ready: false },
-  { href: '/mi-rendimiento', label: 'Rendimiento', ready: false },
+  { href: '/mi-rendimiento', label: 'Rendimiento', ready: true },
   { href: '/mi-salud', label: 'Salud', ready: false },
   { href: '/perfil', label: 'Perfil', ready: false },
 ]
