@@ -1,6 +1,41 @@
 import { createServerClient, createServiceClient, type AppSupabaseClient } from '@/lib/supabase/server'
 import { DomainError } from '@/types/errors'
-import type { RosterEntry, CoachDirectoryEntry } from './types'
+import type { RosterEntry, CoachDirectoryEntry, Group } from './types'
+
+/** Datos básicos de la organización — nombre y código de invitación. */
+export async function getOrganization(
+  organizationId: string,
+  client?: AppSupabaseClient
+): Promise<{ id: string; name: string; joinCode: string } | null> {
+  const supabase = client ?? (await createServerClient())
+  const { data, error } = await supabase
+    .from('organizations')
+    .select('id, name, join_code')
+    .eq('id', organizationId)
+    .maybeSingle()
+
+  if (error) throw new DomainError('NOT_FOUND', error.message)
+  if (!data) return null
+  return { id: data.id, name: data.name, joinCode: data.join_code }
+}
+
+/** Grupos de la organización (spec 3.1: conjunto de atletas). */
+export async function getGroups(organizationId: string, client?: AppSupabaseClient): Promise<Group[]> {
+  const supabase = client ?? (await createServerClient())
+  const { data, error } = await supabase
+    .from('groups')
+    .select('id, organization_id, name, created_at')
+    .eq('organization_id', organizationId)
+    .order('name')
+
+  if (error) throw new DomainError('NOT_FOUND', error.message)
+  return (data ?? []).map((row) => ({
+    id: row.id,
+    organizationId: row.organization_id,
+    name: row.name,
+    createdAt: row.created_at,
+  }))
+}
 
 /** Lista de atletas de la organización — RLS resuelve qué ve cada rol (manager: todos, coach: solo los suyos). */
 export async function getRoster(

@@ -17,6 +17,7 @@ export type AuditAction =
   | 'plan.create'
   | 'objective.create'
   | 'objective.achieve'
+  | 'group.create'
 
 export interface AuditLogInput {
   organizationId: string

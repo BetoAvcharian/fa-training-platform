@@ -15,7 +15,7 @@ const NAV_ITEMS = [
   { href: '/salud', label: 'Salud', ready: true },
   { href: '/planificacion', label: 'Planificación', ready: true },
   { href: '/biblioteca', label: 'Biblioteca', ready: true },
-  { href: '/configuracion', label: 'Configuración', ready: false },
+  { href: '/configuracion', label: 'Configuración', ready: true },
 ]
 
 export default async function CoachLayout({ children }: { children: React.ReactNode }) {
