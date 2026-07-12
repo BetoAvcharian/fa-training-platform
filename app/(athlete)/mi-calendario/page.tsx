@@ -78,9 +78,10 @@ export default async function MiCalendarioPage({
                 <div key={event.id} className="rounded-2xl border border-gray-100 bg-white p-4 shadow-sm mb-2">
                   <p className="font-medium text-navy text-sm mb-1">{event.title}</p>
                   <div className="space-y-1">
-                    {lines.map((line) => (
-                      <p key={line.id} className="text-xs text-status-neutral">
-                        {line.rawText}
+                    {lines.map((resolved) => (
+                      <p key={resolved.line.id} className="text-xs text-status-neutral">
+                        {resolved.line.rawText}
+                        {resolved.executed && <span className="text-status-positive"> ✓</span>}
                       </p>
                     ))}
                     {lines.length === 0 && <p className="text-xs text-gray-300">Sin líneas cargadas</p>}
