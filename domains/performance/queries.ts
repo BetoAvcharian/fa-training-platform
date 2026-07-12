@@ -1,10 +1,6 @@
 import { createServerClient, type AppSupabaseClient } from '@/lib/supabase/server'
 import { DomainError } from '@/types/errors'
 import { requireRole } from '@/domains/athletes/rules'
-
-import { createServerClient, type AppSupabaseClient } from '@/lib/supabase/server'
-import { DomainError } from '@/types/errors'
-import { requireRole } from '@/domains/athletes/rules'
 import { getMyActiveMembership } from '@/domains/athletes/queries'
 
 export interface MyRecord {
