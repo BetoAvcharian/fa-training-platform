@@ -9,7 +9,32 @@ import type {
   SignUpManagerInput,
   SignUpCoachInput,
   SignUpAthleteInput,
+  CreateGroupInput,
 } from './types'
+
+export async function createGroup(input: CreateGroupInput, client?: AppSupabaseClient): Promise<{ id: string }> {
+  const supabase = client ?? (await createServerClient())
+  const actor = await requireRole(input.organizationId, ['manager', 'coach'], supabase)
+
+  const { data, error } = await supabase
+    .from('groups')
+    .insert({ organization_id: input.organizationId, name: input.name })
+    .select('id')
+    .single()
+
+  if (error || !data) throw new DomainError('CONFLICT', error?.message ?? 'No se pudo crear el grupo')
+
+  await logAudit({
+    organizationId: input.organizationId,
+    actorMembershipId: actor.id,
+    action: 'group.create',
+    entityType: 'group',
+    entityId: data.id,
+    metadata: { name: input.name },
+  })
+
+  return { id: data.id }
+}
 
 export async function inviteMember(input: InviteMemberInput, client?: AppSupabaseClient) {
   const supabase = client ?? (await createServerClient())

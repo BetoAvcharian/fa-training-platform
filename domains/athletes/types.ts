@@ -72,6 +72,18 @@ export interface SignUpAthleteInput {
   coachMembershipId: string
 }
 
+export interface Group {
+  id: string
+  organizationId: string
+  name: string
+  createdAt: string
+}
+
+export interface CreateGroupInput {
+  organizationId: string
+  name: string
+}
+
 export interface CoachDirectoryEntry {
   membershipId: string
   name: string
