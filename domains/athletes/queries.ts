@@ -37,7 +37,20 @@ export async function getGroups(organizationId: string, client?: AppSupabaseClie
   }))
 }
 
-/** Todas las membresías de la organización (staff + atletas + invitados pendientes), para Configuración → Personas. */
+/** Atletas que pertenecen a un grupo puntual. */
+export async function getGroupMembers(groupId: string, client?: AppSupabaseClient): Promise<RosterEntry[]> {
+  const supabase = client ?? (await createServerClient())
+  const { data, error } = await supabase
+    .from('group_memberships')
+    .select('membership:memberships(id, role, status, person:people(first_name, last_name, email))')
+    .eq('group_id', groupId)
+
+  if (error) throw new DomainError('NOT_FOUND', error.message)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return mapRoster((data ?? []).map((row: any) => row.membership).filter(Boolean))
+}
+
+
 export async function getAllMembers(organizationId: string, client?: AppSupabaseClient) {
   const supabase = client ?? (await createServerClient())
 
@@ -116,7 +129,35 @@ function mapRoster(rows: any[]): RosterEntry[] {
   }))
 }
 
-/** La membership activa del usuario autenticado — base para redirigir según rol al entrar. */
+/** Perfil completo del usuario autenticado — para la pantalla Perfil del atleta. */
+export async function getMyProfile(client?: AppSupabaseClient) {
+  const supabase = client ?? (await createServerClient())
+  const membership = await getMyActiveMembership(supabase)
+  if (!membership) return null
+
+  const { data, error } = await supabase
+    .from('memberships')
+    .select(
+      'role, person:people(first_name, last_name, email), organization:organizations(name), coach:coach_membership_id(person:people(first_name, last_name))'
+    )
+    .eq('id', membership.id)
+    .single()
+
+  if (error || !data) throw new DomainError('NOT_FOUND', error?.message ?? 'Perfil no encontrado')
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const row = data as any
+  return {
+    firstName: row.person?.first_name ?? '',
+    lastName: row.person?.last_name ?? '',
+    email: row.person?.email ?? '',
+    role: row.role as string,
+    organizationName: row.organization?.name ?? '',
+    coachName: row.coach?.person ? `${row.coach.person.first_name} ${row.coach.person.last_name}` : null,
+  }
+}
+
+
 export async function getMyActiveMembership(
   client?: AppSupabaseClient
 ): Promise<{ id: string; organizationId: string; role: string } | null> {

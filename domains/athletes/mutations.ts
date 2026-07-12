@@ -12,6 +12,43 @@ import type {
   CreateGroupInput,
 } from './types'
 
+export async function addAthleteToGroup(
+  input: { groupId: string; athleteMembershipId: string; organizationId: string },
+  client?: AppSupabaseClient
+): Promise<void> {
+  const supabase = client ?? (await createServerClient())
+  const actor = await requireRole(input.organizationId, ['manager', 'coach'], supabase)
+
+  const { error } = await supabase
+    .from('group_memberships')
+    .insert({ group_id: input.groupId, membership_id: input.athleteMembershipId })
+
+  if (error) throw new DomainError('CONFLICT', error.message)
+
+  await logAudit({
+    organizationId: input.organizationId,
+    actorMembershipId: actor.id,
+    action: 'group.create',
+    entityType: 'group_membership',
+    entityId: input.groupId,
+    metadata: { athleteMembershipId: input.athleteMembershipId },
+  })
+}
+
+export async function removeAthleteFromGroup(
+  input: { groupId: string; athleteMembershipId: string },
+  client?: AppSupabaseClient
+): Promise<void> {
+  const supabase = client ?? (await createServerClient())
+  const { error } = await supabase
+    .from('group_memberships')
+    .delete()
+    .eq('group_id', input.groupId)
+    .eq('membership_id', input.athleteMembershipId)
+
+  if (error) throw new DomainError('CONFLICT', error.message)
+}
+
 export async function createGroup(input: CreateGroupInput, client?: AppSupabaseClient): Promise<{ id: string }> {
   const supabase = client ?? (await createServerClient())
   const actor = await requireRole(input.organizationId, ['manager', 'coach'], supabase)

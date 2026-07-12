@@ -1,6 +1,7 @@
-import { getMyActiveMembership, getOrganization, getGroups } from '@/domains/athletes/queries'
+import { getMyActiveMembership, getOrganization, getGroups, getRoster, getGroupMembers } from '@/domains/athletes/queries'
 import { GroupForm } from './group-form'
 import { CopyJoinCode } from './copy-join-code'
+import { GroupMembersEditor } from './group-members-editor'
 
 export const dynamic = 'force-dynamic'
 
@@ -8,10 +9,15 @@ export default async function ConfiguracionPage() {
   const membership = await getMyActiveMembership()
   if (!membership) return null
 
-  const [org, groups] = await Promise.all([
+  const [org, groups, roster] = await Promise.all([
     getOrganization(membership.organizationId),
     getGroups(membership.organizationId),
+    getRoster(membership.organizationId),
   ])
+
+  const groupsWithMembers = await Promise.all(
+    groups.map(async (g) => ({ group: g, members: await getGroupMembers(g.id) }))
+  )
 
   return (
     <div className="space-y-8 max-w-2xl">
@@ -43,9 +49,10 @@ export default async function ConfiguracionPage() {
         )}
 
         <div className="space-y-2">
-          {groups.map((g) => (
-            <div key={g.id} className="rounded-xl border border-gray-100 bg-white p-4 shadow-sm">
+          {groupsWithMembers.map(({ group: g, members }) => (
+            <div key={g.id} className="rounded-xl border border-gray-100 bg-white p-4 shadow-sm space-y-2">
               <p className="font-medium text-navy text-sm">{g.name}</p>
+              <GroupMembersEditor groupId={g.id} members={members} roster={roster} />
             </div>
           ))}
         </div>
