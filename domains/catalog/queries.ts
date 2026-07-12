@@ -123,6 +123,7 @@ export async function getHiddenObservables(
 
 export async function getContextKeys(
   organizationId: string,
+  sportId?: string,
   client?: AppSupabaseClient
 ): Promise<ContextKey[]> {
   const supabase = client ?? (await createServerClient())
