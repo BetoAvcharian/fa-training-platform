@@ -101,6 +101,77 @@ export async function getMyResults(
   }))
 }
 
+/**
+ * Igual que getMyRecords pero para que un coach/manager vea los récords de
+ * un atleta puntual de su organización. La membership del atleta la valida
+ * RLS (coach solo ve los suyos, manager ve todos) — acá solo confirmamos
+ * que quien pregunta tiene uno de esos dos roles en la organización.
+ */
+export async function getAthleteRecords(
+  athleteMembershipId: string,
+  organizationId: string,
+  client?: AppSupabaseClient
+): Promise<MyRecord[]> {
+  const supabase = client ?? (await createServerClient())
+  await requireRole(organizationId, ['manager', 'coach'], supabase)
+
+  const { data, error } = await supabase
+    .from('personal_records')
+    .select('id, observable_id, record_type, value, achieved_date, observables(name, higher_is_better, units(symbol))')
+    .eq('athlete_membership_id', athleteMembershipId)
+    .order('achieved_date', { ascending: false })
+
+  if (error) throw new DomainError('NOT_FOUND', error.message)
+
+  return (data ?? []).map((row: any) => ({
+    id: row.id,
+    observableId: row.observable_id,
+    observableName: row.observables?.name ?? '—',
+    unitSymbol: row.observables?.units?.symbol ?? null,
+    higherIsBetter: row.observables?.higher_is_better ?? false,
+    recordType: row.record_type,
+    value: row.value,
+    achievedDate: row.achieved_date,
+  }))
+}
+
+/** Igual que getMyResults pero para un atleta puntual, vista coach/manager. */
+export async function getAthleteResults(
+  athleteMembershipId: string,
+  organizationId: string,
+  limit = 50,
+  client?: AppSupabaseClient
+): Promise<MyResultRow[]> {
+  const supabase = client ?? (await createServerClient())
+  await requireRole(organizationId, ['manager', 'coach'], supabase)
+
+  const { data, error } = await supabase
+    .from('observations')
+    .select(
+      'id, observable_id, value, date, source_type, validation_status, observables!inner(name, is_performance, units(symbol))'
+    )
+    .eq('athlete_membership_id', athleteMembershipId)
+    .eq('state', 'ejecutado')
+    .eq('observables.is_performance', true)
+    .is('superseded_by', null)
+    .order('date', { ascending: false })
+    .limit(limit)
+
+  if (error) throw new DomainError('NOT_FOUND', error.message)
+
+  return (data ?? []).map((row: any) => ({
+    id: row.id,
+    observableId: row.observable_id,
+    observableName: row.observables?.name ?? '—',
+    unitSymbol: row.observables?.units?.symbol ?? null,
+    value: row.value,
+    date: row.date,
+    sourceType: row.source_type,
+    validationStatus: row.validation_status,
+    wasCorrected: false,
+  }))
+}
+
 export interface AthleteSeries {
   athleteMembershipId: string
   athleteName: string
