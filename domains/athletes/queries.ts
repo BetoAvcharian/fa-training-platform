@@ -137,23 +137,34 @@ export async function getMyProfile(client?: AppSupabaseClient) {
 
   const { data, error } = await supabase
     .from('memberships')
-    .select(
-      'role, person:people(first_name, last_name, email), organization:organizations(name), coach:coach_membership_id(person:people(first_name, last_name))'
-    )
+    .select('role, coach_membership_id, person:people(first_name, last_name, email), organization:organizations(name)')
     .eq('id', membership.id)
-    .single()
+    .maybeSingle()
 
   if (error || !data) throw new DomainError('NOT_FOUND', error?.message ?? 'Perfil no encontrado')
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const row = data as any
+
+  let coachName: string | null = null
+  if (row.coach_membership_id) {
+    const { data: coachRow } = await supabase
+      .from('memberships')
+      .select('person:people(first_name, last_name)')
+      .eq('id', row.coach_membership_id)
+      .maybeSingle()
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const coachPerson = (coachRow as any)?.person
+    if (coachPerson) coachName = `${coachPerson.first_name} ${coachPerson.last_name}`
+  }
+
   return {
     firstName: row.person?.first_name ?? '',
     lastName: row.person?.last_name ?? '',
     email: row.person?.email ?? '',
     role: row.role as string,
     organizationName: row.organization?.name ?? '',
-    coachName: row.coach?.person ? `${row.coach.person.first_name} ${row.coach.person.last_name}` : null,
+    coachName,
   }
 }
 
