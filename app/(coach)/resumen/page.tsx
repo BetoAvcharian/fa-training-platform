@@ -1,10 +1,15 @@
+import Link from 'next/link'
 import { getMyActiveMembership } from '@/domains/athletes/queries'
 import {
   getAthletesWithoutExecutionSince,
   getWellnessAlerts,
   getUpcomingCompetitions,
-  getTodaySummary,
+  getOrgStats,
+  getUpcomingEventsOrg,
+  getAttendanceSeries,
 } from '@/domains/dashboard/queries'
+import { AttendanceChart } from './attendance-chart'
+import { PerformanceChart } from './performance-chart'
 
 export const dynamic = 'force-dynamic'
 
@@ -14,6 +19,19 @@ function daysAgo(n: number) {
   return d.toISOString().slice(0, 10)
 }
 
+function formatEventDate(date: string) {
+  return new Date(date + 'T00:00:00').toLocaleDateString('es-AR', { weekday: 'short', day: 'numeric', month: 'short' })
+}
+
+const TYPE_LABELS: Record<string, string> = {
+  entrenamiento: 'Entrenamiento',
+  competencia: 'Competencia',
+  viaje: 'Viaje',
+  concentracion: 'Concentración',
+  medico: 'Médico',
+  reunion: 'Reunión',
+}
+
 export default async function ResumenPage() {
   const membership = await getMyActiveMembership()
   if (!membership) return null
@@ -21,11 +39,13 @@ export default async function ResumenPage() {
   const today = new Date().toISOString().slice(0, 10)
   const in14Days = new Date(Date.now() + 14 * 86400000).toISOString().slice(0, 10)
 
-  const [withoutExecution, wellness, competitions, summary] = await Promise.all([
+  const [withoutExecution, wellness, competitions, stats, upcoming, attendance] = await Promise.all([
     getAthletesWithoutExecutionSince(membership.id, daysAgo(4)),
     getWellnessAlerts(membership.id, today),
     getUpcomingCompetitions(membership.id, today, in14Days),
-    getTodaySummary(membership.id, today),
+    getOrgStats(membership.organizationId),
+    getUpcomingEventsOrg(membership.organizationId, 5),
+    getAttendanceSeries(membership.organizationId, 10),
   ])
 
   const hasAlerts = withoutExecution.length > 0 || wellness.length > 0
@@ -39,7 +59,7 @@ export default async function ResumenPage() {
         </h1>
       </div>
 
-      {/* Jerarquía de la Fase 8.2, confirmada: alertas primero, siempre */}
+      {/* Jerarquía: alertas primero, siempre */}
       {hasAlerts && (
         <div className="space-y-3">
           {withoutExecution.length > 0 && (
@@ -83,20 +103,72 @@ export default async function ResumenPage() {
         </div>
       )}
 
-      <div className="grid grid-cols-2 gap-4">
-        <div className="rounded-xl border border-gray-200 bg-white p-4">
-          <p className="text-xs text-status-neutral uppercase tracking-wide">Hoy — asignados</p>
-          <p className="font-display text-2xl font-bold text-navy">{summary.assigned}</p>
-        </div>
-        <div className="rounded-xl border border-gray-200 bg-white p-4">
-          <p className="text-xs text-status-neutral uppercase tracking-wide">Hoy — completados</p>
-          <p className="font-display text-2xl font-bold text-status-positive">{summary.completed}</p>
-        </div>
+      {/* Tarjetas de métricas */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <StatCard label="Ejercicios" value={stats.drills.count} delta={stats.drills.deltaWeek} />
+        <StatCard label="Sesiones" value={stats.sessions.count} delta={stats.sessions.deltaWeek} />
+        <StatCard label="Atletas" value={stats.athletes.count} delta={stats.athletes.deltaWeek} />
+        <StatCard label="Miembros activos" value={stats.activeMembers.count} delta={stats.activeMembers.deltaWeek} />
       </div>
 
-      {!hasAlerts && (
-        <p className="text-sm text-status-neutral">Sin alertas — todo en orden.</p>
-      )}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        {/* Próximos eventos */}
+        <div className="rounded-xl border border-gray-200 bg-white p-4">
+          <div className="flex items-center justify-between mb-3">
+            <p className="text-sm font-semibold text-navy">Próximos eventos</p>
+            <Link href="/calendario" className="text-xs text-gold font-medium">
+              Ver todos →
+            </Link>
+          </div>
+          {upcoming.length === 0 && <p className="text-sm text-status-neutral">Sin eventos próximos.</p>}
+          <div className="divide-y divide-gray-100">
+            {upcoming.map((e) => (
+              <div key={e.id} className="py-3 flex items-center justify-between gap-2">
+                <div>
+                  <p className="text-xs text-gold font-medium">{TYPE_LABELS[e.type] ?? e.type}</p>
+                  <p className="text-sm font-medium text-navy">{e.title}</p>
+                  <p className="text-xs text-status-neutral">{formatEventDate(e.date)}</p>
+                </div>
+                {e.assignedCount > 0 && (
+                  <span className="text-xs text-status-neutral shrink-0">
+                    {e.completedCount}/{e.assignedCount} hechos
+                  </span>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Gráficos */}
+        <div className="space-y-4">
+          <div className="rounded-xl border border-gray-200 bg-white p-4">
+            <p className="text-sm font-semibold text-navy mb-2">Rendimiento (% completado, últimas sesiones)</p>
+            {attendance.length === 0 ? (
+              <p className="text-sm text-status-neutral">Sin datos todavía.</p>
+            ) : (
+              <PerformanceChart data={attendance} />
+            )}
+          </div>
+          <div className="rounded-xl border border-gray-200 bg-white p-4">
+            <p className="text-sm font-semibold text-navy mb-2">Asistencia (últimas sesiones)</p>
+            {attendance.length === 0 ? (
+              <p className="text-sm text-status-neutral">Sin datos todavía.</p>
+            ) : (
+              <AttendanceChart data={attendance} />
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function StatCard({ label, value, delta }: { label: string; value: number; delta: number }) {
+  return (
+    <div className="rounded-xl border border-gray-200 bg-white p-4">
+      <p className="text-xs text-status-neutral uppercase tracking-wide">{label}</p>
+      <p className="font-display text-2xl font-bold text-navy">{value}</p>
+      {delta > 0 && <p className="text-xs text-status-positive mt-0.5">+{delta} esta semana</p>}
     </div>
   )
 }
