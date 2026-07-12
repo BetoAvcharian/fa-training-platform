@@ -16,7 +16,7 @@ export async function EventCompareCard({ event, roster }: { event: Event; roster
   ])
 
   const structuredLines = lines.filter((l) => l.isStructured && l.observableId)
-  const athleteIds = assignments.filter((a) => a.assigneeType === 'athlete').map((a) => a.assigneeId)
+  const athleteIds = assignments.filter((a) => a.assigneeType === 'person').map((a) => a.assigneeId)
   const rosterById = new Map(roster.map((r) => [r.id, r]))
 
   return (
