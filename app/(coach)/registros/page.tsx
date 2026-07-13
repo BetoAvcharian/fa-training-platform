@@ -28,6 +28,12 @@ export default async function RegistrosPage() {
   const sportById = new Map(sports.map((s) => [s.id, s]))
   const isManager = membership.role === 'manager'
 
+  // Peso, talla, frecuencia cardíaca, etc. ya tienen su lugar en Salud —
+  // no tiene sentido que aparezcan mezcladas con marcas deportivas acá.
+  const registrableObservables = observables.filter(
+    (o) => !o.tags?.includes('antropometria') && !o.tags?.includes('signos_vitales')
+  )
+
   return (
     <div className="space-y-6">
       <div>
@@ -37,7 +43,7 @@ export default async function RegistrosPage() {
 
       <RecordForm
         roster={roster}
-        observables={observables.map((o) => ({ id: o.id, name: o.name, unitSymbol: unitById.get(o.unitId)?.symbol ?? null }))}
+        observables={registrableObservables.map((o) => ({ id: o.id, name: o.name, unitSymbol: unitById.get(o.unitId)?.symbol ?? null }))}
       />
 
       <section className="space-y-2">
