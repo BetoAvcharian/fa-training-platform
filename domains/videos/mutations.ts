@@ -15,6 +15,7 @@ export async function createVideo(input: CreateVideoInput, client?: AppSupabaseC
       title: input.title,
       description: input.description ?? null,
       source_type: input.sourceType,
+      category: input.category,
       url: input.url,
       created_by_membership_id: actor.id,
     })

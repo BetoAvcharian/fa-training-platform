@@ -13,12 +13,16 @@ export async function createVideoAction(formData: FormData) {
   const title = String(formData.get('title') ?? '')
   const description = String(formData.get('description') ?? '')
   const sourceType = String(formData.get('sourceType') ?? '')
+  const category = String(formData.get('category') ?? '')
   const url = String(formData.get('url') ?? '')
   const athleteIds = formData.getAll('athleteIds').map(String).filter(Boolean)
 
   if (!title.trim()) return { error: 'Falta el título' }
   if (!url.trim()) return { error: 'Falta la URL' }
   if (sourceType !== 'upload' && sourceType !== 'link') return { error: 'Tipo inválido' }
+  if (!['carreras', 'tecnica', 'musculacion', 'entrenamientos'].includes(category)) {
+    return { error: 'Categoría inválida' }
+  }
 
   try {
     const video = await createVideo({
@@ -26,6 +30,7 @@ export async function createVideoAction(formData: FormData) {
       title,
       description: description || undefined,
       sourceType,
+      category: category as never,
       url,
     })
 
