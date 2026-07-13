@@ -60,7 +60,7 @@ export async function getVideosForAthlete(athleteMembershipId: string, client?: 
   const supabase = client ?? (await createServerClient())
   const { data, error } = await supabase
     .from('video_athlete_tags')
-    .select('videos(id, title, description, source_type, url, created_at)')
+    .select('videos(id, title, description, source_type, category, url, created_at)')
     .eq('athlete_membership_id', athleteMembershipId)
 
   if (error) throw new DomainError('NOT_FOUND', error.message)
@@ -74,6 +74,7 @@ export async function getVideosForAthlete(athleteMembershipId: string, client?: 
       title: v.title,
       description: v.description,
       sourceType: v.source_type,
+      category: v.category,
       url: v.url,
       createdAt: v.created_at,
     }))

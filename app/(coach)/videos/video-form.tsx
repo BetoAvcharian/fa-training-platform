@@ -7,9 +7,11 @@ import { createVideoAction } from './actions'
 export function VideoForm({
   organizationId,
   roster,
+  category,
 }: {
   organizationId: string
   roster: Array<{ id: string; person: { firstName: string; lastName: string } | null }>
+  category: string
 }) {
   const [open, setOpen] = useState(false)
   const [mode, setMode] = useState<'link' | 'upload'>('link')
@@ -38,6 +40,7 @@ export function VideoForm({
       fd.set('title', title)
       fd.set('description', description)
       fd.set('sourceType', 'link')
+      fd.set('category', category)
       fd.set('url', url)
       athleteIds.forEach((id) => fd.append('athleteIds', id))
       startTransition(async () => {
@@ -74,6 +77,7 @@ export function VideoForm({
       fd.set('title', title)
       fd.set('description', description)
       fd.set('sourceType', 'upload')
+      fd.set('category', category)
       fd.set('url', publicUrl.publicUrl)
       athleteIds.forEach((id) => fd.append('athleteIds', id))
       startTransition(async () => {

@@ -11,6 +11,13 @@ function getEmbedUrl(url: string): string | null {
   return null
 }
 
+const CATEGORY_LABELS: Record<string, string> = {
+  carreras: 'Carreras',
+  tecnica: 'Técnica',
+  musculacion: 'Musculación',
+  entrenamientos: 'Entrenamientos',
+}
+
 export default async function MisVideosPage() {
   const membership = await getMyActiveMembership()
   if (!membership) return null
@@ -47,6 +54,7 @@ export default async function MisVideosPage() {
                 )}
               </div>
               <div className="p-3">
+                <p className="text-[10px] uppercase tracking-wide text-gold font-semibold">{CATEGORY_LABELS[v.category] ?? v.category}</p>
                 <p className="font-medium text-navy text-sm">{v.title}</p>
                 {v.description && <p className="text-xs text-status-neutral mt-1">{v.description}</p>}
               </div>

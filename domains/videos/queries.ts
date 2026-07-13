@@ -6,7 +6,7 @@ export async function getVideos(organizationId: string, client?: AppSupabaseClie
   const supabase = client ?? (await createServerClient())
   const { data, error } = await supabase
     .from('videos')
-    .select('id, organization_id, title, description, source_type, url, created_at')
+    .select('id, organization_id, title, description, source_type, category, url, created_at')
     .eq('organization_id', organizationId)
     .order('created_at', { ascending: false })
 
@@ -18,6 +18,7 @@ export async function getVideos(organizationId: string, client?: AppSupabaseClie
     title: row.title,
     description: row.description,
     sourceType: row.source_type as Video['sourceType'],
+    category: row.category as Video['category'],
     url: row.url,
     createdAt: row.created_at,
   }))
