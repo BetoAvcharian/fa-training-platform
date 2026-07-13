@@ -90,7 +90,8 @@ export async function unassignAthlete(
   if (error) throw new DomainError('CONFLICT', error.message)
 }
 
-
+/**
+ * Agrega una línea de sesión, corriendo SmartLine sobre el texto. Nunca
  * falla por no poder interpretar la línea — la guarda igual, marcada
  * `is_structured: false` (2.19).
  *
