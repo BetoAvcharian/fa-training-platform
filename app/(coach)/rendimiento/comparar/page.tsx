@@ -31,7 +31,7 @@ export default async function CompararPage({
 
   const showResult = params.observableId && athleteIds.length >= 2
 
-  let chartData: Array<Record<string, string | number>> = []
+  let chartData: Array<{ date: string; [key: string]: string | number }> = []
   let athleteNames: string[] = []
 
   if (showResult) {
