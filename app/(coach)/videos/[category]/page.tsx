@@ -99,7 +99,7 @@ export default async function VideoCategoryPage({
           <input type="checkbox" name="etiquetados" value="1" defaultChecked={sParams.etiquetados === '1'} />
           Solo etiquetados
         </label>
-        <button type="submit" className="rounded-lg bg-navy text-white px-4 py-1.5 text-sm font-medium">
+        <button type="submit" className="btn-primary px-4 py-1.5 text-sm">
           Filtrar
         </button>
       </form>

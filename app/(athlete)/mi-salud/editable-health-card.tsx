@@ -44,15 +44,15 @@ export function EditableHealthCard({ episode }: { episode: Episode }) {
       <form action={handleSubmit} className="rounded-2xl border border-gray-100 bg-white p-4 shadow-sm space-y-2">
         <input type="hidden" name="id" value={episode.id} />
         <p className="text-xs uppercase tracking-wide text-gold font-semibold">{TYPE_LABELS[episode.type]}</p>
-        <input name="title" defaultValue={episode.title} className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm" required />
-        <input name="startDate" type="date" defaultValue={episode.startDate} className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm" />
-        <textarea name="notes" defaultValue={episode.notes ?? ''} rows={2} className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm" />
+        <input name="title" defaultValue={episode.title} className="input-field" required />
+        <input name="startDate" type="date" defaultValue={episode.startDate} className="input-field" />
+        <textarea name="notes" defaultValue={episode.notes ?? ''} rows={2} className="input-field" />
         {error && <p className="text-xs text-status-critical">{error}</p>}
         <div className="flex gap-2">
-          <button type="submit" disabled={pending} className="flex-1 bg-navy text-white rounded-lg py-2 text-sm font-medium disabled:opacity-50">
+          <button type="submit" disabled={pending} className="flex-1 btn-primary py-2 text-sm">
             Guardar
           </button>
-          <button type="button" onClick={() => setEditing(false)} className="px-4 rounded-lg border border-gray-200 text-sm text-status-neutral">
+          <button type="button" onClick={() => setEditing(false)} className="btn-secondary px-4 text-sm">
             Cancelar
           </button>
         </div>

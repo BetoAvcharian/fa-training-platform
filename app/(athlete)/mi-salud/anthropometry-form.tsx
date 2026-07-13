@@ -39,7 +39,7 @@ export function AnthropometryForm({ observables }: { observables: Observable[] }
 
   return (
     <form action={handleSubmit} className="rounded-2xl border border-gray-100 bg-white p-4 shadow-sm space-y-3">
-      <select name="observableId" className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm" required>
+      <select name="observableId" className="input-field" required>
         {observables.map((o) => (
           <option key={o.id} value={o.id}>
             {o.name} {o.unitSymbol ? `(${o.unitSymbol})` : ''}
@@ -51,7 +51,7 @@ export function AnthropometryForm({ observables }: { observables: Observable[] }
         type="number"
         step="0.1"
         placeholder="Valor"
-        className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm"
+        className="input-field"
         required
       />
       {error && <p className="text-xs text-status-critical">{error}</p>}
@@ -59,14 +59,14 @@ export function AnthropometryForm({ observables }: { observables: Observable[] }
         <button
           type="submit"
           disabled={pending}
-          className="flex-1 bg-navy text-white rounded-lg py-2 text-sm font-medium disabled:opacity-50"
+          className="flex-1 btn-primary py-2 text-sm"
         >
           Guardar
         </button>
         <button
           type="button"
           onClick={() => setOpen(false)}
-          className="px-4 rounded-lg border border-gray-200 text-sm text-status-neutral"
+          className="btn-secondary px-4 text-sm"
         >
           Cancelar
         </button>

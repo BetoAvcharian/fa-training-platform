@@ -34,7 +34,7 @@ export function ProtocolForm({ observables }: { observables: ObservableOption[] 
 
   return (
     <form action={handleSubmit} className="rounded-xl border border-gray-200 bg-white p-4 space-y-3 max-w-sm">
-      <input name="name" placeholder="Nombre (ej: ISAK completo)" className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm" required />
+      <input name="name" placeholder="Nombre (ej: ISAK completo)" className="input-field" required />
       <div className="max-h-40 overflow-y-auto space-y-1 border border-gray-100 rounded-lg p-2">
         {observables.map((o) => (
           <label key={o.id} className="flex items-center gap-2 text-xs text-navy">
@@ -45,10 +45,10 @@ export function ProtocolForm({ observables }: { observables: ObservableOption[] 
       </div>
       {error && <p className="text-xs text-status-critical">{error}</p>}
       <div className="flex gap-2">
-        <button type="submit" disabled={pending} className="flex-1 bg-navy text-white rounded-lg py-2 text-sm font-medium disabled:opacity-50">
+        <button type="submit" disabled={pending} className="flex-1 btn-primary py-2 text-sm">
           Crear
         </button>
-        <button type="button" onClick={() => setOpen(false)} className="px-4 rounded-lg border border-gray-200 text-sm text-status-neutral">
+        <button type="button" onClick={() => setOpen(false)} className="btn-secondary px-4 text-sm">
           Cancelar
         </button>
       </div>

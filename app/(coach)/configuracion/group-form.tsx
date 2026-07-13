@@ -36,7 +36,7 @@ export function GroupForm() {
       <input
         name="name"
         placeholder="Nombre del grupo (ej: Sub-18 fondo)"
-        className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm"
+        className="input-field"
         required
       />
       {error && <p className="text-xs text-status-critical">{error}</p>}
@@ -44,14 +44,14 @@ export function GroupForm() {
         <button
           type="submit"
           disabled={pending}
-          className="flex-1 bg-navy text-white rounded-lg py-2 text-sm font-medium disabled:opacity-50"
+          className="flex-1 btn-primary py-2 text-sm"
         >
           Guardar
         </button>
         <button
           type="button"
           onClick={() => setOpen(false)}
-          className="px-4 rounded-lg border border-gray-200 text-sm text-status-neutral"
+          className="btn-secondary px-4 text-sm"
         >
           Cancelar
         </button>

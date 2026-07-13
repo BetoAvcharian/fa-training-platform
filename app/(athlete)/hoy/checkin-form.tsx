@@ -56,7 +56,7 @@ export function CheckinForm({ alreadySubmitted }: { alreadySubmitted: boolean })
         <button
           type="submit"
           disabled={pending}
-          className="w-full bg-navy text-white rounded-lg py-2 text-sm font-medium disabled:opacity-50"
+          className="w-full btn-primary py-2 text-sm"
         >
           {saved ? 'Actualizar check-in' : 'Guardar check-in'}
         </button>

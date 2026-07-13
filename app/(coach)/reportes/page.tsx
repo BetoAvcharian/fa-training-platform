@@ -93,7 +93,7 @@ export default async function ReportesPage({
           <label className="text-xs text-status-neutral block mb-1">Hasta</label>
           <input type="date" name="hasta" defaultValue={params.hasta ?? ''} className="w-full rounded-lg border border-gray-200 px-2 py-1.5 text-sm" />
         </div>
-        <button type="submit" className="rounded-lg bg-navy text-white px-4 py-1.5 text-sm font-medium h-fit">
+        <button type="submit" className="btn-primary px-4 py-1.5 text-sm h-fit">
           Filtrar
         </button>
       </form>

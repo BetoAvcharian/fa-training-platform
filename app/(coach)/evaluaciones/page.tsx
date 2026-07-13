@@ -40,7 +40,7 @@ export default async function EvaluacionesPage() {
       </div>
 
       {protocols.length > 0 && (
-        <div className="rounded-xl border border-gray-200 bg-white p-4">
+        <div className="card p-4">
           <p className="text-sm font-semibold text-navy mb-2">Protocolos</p>
           <div className="flex flex-wrap gap-2">
             {protocols.map((p) => (

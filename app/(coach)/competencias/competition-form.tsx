@@ -29,14 +29,14 @@ export function CompetitionForm() {
 
   return (
     <form action={handleSubmit} className="rounded-xl border border-gray-200 bg-white p-4 space-y-3 max-w-sm">
-      <input name="title" placeholder="Nombre (ej: Provincial U18)" className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm" required />
-      <input name="date" type="date" className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm" required />
+      <input name="title" placeholder="Nombre (ej: Provincial U18)" className="input-field" required />
+      <input name="date" type="date" className="input-field" required />
       {error && <p className="text-xs text-status-critical">{error}</p>}
       <div className="flex gap-2">
-        <button type="submit" disabled={pending} className="flex-1 bg-navy text-white rounded-lg py-2 text-sm font-medium disabled:opacity-50">
+        <button type="submit" disabled={pending} className="flex-1 btn-primary py-2 text-sm">
           Crear
         </button>
-        <button type="button" onClick={() => setOpen(false)} className="px-4 rounded-lg border border-gray-200 text-sm text-status-neutral">
+        <button type="button" onClick={() => setOpen(false)} className="btn-secondary px-4 text-sm">
           Cancelar
         </button>
       </div>

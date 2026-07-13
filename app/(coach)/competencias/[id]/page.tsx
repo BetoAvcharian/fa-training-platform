@@ -55,7 +55,7 @@ export default async function CompetitionDetailPage({ params }: { params: Promis
           </div>
         )}
         {entries.map((entry) => (
-          <div key={entry.athleteMembershipId} className="rounded-xl border border-gray-200 bg-white p-4">
+          <div key={entry.athleteMembershipId} className="card p-4">
             <div className="flex items-start justify-between gap-2">
               <p className="font-medium text-navy text-sm">{entry.athleteName}</p>
               <UnenrollButton eventId={id} athleteMembershipId={entry.athleteMembershipId} />

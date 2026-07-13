@@ -80,7 +80,7 @@ export function SignupForm({
 
       {errorMessage && <p className="text-sm text-status-critical">{errorMessage}</p>}
 
-      <button type="submit" className="w-full bg-navy text-white rounded-lg py-2.5 text-sm font-medium">
+      <button type="submit" className="w-full btn-primary py-2.5 text-sm">
         Crear cuenta
       </button>
     </form>

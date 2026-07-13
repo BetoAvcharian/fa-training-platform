@@ -38,8 +38,8 @@ export function ObservableForm({ sports, units }: { sports: Option[]; units: Opt
 
   return (
     <form action={handleSubmit} className="rounded-xl border border-gray-100 bg-white p-4 shadow-sm space-y-3 max-w-sm">
-      <input name="name" placeholder="Nombre (ej: Sentadilla búlgara)" className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm" required />
-      <select name="sportId" className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm" required>
+      <input name="name" placeholder="Nombre (ej: Sentadilla búlgara)" className="input-field" required />
+      <select name="sportId" className="input-field" required>
         <option value="">Deporte</option>
         {sports.map((s) => (
           <option key={s.id} value={s.id}>
@@ -47,7 +47,7 @@ export function ObservableForm({ sports, units }: { sports: Option[]; units: Opt
           </option>
         ))}
       </select>
-      <select name="unitId" className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm" required>
+      <select name="unitId" className="input-field" required>
         <option value="">Unidad</option>
         {units.map((u) => (
           <option key={u.id} value={u.id}>
@@ -61,10 +61,10 @@ export function ObservableForm({ sports, units }: { sports: Option[]; units: Opt
       </label>
       {error && <p className="text-xs text-status-critical">{error}</p>}
       <div className="flex gap-2">
-        <button type="submit" disabled={pending} className="flex-1 bg-navy text-white rounded-lg py-2 text-sm font-medium disabled:opacity-50">
+        <button type="submit" disabled={pending} className="flex-1 btn-primary py-2 text-sm">
           Guardar
         </button>
-        <button type="button" onClick={() => setOpen(false)} className="px-4 rounded-lg border border-gray-200 text-sm text-status-neutral">
+        <button type="button" onClick={() => setOpen(false)} className="btn-secondary px-4 text-sm">
           Cancelar
         </button>
       </div>

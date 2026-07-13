@@ -36,7 +36,7 @@ export function RecordForm({ roster, observables }: { roster: RosterOption[]; ob
   return (
     <form action={handleSubmit} className="rounded-xl border border-gray-200 bg-white p-4 space-y-3">
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-        <select name="athleteMembershipId" className="rounded-lg border border-gray-200 px-3 py-2 text-sm" required>
+        <select name="athleteMembershipId" className="input-field" required>
           <option value="">Atleta</option>
           {roster.map((r) => (
             <option key={r.id} value={r.id}>
@@ -44,7 +44,7 @@ export function RecordForm({ roster, observables }: { roster: RosterOption[]; ob
             </option>
           ))}
         </select>
-        <select name="observableId" className="rounded-lg border border-gray-200 px-3 py-2 text-sm" required>
+        <select name="observableId" className="input-field" required>
           <option value="">Qué registrar</option>
           {observables.map((o) => (
             <option key={o.id} value={o.id}>
@@ -59,13 +59,13 @@ export function RecordForm({ roster, observables }: { roster: RosterOption[]; ob
           type="number"
           step="0.01"
           placeholder="Valor"
-          className="flex-1 rounded-lg border border-gray-200 px-3 py-2 text-sm"
+          className="input-field flex-1"
           required
         />
         <button
           type="submit"
           disabled={pending}
-          className="bg-navy text-white rounded-lg px-5 py-2 text-sm font-medium disabled:opacity-50"
+          className="btn-primary px-5 py-2 text-sm"
         >
           {pending ? 'Guardando…' : 'Registrar'}
         </button>

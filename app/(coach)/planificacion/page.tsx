@@ -62,7 +62,7 @@ export default async function PlanificacionPage() {
           {plans
             .filter((p) => !p.parentPlanId)
             .map((root) => (
-              <div key={root.id} className="rounded-xl border border-gray-100 bg-white p-4 shadow-sm">
+              <div key={root.id} className="card p-4">
                 <p className="text-xs uppercase tracking-wide text-gold font-semibold">{TYPE_LABELS[root.type]}</p>
                 <p className="font-medium text-navy">{root.title}</p>
                 <div className="mt-2 space-y-1 pl-3 border-l-2 border-gray-100">

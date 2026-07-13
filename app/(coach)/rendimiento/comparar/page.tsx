@@ -65,7 +65,7 @@ export default async function CompararPage({
       </div>
 
       <form action={compareAction} className="rounded-xl border border-gray-200 bg-white p-4 space-y-3 max-w-lg">
-        <select name="observableId" defaultValue={params.observableId ?? ''} required className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm">
+        <select name="observableId" defaultValue={params.observableId ?? ''} required className="input-field">
           <option value="">Prueba/ejercicio</option>
           {performanceObservables.map((o) => (
             <option key={o.id} value={o.id}>
@@ -75,7 +75,7 @@ export default async function CompararPage({
         </select>
 
         {groups.length > 0 && (
-          <select name="groupId" defaultValue={params.groupId ?? ''} className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm">
+          <select name="groupId" defaultValue={params.groupId ?? ''} className="input-field">
             <option value="">— O elegí un grupo completo —</option>
             {groups.map((g) => (
               <option key={g.id} value={g.id}>
@@ -97,13 +97,13 @@ export default async function CompararPage({
           </div>
         </div>
 
-        <button type="submit" className="bg-navy text-white rounded-lg px-4 py-2 text-sm font-medium">
+        <button type="submit" className="btn-primary px-4 py-2 text-sm">
           Comparar
         </button>
       </form>
 
       {showResult && (
-        <div className="rounded-xl border border-gray-200 bg-white p-4">
+        <div className="card p-4">
           {chartData.length === 0 ? (
             <p className="text-sm text-status-neutral">Sin datos todavía para esta combinación.</p>
           ) : (

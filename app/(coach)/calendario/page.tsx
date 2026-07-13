@@ -134,7 +134,7 @@ export default async function CalendarioPage({
                 ))}
               </select>
             )}
-            <button type="submit" className="w-full bg-navy text-white rounded-md py-2 text-sm font-medium">Crear</button>
+            <button type="submit" className="w-full btn-primary py-2 text-sm">Crear</button>
           </form>
         </details>
       )}
