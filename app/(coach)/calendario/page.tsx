@@ -106,7 +106,13 @@ export default async function CalendarioPage({
       {mode === 'planificar' && (
         <details className="mb-6 max-w-md">
           <summary className="cursor-pointer text-sm font-medium text-navy">+ Nuevo entrenamiento</summary>
-          <form action={createEventAction} className="mt-3 space-y-2 bg-white border border-gray-200 rounded-xl p-4">
+          <form
+            action={async (formData: FormData) => {
+              'use server'
+              await createEventAction(formData)
+            }}
+            className="mt-3 space-y-2 bg-white border border-gray-200 rounded-xl p-4"
+          >
             <input name="title" placeholder="Título (ej: Series de pista)" required className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm" />
             <input name="date" type="date" required defaultValue={weekStartStr} className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm" />
             <select name="athleteId" required className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm">
