@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import { getMyActiveMembership, getAllMembers } from '@/domains/athletes/queries'
 import { InviteForm } from './invite-form'
 import { DeactivateButton } from './deactivate-button'
@@ -63,7 +64,13 @@ export default async function PersonasPage() {
           {activos.map((m) => (
             <div key={m.id} className="rounded-xl border border-gray-100 bg-white p-4 shadow-sm flex items-center justify-between gap-2">
               <div>
-                <p className="text-sm font-medium text-navy">{m.name ?? m.email ?? '—'}</p>
+                {m.role === 'athlete' ? (
+                  <Link href={`/atletas/${m.id}`} className="text-sm font-medium text-navy underline">
+                    {m.name ?? m.email ?? '—'}
+                  </Link>
+                ) : (
+                  <p className="text-sm font-medium text-navy">{m.name ?? m.email ?? '—'}</p>
+                )}
                 <p className="text-xs text-status-neutral">{ROLE_LABELS[m.role]}</p>
               </div>
               <div className="flex items-center gap-2">
