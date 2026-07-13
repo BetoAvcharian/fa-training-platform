@@ -1,17 +1,26 @@
 'use client'
 
 import { useState, useTransition } from 'react'
-import { addSessionLineAction } from './actions'
+import { addSessionLineAction, duplicateEventAction } from './actions'
 import type { Event, SessionExercise } from '@/domains/events/types'
 
 export function EventCard({ event, lines }: { event: Event; lines: SessionExercise[] }) {
   const [expanded, setExpanded] = useState(false)
   const [sport, setSport] = useState<'Atletismo' | 'Fuerza'>('Atletismo')
   const [pending, startTransition] = useTransition()
+  const [duplicating, setDuplicating] = useState(false)
 
   function handleAdd(formData: FormData) {
     startTransition(async () => {
       await addSessionLineAction(event.id, sport, formData)
+    })
+  }
+
+  function handleDuplicate(formData: FormData) {
+    formData.set('sourceEventId', event.id)
+    startTransition(async () => {
+      await duplicateEventAction(formData)
+      setDuplicating(false)
     })
   }
 
@@ -57,6 +66,19 @@ export function EventCard({ event, lines }: { event: Event; lines: SessionExerci
               </button>
             </form>
           </div>
+
+          {duplicating ? (
+            <form action={handleDuplicate} className="flex gap-1 mt-1.5">
+              <input name="newDate" type="date" className="flex-1 min-w-0 border border-gray-300 rounded px-1.5 py-1 text-[11px]" required />
+              <button type="submit" disabled={pending} className="bg-gold text-white rounded px-2 text-[11px] disabled:opacity-50">
+                Ir
+              </button>
+            </form>
+          ) : (
+            <button onClick={() => setDuplicating(true)} className="text-[10px] text-status-neutral underline mt-1.5">
+              Duplicar a otra fecha
+            </button>
+          )}
         </div>
       )}
     </div>
