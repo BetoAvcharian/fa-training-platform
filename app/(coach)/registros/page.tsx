@@ -29,9 +29,14 @@ export default async function RegistrosPage() {
   const isManager = membership.role === 'manager'
 
   // Peso, talla, frecuencia cardíaca, etc. ya tienen su lugar en Salud —
-  // no tiene sentido que aparezcan mezcladas con marcas deportivas acá.
+  // y energía/fatiga/molestia son del check-in diario del atleta, no
+  // algo que el coach "registra" acá — no tiene sentido que aparezcan
+  // mezcladas con marcas deportivas.
   const registrableObservables = observables.filter(
-    (o) => !o.tags?.includes('antropometria') && !o.tags?.includes('signos_vitales')
+    (o) =>
+      !o.tags?.includes('antropometria') &&
+      !o.tags?.includes('signos_vitales') &&
+      !o.tags?.includes('checkin')
   )
 
   return (
