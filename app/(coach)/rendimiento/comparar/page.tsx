@@ -46,7 +46,7 @@ export default async function CompararPage({
 
     const allDates = Array.from(new Set(series.flatMap((s) => s.points.map((p) => p.date)))).sort()
     chartData = allDates.map((date) => {
-      const row: Record<string, string | number> = { date }
+      const row: { date: string; [key: string]: string | number } = { date }
       for (const s of series) {
         const point = s.points.find((p) => p.date === date)
         if (point) row[s.athleteName] = point.value
