@@ -23,6 +23,28 @@ export async function getEventsForRange(
   return (data ?? []).map(mapEvent)
 }
 
+/** Historial de entrenamientos/competencias de un atleta puntual (para su pestaña "Entrenamientos"). */
+export async function getEventsForAthlete(
+  athleteMembershipId: string,
+  limit = 30,
+  client?: AppSupabaseClient
+): Promise<Event[]> {
+  const supabase = client ?? (await createServerClient())
+  const { data, error } = await supabase
+    .from('event_assignments')
+    .select('events!inner(id, organization_id, type, title, date, is_template, created_by_membership_id)')
+    .eq('assignee_type', 'person')
+    .eq('assignee_id', athleteMembershipId)
+    .eq('events.is_template', false)
+    .order('date', { referencedTable: 'events', ascending: false })
+    .limit(limit)
+
+  if (error) throw new DomainError('NOT_FOUND', error.message)
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return (data ?? []).map((row: any) => mapEvent(row.events))
+}
+
 export async function getEventAssignments(eventId: string, client?: AppSupabaseClient): Promise<EventAssignment[]> {
   const supabase = client ?? (await createServerClient())
   const { data, error } = await supabase
