@@ -1,4 +1,4 @@
-import { getMyActiveMembership, getRoster } from '@/domains/athletes/queries'
+import { getMyActiveMembership, getRoster, getGroups } from '@/domains/athletes/queries'
 import { getEventsForRange, getSessionExercises } from '@/domains/events/queries'
 import { EventCard } from './event-card'
 import { EventCompareCard } from './event-compare-card'
@@ -53,9 +53,10 @@ export default async function CalendarioPage({
   const prevWeek = toISO(new Date(weekStart.getTime() - 7 * 86400000))
   const nextWeek = toISO(new Date(weekStart.getTime() + 7 * 86400000))
 
-  const [events, roster] = await Promise.all([
+  const [events, roster, groups] = await Promise.all([
     getEventsForRange(membership.organizationId, weekStartStr, weekEndStr),
     getRoster(membership.organizationId),
+    getGroups(membership.organizationId),
   ])
 
   const eventsWithLines = await Promise.all(
@@ -115,7 +116,7 @@ export default async function CalendarioPage({
           >
             <input name="title" placeholder="Título (ej: Series de pista)" required className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm" />
             <input name="date" type="date" required defaultValue={weekStartStr} className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm" />
-            <select name="athleteId" required className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm">
+            <select name="athleteId" className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm">
               <option value="">Elegí un atleta</option>
               {roster.map((a) => (
                 <option key={a.id} value={a.id}>
@@ -123,6 +124,16 @@ export default async function CalendarioPage({
                 </option>
               ))}
             </select>
+            {groups.length > 0 && (
+              <select name="groupId" className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm">
+                <option value="">— O elegí un grupo completo —</option>
+                {groups.map((g) => (
+                  <option key={g.id} value={g.id}>
+                    {g.name}
+                  </option>
+                ))}
+              </select>
+            )}
             <button type="submit" className="w-full bg-navy text-white rounded-md py-2 text-sm font-medium">Crear</button>
           </form>
         </details>
@@ -142,7 +153,7 @@ export default async function CalendarioPage({
                   mode === 'ver' ? (
                     <EventCompareCard key={event.id} event={event} roster={roster} />
                   ) : (
-                    <EventCard key={event.id} event={event} lines={lines} />
+                    <EventCard key={event.id} event={event} lines={lines} roster={roster} />
                   )
                 )}
                 {dayEvents.length === 0 && <div className="text-[11px] text-gray-300">—</div>}

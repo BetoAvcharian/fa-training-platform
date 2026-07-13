@@ -2,11 +2,12 @@
 
 import { revalidatePath } from 'next/cache'
 import { getMyActiveMembership } from '@/domains/athletes/queries'
-import { getEventsForRange } from '@/domains/events/queries'
+import { getEventsForRange, getEventAssignments } from '@/domains/events/queries'
 import {
   createEvent as createEventDomain,
   addSessionLine as addSessionLineDomain,
   cloneEvent as cloneEventDomain,
+  assignAthleteToEvent as assignAthleteToEventDomain,
 } from '@/domains/events/mutations'
 import { DomainError } from '@/types/errors'
 
@@ -17,8 +18,9 @@ export async function createEventAction(formData: FormData) {
   const title = String(formData.get('title') ?? '')
   const date = String(formData.get('date') ?? '')
   const athleteId = String(formData.get('athleteId') ?? '')
+  const groupId = String(formData.get('groupId') ?? '')
 
-  if (!title || !date || !athleteId) {
+  if (!title || !date || (!athleteId && !groupId)) {
     return { error: 'Faltan datos para crear el entrenamiento' }
   }
 
@@ -28,10 +30,54 @@ export async function createEventAction(formData: FormData) {
       type: 'entrenamiento',
       title,
       date,
-      assignments: [{ type: 'person', id: athleteId }],
+      assignments: groupId ? [{ type: 'group', id: groupId }] : [{ type: 'person', id: athleteId }],
     })
   } catch (e) {
     return { error: e instanceof DomainError ? e.message : 'No se pudo crear' }
+  }
+
+  revalidatePath('/calendario')
+  return { error: null }
+}
+
+export async function createExceptionAction(
+  eventId: string,
+  replacesId: string,
+  sport: 'Fuerza' | 'Atletismo',
+  formData: FormData
+) {
+  const membership = await getMyActiveMembership()
+  if (!membership) return { error: 'No autenticado' }
+
+  const athleteMembershipId = String(formData.get('athleteMembershipId') ?? '')
+  const rawText = String(formData.get('rawText') ?? '')
+  if (!athleteMembershipId || !rawText.trim()) return { error: 'Faltan datos' }
+
+  try {
+    // La excepción necesita que el atleta tenga una asignación DIRECTA
+    // a este Event (no alcanza con que esté cubierto por la del grupo)
+    // — si todavía no la tiene, se la creamos ahora, sin duplicar si
+    // ya existía.
+    const assignments = await getEventAssignments(eventId)
+    let assignment = assignments.find((a) => a.assigneeType === 'person' && a.assigneeId === athleteMembershipId)
+
+    if (!assignment) {
+      await assignAthleteToEventDomain({ eventId, athleteMembershipId, organizationId: membership.organizationId })
+      const refreshed = await getEventAssignments(eventId)
+      assignment = refreshed.find((a) => a.assigneeType === 'person' && a.assigneeId === athleteMembershipId)
+    }
+
+    if (!assignment) throw new DomainError('CONFLICT', 'No se pudo asignar al atleta')
+
+    await addSessionLineDomain({
+      eventId,
+      sportName: sport,
+      rawText,
+      exceptionForAssignmentIds: [assignment.id],
+      replacesId,
+    })
+  } catch (e) {
+    return { error: e instanceof DomainError ? e.message : 'No se pudo crear la excepción' }
   }
 
   revalidatePath('/calendario')
