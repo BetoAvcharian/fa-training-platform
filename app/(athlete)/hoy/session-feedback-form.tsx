@@ -76,7 +76,7 @@ export function SessionFeedbackForm({
       <button
         onClick={handleSubmit}
         disabled={pending}
-        className="w-full bg-navy text-white rounded-lg py-2 text-xs font-medium disabled:opacity-50"
+        className="w-full btn-primary py-2 text-xs"
       >
         {pending ? 'Guardando…' : saved ? 'Guardado ✓' : 'Guardar feedback'}
       </button>

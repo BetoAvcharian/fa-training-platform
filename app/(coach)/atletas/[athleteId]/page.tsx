@@ -113,7 +113,7 @@ async function ResumenTab({ athleteId, organizationId }: { athleteId: string; or
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-      <div className="rounded-xl border border-gray-200 bg-white p-4">
+      <div className="card p-4">
         <p className="text-sm font-semibold text-navy mb-2">Últimos entrenamientos</p>
         {events.length === 0 && <p className="text-sm text-status-neutral">Sin actividad todavía.</p>}
         {events.map((e) => (
@@ -122,7 +122,7 @@ async function ResumenTab({ athleteId, organizationId }: { athleteId: string; or
           </p>
         ))}
       </div>
-      <div className="rounded-xl border border-gray-200 bg-white p-4">
+      <div className="card p-4">
         <p className="text-sm font-semibold text-navy mb-2">Récords oficiales</p>
         {records.filter((r) => r.recordType === 'oficial').length === 0 && (
           <p className="text-sm text-status-neutral">Sin récords todavía.</p>
@@ -165,7 +165,7 @@ async function ResultadosTab({ athleteId, organizationId }: { athleteId: string;
 
   return (
     <div className="space-y-4">
-      <div className="rounded-xl border border-gray-200 bg-white p-4">
+      <div className="card p-4">
         <p className="text-sm font-semibold text-navy mb-2">Récords</p>
         {records.length === 0 && <p className="text-sm text-status-neutral">Sin récords todavía.</p>}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -217,7 +217,7 @@ async function SaludTab({ athleteId }: { athleteId: string }) {
 
   return (
     <div className="space-y-4">
-      <div className="rounded-xl border border-gray-200 bg-white p-4">
+      <div className="card p-4">
         <p className="text-sm font-semibold text-navy mb-2">Episodios</p>
         {episodes.length === 0 && (
           <p className="text-sm text-status-neutral">Sin episodios visibles para vos en este momento.</p>

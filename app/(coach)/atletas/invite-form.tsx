@@ -43,20 +43,20 @@ export function InviteForm({ coaches }: { coaches: CoachOption[] }) {
         name="email"
         type="email"
         placeholder="Email de la persona"
-        className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm"
+        className="input-field"
         required
       />
       <select
         name="role"
         value={role}
         onChange={(e) => setRole(e.target.value)}
-        className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm"
+        className="input-field"
       >
         <option value="athlete">Atleta</option>
         <option value="coach">Entrenador</option>
       </select>
       {role === 'athlete' && (
-        <select name="coachMembershipId" className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm" required>
+        <select name="coachMembershipId" className="input-field" required>
           <option value="">Elegí su entrenador</option>
           {coaches.map((c) => (
             <option key={c.id} value={c.id}>
@@ -70,14 +70,14 @@ export function InviteForm({ coaches }: { coaches: CoachOption[] }) {
         <button
           type="submit"
           disabled={pending}
-          className="flex-1 bg-navy text-white rounded-lg py-2 text-sm font-medium disabled:opacity-50"
+          className="flex-1 btn-primary py-2 text-sm"
         >
           Invitar
         </button>
         <button
           type="button"
           onClick={() => setOpen(false)}
-          className="px-4 rounded-lg border border-gray-200 text-sm text-status-neutral"
+          className="btn-secondary px-4 text-sm"
         >
           Cancelar
         </button>

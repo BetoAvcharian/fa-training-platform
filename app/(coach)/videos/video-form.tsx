@@ -124,11 +124,11 @@ export function VideoForm({
         </button>
       </div>
 
-      <input name="title" placeholder="Título" className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm" required />
-      <textarea name="description" placeholder="Descripción (opcional)" rows={2} className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm" />
+      <input name="title" placeholder="Título" className="input-field" required />
+      <textarea name="description" placeholder="Descripción (opcional)" rows={2} className="input-field" />
 
       {mode === 'link' ? (
-        <input name="url" placeholder="https://youtube.com/..." className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm" />
+        <input name="url" placeholder="https://youtube.com/..." className="input-field" />
       ) : (
         <input name="file" type="file" accept="video/*" className="w-full text-sm" />
       )}
@@ -150,10 +150,10 @@ export function VideoForm({
       {error && <p className="text-xs text-status-critical">{error}</p>}
 
       <div className="flex gap-2">
-        <button type="submit" disabled={busy} className="flex-1 bg-navy text-white rounded-lg py-2 text-sm font-medium disabled:opacity-50">
+        <button type="submit" disabled={busy} className="flex-1 btn-primary py-2 text-sm">
           {uploading ? 'Subiendo…' : pending ? 'Guardando…' : 'Guardar'}
         </button>
-        <button type="button" onClick={() => setOpen(false)} className="px-4 rounded-lg border border-gray-200 text-sm text-status-neutral">
+        <button type="button" onClick={() => setOpen(false)} className="btn-secondary px-4 text-sm">
           Cancelar
         </button>
       </div>

@@ -53,7 +53,7 @@ export function AssessmentForm({
 
   return (
     <form action={handleSubmit} className="rounded-xl border border-gray-200 bg-white p-4 space-y-3 max-w-lg">
-      <select name="athleteMembershipId" className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm" required>
+      <select name="athleteMembershipId" className="input-field" required>
         <option value="">Atleta</option>
         {roster.map((r) => (
           <option key={r.id} value={r.id}>
@@ -61,11 +61,11 @@ export function AssessmentForm({
           </option>
         ))}
       </select>
-      <input name="title" placeholder="Título (ej: Evaluación antropométrica ISAK)" className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm" required />
+      <input name="title" placeholder="Título (ej: Evaluación antropométrica ISAK)" className="input-field" required />
       <div className="flex gap-2">
-        <input name="date" type="date" className="flex-1 rounded-lg border border-gray-200 px-3 py-2 text-sm" />
+        <input name="date" type="date" className="input-field flex-1" />
         {protocols.length > 0 && (
-          <select name="protocolId" className="flex-1 rounded-lg border border-gray-200 px-3 py-2 text-sm">
+          <select name="protocolId" className="input-field flex-1">
             <option value="">Sin protocolo</option>
             {protocols.map((p) => (
               <option key={p.id} value={p.id}>
@@ -105,14 +105,14 @@ export function AssessmentForm({
         </div>
       </div>
 
-      <textarea name="notes" placeholder="Notas (opcional)" rows={2} className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm" />
+      <textarea name="notes" placeholder="Notas (opcional)" rows={2} className="input-field" />
 
       {error && <p className="text-xs text-status-critical">{error}</p>}
       <div className="flex gap-2">
-        <button type="submit" disabled={pending} className="flex-1 bg-navy text-white rounded-lg py-2 text-sm font-medium disabled:opacity-50">
+        <button type="submit" disabled={pending} className="flex-1 btn-primary py-2 text-sm">
           Guardar
         </button>
-        <button type="button" onClick={() => setOpen(false)} className="px-4 rounded-lg border border-gray-200 text-sm text-status-neutral">
+        <button type="button" onClick={() => setOpen(false)} className="btn-secondary px-4 text-sm">
           Cancelar
         </button>
       </div>

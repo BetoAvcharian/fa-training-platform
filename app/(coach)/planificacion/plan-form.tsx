@@ -40,7 +40,7 @@ export function PlanForm({ plans }: { plans: Array<{ id: string; title: string; 
 
   return (
     <form action={handleSubmit} className="rounded-xl border border-gray-100 bg-white p-4 shadow-sm space-y-3 max-w-md">
-      <select name="type" className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm" required>
+      <select name="type" className="input-field" required>
         {TYPE_OPTIONS.map((opt) => (
           <option key={opt.value} value={opt.value}>
             {opt.label}
@@ -48,7 +48,7 @@ export function PlanForm({ plans }: { plans: Array<{ id: string; title: string; 
         ))}
       </select>
       {plans.length > 0 && (
-        <select name="parentPlanId" className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm">
+        <select name="parentPlanId" className="input-field">
           <option value="">Sin padre (raíz / temporada)</option>
           {plans.map((p) => (
             <option key={p.id} value={p.id}>
@@ -60,7 +60,7 @@ export function PlanForm({ plans }: { plans: Array<{ id: string; title: string; 
       <input
         name="title"
         placeholder="Título (ej: Temporada 2026)"
-        className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm"
+        className="input-field"
         required
       />
       {error && <p className="text-xs text-status-critical">{error}</p>}
@@ -68,14 +68,14 @@ export function PlanForm({ plans }: { plans: Array<{ id: string; title: string; 
         <button
           type="submit"
           disabled={pending}
-          className="flex-1 bg-navy text-white rounded-lg py-2 text-sm font-medium disabled:opacity-50"
+          className="flex-1 btn-primary py-2 text-sm"
         >
           Guardar
         </button>
         <button
           type="button"
           onClick={() => setOpen(false)}
-          className="px-4 rounded-lg border border-gray-200 text-sm text-status-neutral"
+          className="btn-secondary px-4 text-sm"
         >
           Cancelar
         </button>

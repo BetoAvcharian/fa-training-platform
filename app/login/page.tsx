@@ -39,7 +39,7 @@ export default async function LoginPage({
 
         <button
           type="submit"
-          className="w-full bg-navy text-white rounded-lg py-2.5 text-sm font-medium"
+          className="w-full btn-primary py-2.5 text-sm"
         >
           Ingresar
         </button>

@@ -1,21 +1,32 @@
 'use client'
 
-import { useTransition } from 'react'
+import { useState, useTransition } from 'react'
 import { deactivateMemberAction } from './actions'
 
 export function DeactivateButton({ id }: { id: string }) {
+  const [confirming, setConfirming] = useState(false)
   const [pending, startTransition] = useTransition()
 
+  if (confirming) {
+    return (
+      <div className="flex items-center gap-2 text-xs">
+        <span className="text-status-neutral">¿Seguro?</span>
+        <button
+          disabled={pending}
+          onClick={() => startTransition(() => deactivateMemberAction(id))}
+          className="btn-danger"
+        >
+          Sí, desactivar
+        </button>
+        <button onClick={() => setConfirming(false)} className="text-status-neutral hover:text-navy">
+          Cancelar
+        </button>
+      </div>
+    )
+  }
+
   return (
-    <button
-      disabled={pending}
-      onClick={() => {
-        if (confirm('¿Desactivar a esta persona?')) {
-          startTransition(() => deactivateMemberAction(id))
-        }
-      }}
-      className="text-xs text-status-critical underline disabled:opacity-50"
-    >
+    <button onClick={() => setConfirming(true)} className="btn-danger">
       Desactivar
     </button>
   )

@@ -31,7 +31,7 @@ export default async function ConfiguracionPage() {
         <p className="text-xs text-status-neutral">
           Compartilo con entrenadores y atletas para que se sumen a tu equipo.
         </p>
-        <div className="rounded-xl border border-gray-100 bg-white p-4 shadow-sm">
+        <div className="card p-4">
           {org && <CopyJoinCode code={org.joinCode} />}
         </div>
       </section>

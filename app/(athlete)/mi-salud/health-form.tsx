@@ -40,7 +40,7 @@ export function HealthForm({ gender }: { gender: string | null }) {
 
   return (
     <form action={handleSubmit} className="rounded-2xl border border-gray-100 bg-white p-4 shadow-sm space-y-3">
-      <select name="type" className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm" required>
+      <select name="type" className="input-field" required>
         {TYPE_OPTIONS.map((opt) => (
           <option key={opt.value} value={opt.value}>
             {opt.label}
@@ -50,13 +50,13 @@ export function HealthForm({ gender }: { gender: string | null }) {
       <input
         name="title"
         placeholder="Título (ej: Molestia isquiotibial derecho)"
-        className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm"
+        className="input-field"
         required
       />
       <textarea
         name="notes"
         placeholder="Notas (opcional)"
-        className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm"
+        className="input-field"
         rows={2}
       />
       {error && <p className="text-xs text-status-critical">{error}</p>}
@@ -64,14 +64,14 @@ export function HealthForm({ gender }: { gender: string | null }) {
         <button
           type="submit"
           disabled={pending}
-          className="flex-1 bg-navy text-white rounded-lg py-2 text-sm font-medium disabled:opacity-50"
+          className="flex-1 btn-primary py-2 text-sm"
         >
           Guardar
         </button>
         <button
           type="button"
           onClick={() => setOpen(false)}
-          className="px-4 rounded-lg border border-gray-200 text-sm text-status-neutral"
+          className="btn-secondary px-4 text-sm"
         >
           Cancelar
         </button>

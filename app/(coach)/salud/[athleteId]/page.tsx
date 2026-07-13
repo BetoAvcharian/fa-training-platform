@@ -58,7 +58,7 @@ export default async function AthleteSaludPage({
 
       <div className="space-y-2">
         {episodes.map((e) => (
-          <div key={e.id} className="rounded-xl border border-gray-100 bg-white p-4 shadow-sm">
+          <div key={e.id} className="card p-4">
             <p className="text-xs uppercase tracking-wide text-gold font-semibold">{TYPE_LABELS[e.type]}</p>
             <p className="font-medium text-navy">{e.title}</p>
             <p className="text-xs text-status-neutral mt-0.5">

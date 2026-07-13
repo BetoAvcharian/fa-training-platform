@@ -91,7 +91,7 @@ export default async function ResumenPage() {
       )}
 
       {competitions.length > 0 && (
-        <div className="rounded-xl border border-gray-200 bg-white p-4">
+        <div className="card p-4">
           <p className="text-sm font-medium text-navy mb-2">ℹ️ Próximas competencias</p>
           <ul className="space-y-1">
             {competitions.map((c) => (
@@ -113,7 +113,7 @@ export default async function ResumenPage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {/* Próximos eventos */}
-        <div className="rounded-xl border border-gray-200 bg-white p-4">
+        <div className="card p-4">
           <div className="flex items-center justify-between mb-3">
             <p className="text-sm font-semibold text-navy">Próximos eventos</p>
             <Link href="/calendario" className="text-xs text-gold font-medium">
@@ -141,7 +141,7 @@ export default async function ResumenPage() {
 
         {/* Gráficos */}
         <div className="space-y-4">
-          <div className="rounded-xl border border-gray-200 bg-white p-4">
+          <div className="card p-4">
             <p className="text-sm font-semibold text-navy mb-2">Rendimiento (% completado, últimas sesiones)</p>
             {attendance.length === 0 ? (
               <p className="text-sm text-status-neutral">Sin datos todavía.</p>
@@ -149,7 +149,7 @@ export default async function ResumenPage() {
               <PerformanceChart data={attendance} />
             )}
           </div>
-          <div className="rounded-xl border border-gray-200 bg-white p-4">
+          <div className="card p-4">
             <p className="text-sm font-semibold text-navy mb-2">Asistencia (últimas sesiones)</p>
             {attendance.length === 0 ? (
               <p className="text-sm text-status-neutral">Sin datos todavía.</p>
@@ -165,7 +165,7 @@ export default async function ResumenPage() {
 
 function StatCard({ label, value, delta }: { label: string; value: number; delta: number }) {
   return (
-    <div className="rounded-xl border border-gray-200 bg-white p-4">
+    <div className="card p-4">
       <p className="text-xs text-status-neutral uppercase tracking-wide">{label}</p>
       <p className="font-display text-2xl font-bold text-navy">{value}</p>
       {delta > 0 && <p className="text-xs text-status-positive mt-0.5">+{delta} esta semana</p>}

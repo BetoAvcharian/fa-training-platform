@@ -70,11 +70,11 @@ export function ProfileEditForm({
       <p className="text-xs text-status-neutral uppercase tracking-wide">Datos personales</p>
       <div>
         <label className="text-xs text-status-neutral">Fecha de nacimiento</label>
-        <input name="birthDate" type="date" defaultValue={birthDate ?? ''} className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm mt-1" />
+        <input name="birthDate" type="date" defaultValue={birthDate ?? ''} className="input-field mt-1" />
       </div>
       <div>
         <label className="text-xs text-status-neutral">Género</label>
-        <select name="gender" defaultValue={gender ?? ''} className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm mt-1">
+        <select name="gender" defaultValue={gender ?? ''} className="input-field mt-1">
           <option value="">Sin especificar</option>
           {Object.entries(GENDER_LABELS).map(([value, label]) => (
             <option key={value} value={value}>
@@ -85,18 +85,18 @@ export function ProfileEditForm({
       </div>
       <div>
         <label className="text-xs text-status-neutral">Teléfono</label>
-        <input name="phone" defaultValue={phone ?? ''} className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm mt-1" />
+        <input name="phone" defaultValue={phone ?? ''} className="input-field mt-1" />
       </div>
       <div>
         <label className="text-xs text-status-neutral">Club</label>
-        <input name="club" defaultValue={club ?? ''} className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm mt-1" />
+        <input name="club" defaultValue={club ?? ''} className="input-field mt-1" />
       </div>
       {error && <p className="text-xs text-status-critical">{error}</p>}
       <div className="flex gap-2">
-        <button type="submit" disabled={pending} className="flex-1 bg-navy text-white rounded-lg py-2 text-sm font-medium disabled:opacity-50">
+        <button type="submit" disabled={pending} className="flex-1 btn-primary py-2 text-sm">
           Guardar
         </button>
-        <button type="button" onClick={() => setEditing(false)} className="px-4 rounded-lg border border-gray-200 text-sm text-status-neutral">
+        <button type="button" onClick={() => setEditing(false)} className="btn-secondary px-4 text-sm">
           Cancelar
         </button>
       </div>

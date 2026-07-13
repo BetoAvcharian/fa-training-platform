@@ -45,7 +45,7 @@ export function ObjectiveForm({ roster }: { roster: RosterOption[] }) {
 
   return (
     <form action={handleSubmit} className="rounded-xl border border-gray-100 bg-white p-4 shadow-sm space-y-3 max-w-md">
-      <select name="athleteMembershipId" className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm" required>
+      <select name="athleteMembershipId" className="input-field" required>
         <option value="">Elegí un atleta</option>
         {roster.map((r) => (
           <option key={r.id} value={r.id}>
@@ -53,7 +53,7 @@ export function ObjectiveForm({ roster }: { roster: RosterOption[] }) {
           </option>
         ))}
       </select>
-      <select name="category" className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm" required>
+      <select name="category" className="input-field" required>
         {CATEGORY_OPTIONS.map((opt) => (
           <option key={opt.value} value={opt.value}>
             {opt.label}
@@ -63,24 +63,24 @@ export function ObjectiveForm({ roster }: { roster: RosterOption[] }) {
       <textarea
         name="description"
         placeholder="Objetivo (ej: Bajar de 55s en 400m para el Provincial)"
-        className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm"
+        className="input-field"
         rows={2}
         required
       />
-      <input name="targetDate" type="date" className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm" />
+      <input name="targetDate" type="date" className="input-field" />
       {error && <p className="text-xs text-status-critical">{error}</p>}
       <div className="flex gap-2">
         <button
           type="submit"
           disabled={pending}
-          className="flex-1 bg-navy text-white rounded-lg py-2 text-sm font-medium disabled:opacity-50"
+          className="flex-1 btn-primary py-2 text-sm"
         >
           Guardar
         </button>
         <button
           type="button"
           onClick={() => setOpen(false)}
-          className="px-4 rounded-lg border border-gray-200 text-sm text-status-neutral"
+          className="btn-secondary px-4 text-sm"
         >
           Cancelar
         </button>

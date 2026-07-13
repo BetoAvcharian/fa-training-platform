@@ -33,7 +33,7 @@ export function EnrollForm({ eventId, roster }: { eventId: string; roster: Roste
           })
           e.target.value = ''
         }}
-        className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm"
+        className="input-field"
       >
         <option value="">+ Inscribir atleta</option>
         {roster.map((r) => (
