@@ -21,6 +21,8 @@ export type AuditAction =
   | 'video.create'
   | 'video.delete'
   | 'session_feedback.create'
+  | 'assessment.create'
+  | 'protocol.create'
 
 export interface AuditLogInput {
   organizationId: string
