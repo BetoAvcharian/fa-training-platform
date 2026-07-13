@@ -2,8 +2,10 @@ import { getMyActiveMembership } from '@/domains/athletes/queries'
 import { getEventsForRange } from '@/domains/events/queries'
 import { getResolvedSessionForAthlete } from '@/domains/observations/session-view'
 import { hasCheckinForDate } from '@/domains/observations/checkin'
+import { getMySessionFeedback } from '@/domains/observations/session-feedback'
 import { CheckinForm } from './checkin-form'
 import { SessionLine } from './session-line'
+import { SessionFeedbackForm } from './session-feedback-form'
 
 export const dynamic = 'force-dynamic'
 
@@ -24,6 +26,7 @@ export default async function HoyPage() {
     trainingEvents.map(async (event) => ({
       event,
       lines: await getResolvedSessionForAthlete(event.id, membership.id),
+      feedback: await getMySessionFeedback(event.id, membership.id),
     }))
   )
 
@@ -45,7 +48,7 @@ export default async function HoyPage() {
           </div>
         )}
 
-        {sessions.map(({ event, lines }) => (
+        {sessions.map(({ event, lines, feedback }) => (
           <div key={event.id} className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
             <p className="text-xs uppercase tracking-wide text-gold font-semibold mb-1">Entrenamiento de hoy</p>
             <p className="font-display font-bold text-navy mb-3">{event.title}</p>
@@ -56,6 +59,12 @@ export default async function HoyPage() {
               ))}
               {lines.length === 0 && <p className="text-sm text-status-neutral">Sin ejercicios cargados todavía.</p>}
             </div>
+
+            <SessionFeedbackForm
+              eventId={event.id}
+              initialStatus={feedback?.status ?? null}
+              initialNotes={feedback?.notes ?? null}
+            />
           </div>
         ))}
       </div>
