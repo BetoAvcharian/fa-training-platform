@@ -20,6 +20,7 @@ export type AuditAction =
   | 'group.create'
   | 'video.create'
   | 'video.delete'
+  | 'session_feedback.create'
 
 export interface AuditLogInput {
   organizationId: string
