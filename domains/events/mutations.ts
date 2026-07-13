@@ -50,6 +50,46 @@ export async function createEvent(input: CreateEventInput, client?: AppSupabaseC
   return event
 }
 
+export async function assignAthleteToEvent(
+  input: { eventId: string; athleteMembershipId: string; organizationId: string },
+  client?: AppSupabaseClient
+): Promise<void> {
+  const supabase = client ?? (await createServerClient())
+  const actor = await requireRole(input.organizationId, ['manager', 'coach'], supabase)
+
+  const { error } = await supabase
+    .from('event_assignments')
+    .insert({ event_id: input.eventId, assignee_type: 'person', assignee_id: input.athleteMembershipId })
+
+  if (error) throw new DomainError('CONFLICT', error.message)
+
+  await logAudit({
+    organizationId: input.organizationId,
+    actorMembershipId: actor.id,
+    action: 'event.assign',
+    entityType: 'event',
+    entityId: input.eventId,
+    metadata: { athleteMembershipId: input.athleteMembershipId },
+  })
+}
+
+export async function unassignAthlete(
+  input: { eventId: string; athleteMembershipId: string; organizationId: string },
+  client?: AppSupabaseClient
+): Promise<void> {
+  const supabase = client ?? (await createServerClient())
+  await requireRole(input.organizationId, ['manager', 'coach'], supabase)
+
+  const { error } = await supabase
+    .from('event_assignments')
+    .delete()
+    .eq('event_id', input.eventId)
+    .eq('assignee_type', 'person')
+    .eq('assignee_id', input.athleteMembershipId)
+
+  if (error) throw new DomainError('CONFLICT', error.message)
+}
+
 /**
  * Agrega una línea de sesión, corriendo SmartLine sobre el texto. Nunca
  * falla por no poder interpretar la línea — la guarda igual, marcada

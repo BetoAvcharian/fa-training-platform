@@ -15,6 +15,7 @@ const NAV_ITEMS = [
   { href: '/salud', label: 'Salud', ready: true },
   { href: '/planificacion', label: 'Planificación', ready: true },
   { href: '/registros', label: 'Registros', ready: true },
+  { href: '/competencias', label: 'Competencias', ready: true },
   { href: '/videos', label: 'Videos', ready: true },
   { href: '/configuracion', label: 'Configuración', ready: true },
 ]
