@@ -1,5 +1,5 @@
 import { getMyHealthEpisodes } from '@/domains/health/queries'
-import { getMyActiveMembership } from '@/domains/athletes/queries'
+import { getMyActiveMembership, getMyProfile } from '@/domains/athletes/queries'
 import { getAnthropometryObservables, getAnthropometryHistory } from '@/domains/observations/anthropometry'
 import { HealthForm } from './health-form'
 import { EditableHealthCard } from './editable-health-card'
@@ -15,10 +15,11 @@ export default async function MiSaludPage() {
   const membership = await getMyActiveMembership()
   if (!membership) return null
 
-  const [episodes, observables, history] = await Promise.all([
+  const [episodes, observables, history, profile] = await Promise.all([
     getMyHealthEpisodes(),
     getAnthropometryObservables(membership.organizationId),
     getAnthropometryHistory(membership.id),
+    getMyProfile(),
   ])
   const activos = episodes.filter((e) => e.status === 'activo')
   const resueltos = episodes.filter((e) => e.status === 'resuelto')
@@ -33,7 +34,7 @@ export default async function MiSaludPage() {
         </p>
       </div>
 
-      <HealthForm />
+      <HealthForm gender={profile?.gender ?? null} />
 
       <section className="space-y-3">
         <h2 className="text-sm font-semibold text-navy">Activos</h2>

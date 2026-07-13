@@ -3,16 +3,17 @@
 import { useState, useTransition } from 'react'
 import { createHealthEpisodeAction } from './actions'
 
-const TYPE_OPTIONS = [
+const ALL_TYPE_OPTIONS = [
   { value: 'lesion', label: 'Lesión' },
   { value: 'medicacion', label: 'Medicación' },
   { value: 'ciclo_menstrual', label: 'Ciclo menstrual' },
 ]
 
-export function HealthForm() {
+export function HealthForm({ gender }: { gender: string | null }) {
   const [open, setOpen] = useState(false)
   const [pending, startTransition] = useTransition()
   const [error, setError] = useState<string | null>(null)
+  const TYPE_OPTIONS = ALL_TYPE_OPTIONS.filter((o) => o.value !== 'ciclo_menstrual' || gender === 'femenino')
 
   function handleSubmit(formData: FormData) {
     startTransition(async () => {
