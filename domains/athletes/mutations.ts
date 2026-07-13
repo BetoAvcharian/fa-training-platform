@@ -327,3 +327,24 @@ export async function signUpAthlete(input: SignUpAthleteInput) {
 
   return { organizationId: coachMembership.organization_id }
 }
+
+/** El propio usuario edita sus datos personales (género, fecha de nacimiento, teléfono, club). */
+export async function updateMyProfile(
+  input: { birthDate?: string; gender?: string; phone?: string; club?: string },
+  client?: AppSupabaseClient
+): Promise<void> {
+  const supabase = client ?? (await createServerClient())
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (!user) throw new DomainError('PERMISSION', 'No autenticado')
+
+  const patch: Record<string, unknown> = {}
+  if (input.birthDate !== undefined) patch.birth_date = input.birthDate || null
+  if (input.gender !== undefined) patch.gender = input.gender || null
+  if (input.phone !== undefined) patch.phone = input.phone || null
+  if (input.club !== undefined) patch.club = input.club || null
+
+  const { error } = await supabase.from('people').update(patch).eq('auth_user_id', user.id)
+  if (error) throw new DomainError('CONFLICT', error.message)
+}
