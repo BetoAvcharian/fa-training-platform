@@ -1,12 +1,14 @@
 import Link from 'next/link'
 import { getMyActiveMembership } from '@/domains/athletes/queries'
+import { getUnreadCount } from '@/domains/notifications/queries'
 import { redirect } from 'next/navigation'
 import { createServerClient } from '@/lib/supabase/server'
 
 // 5 ítems de la Fase 7. Diseñado mobile-first a propósito (Fase 9,
 // "rol-first": el atleta vive en el celular, uso diario, gesto rápido —
 // a diferencia del Calendario del entrenador, que se piensa desde
-// desktop).
+// desktop). Notificaciones no suma un 7mo ítem al nav inferior — va
+// como campanita en el header, para no saturar la barra táctil.
 const NAV_ITEMS = [
   { href: '/hoy', label: 'Hoy', ready: true },
   { href: '/mi-calendario', label: 'Calendario', ready: true },
@@ -28,16 +30,27 @@ export default async function AthleteLayout({ children }: { children: React.Reac
   if (!membership || membership.role !== 'athlete') {
     redirect('/login')
   }
+  const unreadCount = await getUnreadCount()
 
   return (
     <div className="min-h-screen bg-cream pb-20">
       <header className="px-5 pt-5 pb-3 flex items-center justify-between">
         <p className="font-display font-bold text-navy">ENTRENAME</p>
-        <form action={signOutAction}>
-          <button type="submit" className="text-xs text-status-neutral">
-            Cerrar sesión
-          </button>
-        </form>
+        <div className="flex items-center gap-3">
+          <Link href="/mis-notificaciones" className="relative text-navy">
+            🔔
+            {unreadCount > 0 && (
+              <span className="absolute -top-1 -right-1 bg-gold text-navy text-[9px] font-bold rounded-full w-4 h-4 flex items-center justify-center">
+                {unreadCount}
+              </span>
+            )}
+          </Link>
+          <form action={signOutAction}>
+            <button type="submit" className="text-xs text-status-neutral">
+              Cerrar sesión
+            </button>
+          </form>
+        </div>
       </header>
 
       <main className="max-w-md mx-auto px-5 pt-2 pb-6">{children}</main>

@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { getMyActiveMembership } from '@/domains/athletes/queries'
+import { getUnreadCount } from '@/domains/notifications/queries'
 import { redirect } from 'next/navigation'
 import { SignOutButton } from '@/components/ui/sign-out-button'
 
@@ -17,6 +18,7 @@ const NAV_ITEMS = [
   { href: '/registros', label: 'Registros', ready: true },
   { href: '/competencias', label: 'Competencias', ready: true },
   { href: '/videos', label: 'Videos', ready: true },
+  { href: '/notificaciones', label: 'Notificaciones', ready: true },
   { href: '/configuracion', label: 'Configuración', ready: true },
 ]
 
@@ -25,6 +27,7 @@ export default async function CoachLayout({ children }: { children: React.ReactN
   if (!membership || membership.role === 'athlete') {
     redirect('/login')
   }
+  const unreadCount = await getUnreadCount()
 
   return (
     <div className="min-h-screen md:flex">
@@ -44,9 +47,12 @@ export default async function CoachLayout({ children }: { children: React.ReactN
             <Link
               key={item.href}
               href={item.href}
-              className="shrink-0 text-xs rounded-full px-3 py-1.5 bg-white/10 text-white/80 whitespace-nowrap"
+              className="shrink-0 text-xs rounded-full px-3 py-1.5 bg-white/10 text-white/80 whitespace-nowrap flex items-center gap-1"
             >
               {item.label}
+              {item.href === '/notificaciones' && unreadCount > 0 && (
+                <span className="bg-gold text-navy rounded-full px-1.5 text-[10px] font-bold">{unreadCount}</span>
+              )}
             </Link>
           ))}
         </nav>
@@ -66,9 +72,12 @@ export default async function CoachLayout({ children }: { children: React.ReactN
               <Link
                 key={item.href}
                 href={item.href}
-                className="text-sm rounded-lg px-3 py-2.5 text-white/70 hover:bg-white/10 hover:text-white transition-colors"
+                className="text-sm rounded-lg px-3 py-2.5 text-white/70 hover:bg-white/10 hover:text-white transition-colors flex items-center justify-between"
               >
                 {item.label}
+                {item.href === '/notificaciones' && unreadCount > 0 && (
+                  <span className="bg-gold text-navy rounded-full px-1.5 text-[10px] font-bold">{unreadCount}</span>
+                )}
               </Link>
             ) : (
               <span
