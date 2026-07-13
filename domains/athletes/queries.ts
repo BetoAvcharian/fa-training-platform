@@ -184,8 +184,9 @@ export async function getMyActiveMembership(
 
   const { data, error } = await supabase
     .from('memberships')
-    .select('id, organization_id, role')
+    .select('id, organization_id, role, people!inner(auth_user_id)')
     .eq('status', 'activo')
+    .eq('people.auth_user_id', user.id)
     .limit(1)
     .maybeSingle()
 
