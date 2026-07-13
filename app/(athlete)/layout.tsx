@@ -3,20 +3,22 @@ import { getMyActiveMembership } from '@/domains/athletes/queries'
 import { getUnreadCount } from '@/domains/notifications/queries'
 import { redirect } from 'next/navigation'
 import { createServerClient } from '@/lib/supabase/server'
+import { SideDrawer } from './side-drawer'
 
-// 5 ítems de la Fase 7. Diseñado mobile-first a propósito (Fase 9,
-// "rol-first": el atleta vive en el celular, uso diario, gesto rápido —
-// a diferencia del Calendario del entrenador, que se piensa desde
-// desktop). Notificaciones no suma un 7mo ítem al nav inferior — va
-// como campanita en el header, para no saturar la barra táctil.
+// Rediseño (feedback del usuario: la barra de 6 ítems abajo se veía
+// "rara" en el celular). Ahora: 3 accesos rápidos fijos abajo (los de
+// uso diario) + un menú lateral desplegable (☰ en el header) con todo
+// lo demás, incluidos esos mismos 3 por si acá.
 const NAV_ITEMS = [
-  { href: '/hoy', label: 'Hoy', ready: true },
-  { href: '/mi-calendario', label: 'Calendario', ready: true },
-  { href: '/mi-rendimiento', label: 'Rendimiento', ready: true },
-  { href: '/mi-salud', label: 'Salud', ready: true },
-  { href: '/mis-videos', label: 'Videos', ready: true },
-  { href: '/perfil', label: 'Perfil', ready: true },
+  { href: '/hoy', label: 'Hoy', icon: '🏠', ready: true },
+  { href: '/mi-calendario', label: 'Calendario', icon: '📅', ready: true },
+  { href: '/mi-rendimiento', label: 'Rendimiento', icon: '📈', ready: true },
+  { href: '/mi-salud', label: 'Salud', icon: '❤️', ready: true },
+  { href: '/mis-videos', label: 'Videos', icon: '🎥', ready: true },
+  { href: '/perfil', label: 'Perfil', icon: '👤', ready: true },
 ]
+
+const QUICK_ITEMS = NAV_ITEMS.filter((i) => ['/hoy', '/mi-calendario', '/mi-salud'].includes(i.href))
 
 async function signOutAction() {
   'use server'
@@ -33,7 +35,7 @@ export default async function AthleteLayout({ children }: { children: React.Reac
   const unreadCount = await getUnreadCount()
 
   return (
-    <div className="min-h-screen bg-cream pb-20">
+    <div className="min-h-screen bg-cream pb-24">
       <header className="px-5 pt-5 pb-3 flex items-center justify-between">
         <p className="font-display font-bold text-navy">ENTRENAME</p>
         <div className="flex items-center gap-3">
@@ -45,9 +47,10 @@ export default async function AthleteLayout({ children }: { children: React.Reac
               </span>
             )}
           </Link>
+          <SideDrawer items={[...NAV_ITEMS, { href: '/mis-notificaciones', label: 'Notificaciones', icon: '🔔', ready: true }]} />
           <form action={signOutAction}>
             <button type="submit" className="text-xs text-status-neutral">
-              Cerrar sesión
+              Salir
             </button>
           </form>
         </div>
@@ -55,18 +58,17 @@ export default async function AthleteLayout({ children }: { children: React.Reac
 
       <main className="max-w-md mx-auto px-5 pt-2 pb-6">{children}</main>
 
-      <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 flex justify-around py-2 shadow-[0_-2px_12px_rgba(0,0,0,0.04)]">
-        {NAV_ITEMS.map((item) =>
-          item.ready ? (
-            <Link key={item.href} href={item.href} className="flex flex-col items-center gap-0.5 px-3 py-1.5 text-navy">
-              <span className="text-xs font-medium">{item.label}</span>
-            </Link>
-          ) : (
-            <span key={item.href} className="flex flex-col items-center gap-0.5 px-3 py-1.5 text-status-neutral">
-              <span className="text-xs">{item.label}</span>
-            </span>
-          )
-        )}
+      <nav className="fixed bottom-4 left-1/2 -translate-x-1/2 bg-navy rounded-full px-2 py-2 flex items-center gap-1 shadow-lg">
+        {QUICK_ITEMS.map((item) => (
+          <Link
+            key={item.href}
+            href={item.href}
+            className="flex flex-col items-center justify-center w-16 h-12 rounded-full text-white/90 hover:bg-white/10 transition-colors"
+          >
+            <span className="text-base leading-none">{item.icon}</span>
+            <span className="text-[9px] mt-0.5">{item.label}</span>
+          </Link>
+        ))}
       </nav>
     </div>
   )
