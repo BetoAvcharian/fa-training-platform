@@ -13,6 +13,175 @@ import { DomainError } from '@/types/errors'
  * hasta que haya volumen real que lo justifique).
  */
 
+function daysAgoISO(n: number): string {
+  const d = new Date()
+  d.setDate(d.getDate() - n)
+  return d.toISOString().slice(0, 10)
+}
+
+export interface OrgStatCard {
+  count: number
+  deltaWeek: number
+}
+
+/** Las 4 métricas de cabecera del dashboard: ejercicios, sesiones, atletas, miembros activos. */
+export async function getOrgStats(
+  organizationId: string,
+  client?: AppSupabaseClient
+): Promise<{ drills: OrgStatCard; sessions: OrgStatCard; athletes: OrgStatCard; activeMembers: OrgStatCard }> {
+  const supabase = client ?? (await createServerClient())
+  const weekAgo = daysAgoISO(7)
+
+  const [drills, drillsWeek, sessions, sessionsWeek, athletes, athletesWeek, activeMembers, activeMembersWeek] =
+    await Promise.all([
+      supabase.from('observables').select('id', { count: 'exact', head: true }),
+      supabase.from('observables').select('id', { count: 'exact', head: true }).gte('created_at', weekAgo),
+      supabase
+        .from('events')
+        .select('id', { count: 'exact', head: true })
+        .eq('organization_id', organizationId)
+        .eq('type', 'entrenamiento'),
+      supabase
+        .from('events')
+        .select('id', { count: 'exact', head: true })
+        .eq('organization_id', organizationId)
+        .eq('type', 'entrenamiento')
+        .gte('created_at', weekAgo),
+      supabase
+        .from('memberships')
+        .select('id', { count: 'exact', head: true })
+        .eq('organization_id', organizationId)
+        .eq('role', 'athlete'),
+      supabase
+        .from('memberships')
+        .select('id', { count: 'exact', head: true })
+        .eq('organization_id', organizationId)
+        .eq('role', 'athlete')
+        .gte('created_at', weekAgo),
+      supabase
+        .from('memberships')
+        .select('id', { count: 'exact', head: true })
+        .eq('organization_id', organizationId)
+        .eq('status', 'activo'),
+      supabase
+        .from('memberships')
+        .select('id', { count: 'exact', head: true })
+        .eq('organization_id', organizationId)
+        .eq('status', 'activo')
+        .gte('created_at', weekAgo),
+    ])
+
+  return {
+    drills: { count: drills.count ?? 0, deltaWeek: drillsWeek.count ?? 0 },
+    sessions: { count: sessions.count ?? 0, deltaWeek: sessionsWeek.count ?? 0 },
+    athletes: { count: athletes.count ?? 0, deltaWeek: athletesWeek.count ?? 0 },
+    activeMembers: { count: activeMembers.count ?? 0, deltaWeek: activeMembersWeek.count ?? 0 },
+  }
+}
+
+/** Próximos eventos de toda la organización (no solo los de un coach), con asignados/completados. */
+export async function getUpcomingEventsOrg(
+  organizationId: string,
+  limit = 5,
+  client?: AppSupabaseClient
+): Promise<
+  Array<{ id: string; title: string; type: string; date: string; assignedCount: number; completedCount: number }>
+> {
+  const supabase = client ?? (await createServerClient())
+  const today = new Date().toISOString().slice(0, 10)
+
+  const { data: events, error } = await supabase
+    .from('events')
+    .select('id, title, type, date, event_assignments(assignee_id, assignee_type)')
+    .eq('organization_id', organizationId)
+    .eq('is_template', false)
+    .gte('date', today)
+    .order('date')
+    .limit(limit)
+
+  if (error) throw new DomainError('NOT_FOUND', error.message)
+
+  const results = []
+  for (const event of events ?? []) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const assignees = ((event as any).event_assignments ?? [])
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      .filter((a: any) => a.assignee_type === 'person')
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      .map((a: any) => a.assignee_id as string)
+
+    let completedCount = 0
+    if (assignees.length > 0) {
+      const { count } = await supabase
+        .from('observations')
+        .select('athlete_membership_id', { count: 'exact', head: true })
+        .eq('event_id', event.id)
+        .eq('state', 'ejecutado')
+        .in('athlete_membership_id', assignees)
+
+      completedCount = count ?? 0
+    }
+
+    results.push({
+      id: event.id,
+      title: event.title,
+      type: event.type,
+      date: event.date as string,
+      assignedCount: assignees.length,
+      completedCount,
+    })
+  }
+
+  return results
+}
+
+/** Asistencia (asignados vs. completados) de las últimas N sesiones de entrenamiento de la org. */
+export async function getAttendanceSeries(
+  organizationId: string,
+  limit = 10,
+  client?: AppSupabaseClient
+): Promise<Array<{ date: string; assigned: number; completed: number }>> {
+  const supabase = client ?? (await createServerClient())
+  const today = new Date().toISOString().slice(0, 10)
+
+  const { data: events, error } = await supabase
+    .from('events')
+    .select('id, date, event_assignments(assignee_id, assignee_type)')
+    .eq('organization_id', organizationId)
+    .eq('type', 'entrenamiento')
+    .eq('is_template', false)
+    .lte('date', today)
+    .order('date', { ascending: false })
+    .limit(limit)
+
+  if (error) throw new DomainError('NOT_FOUND', error.message)
+
+  const series = []
+  for (const event of (events ?? []).reverse()) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const assignees = ((event as any).event_assignments ?? [])
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      .filter((a: any) => a.assignee_type === 'person')
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      .map((a: any) => a.assignee_id as string)
+
+    let completed = 0
+    if (assignees.length > 0) {
+      const { count } = await supabase
+        .from('observations')
+        .select('athlete_membership_id', { count: 'exact', head: true })
+        .eq('event_id', event.id)
+        .eq('state', 'ejecutado')
+        .in('athlete_membership_id', assignees)
+      completed = count ?? 0
+    }
+
+    series.push({ date: event.date as string, assigned: assignees.length, completed })
+  }
+
+  return series
+}
+
 export interface AthleteAlert {
   athleteMembershipId: string
   athleteName: string
