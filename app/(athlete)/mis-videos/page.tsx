@@ -1,66 +1,53 @@
+import Link from 'next/link'
 import { getMyActiveMembership } from '@/domains/athletes/queries'
-import { getVideosForAthlete } from '@/domains/videos/tags'
+import { getVideos } from '@/domains/videos/queries'
 
 export const dynamic = 'force-dynamic'
 
-function getEmbedUrl(url: string): string | null {
-  const yt = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([\w-]+)/)
-  if (yt) return `https://www.youtube.com/embed/${yt[1]}`
-  const vimeo = url.match(/vimeo\.com\/(\d+)/)
-  if (vimeo) return `https://player.vimeo.com/video/${vimeo[1]}`
-  return null
-}
+const CATEGORIES: Array<{ key: string; label: string; description: string }> = [
+  { key: 'carreras', label: 'Carreras', description: 'Series, largos, competencias en pista' },
+  { key: 'tecnica', label: 'Técnica', description: 'Análisis técnico de gesto deportivo' },
+  { key: 'musculacion', label: 'Musculación', description: 'Ejercicios de gimnasio' },
+  { key: 'entrenamientos', label: 'Entrenamientos', description: 'Sesiones generales' },
+]
 
-const CATEGORY_LABELS: Record<string, string> = {
-  carreras: 'Carreras',
-  tecnica: 'Técnica',
-  musculacion: 'Musculación',
-  entrenamientos: 'Entrenamientos',
-}
-
-export default async function MisVideosPage() {
+export default async function MisVideosMenuPage() {
   const membership = await getMyActiveMembership()
   if (!membership) return null
 
-  const videos = await getVideosForAthlete(membership.id)
+  const videos = await getVideos(membership.organizationId)
+  const countByCategory = new Map<string, number>()
+  for (const v of videos) {
+    countByCategory.set(v.category, (countByCategory.get(v.category) ?? 0) + 1)
+  }
 
   return (
     <div className="space-y-4">
       <div>
         <p className="text-xs uppercase tracking-wider text-gold font-medium">Videos</p>
-        <h1 className="font-display text-2xl font-bold text-navy">Mis videos</h1>
+        <h1 className="font-display text-2xl font-bold text-navy">Videos</h1>
       </div>
 
-      {videos.length === 0 && (
-        <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm text-center text-sm text-status-neutral">
-          Todavía no hay videos donde te etiquetaron.
+      <Link
+        href="/mis-videos/todos"
+        className="block rounded-2xl border border-gold/40 bg-gold/5 p-4 shadow-sm"
+      >
+        <div className="flex items-center justify-between">
+          <p className="font-display text-base font-bold text-navy">Ver todos los videos</p>
+          <span className="text-xs text-status-neutral">{videos.length} en total</span>
         </div>
-      )}
+      </Link>
 
-      <div className="space-y-4">
-        {videos.map((v) => {
-          const embedUrl = v.sourceType === 'link' ? getEmbedUrl(v.url) : null
-          return (
-            <div key={v.id} className="rounded-2xl border border-gray-100 bg-white shadow-sm overflow-hidden">
-              <div className="aspect-video bg-navy/5">
-                {v.sourceType === 'upload' ? (
-                  <video src={v.url} controls className="w-full h-full" />
-                ) : embedUrl ? (
-                  <iframe src={embedUrl} className="w-full h-full" allowFullScreen />
-                ) : (
-                  <a href={v.url} target="_blank" rel="noreferrer" className="flex items-center justify-center h-full text-sm text-navy underline">
-                    Ver video →
-                  </a>
-                )}
-              </div>
-              <div className="p-3">
-                <p className="text-[10px] uppercase tracking-wide text-gold font-semibold">{CATEGORY_LABELS[v.category] ?? v.category}</p>
-                <p className="font-medium text-navy text-sm">{v.title}</p>
-                {v.description && <p className="text-xs text-status-neutral mt-1">{v.description}</p>}
-              </div>
+      <div className="space-y-2">
+        {CATEGORIES.map((c) => (
+          <Link key={c.key} href={`/mis-videos/${c.key}`} className="block rounded-2xl border border-gray-100 bg-white p-4 shadow-sm">
+            <div className="flex items-center justify-between">
+              <p className="font-medium text-navy">{c.label}</p>
+              <span className="text-xs text-status-neutral">{countByCategory.get(c.key) ?? 0}</span>
             </div>
-          )
-        })}
+            <p className="text-xs text-status-neutral mt-0.5">{c.description}</p>
+          </Link>
+        ))}
       </div>
     </div>
   )
