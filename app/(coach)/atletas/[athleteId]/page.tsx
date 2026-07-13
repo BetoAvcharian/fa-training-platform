@@ -17,6 +17,13 @@ const TABS = [
   { key: 'salud', label: 'Salud' },
 ]
 
+const GENDER_LABELS: Record<string, string> = {
+  masculino: 'Masculino',
+  femenino: 'Femenino',
+  otro: 'Otro',
+  prefiero_no_decir: 'Prefiero no decir',
+}
+
 const TYPE_LABELS: Record<string, string> = {
   entrenamiento: 'Entrenamiento',
   competencia: 'Competencia',
@@ -51,7 +58,7 @@ export default async function AthleteProfilePage({
   const supabase = await createServerClient()
   const { data: athlete } = await supabase
     .from('memberships')
-    .select('id, status, people(first_name, last_name, email)')
+    .select('id, status, people(first_name, last_name, email, birth_date, gender, phone, club)')
     .eq('id', athleteId)
     .maybeSingle()
 
@@ -67,6 +74,12 @@ export default async function AthleteProfilePage({
         </Link>
         <h1 className="font-display text-2xl font-bold text-navy mt-2">{athleteName}</h1>
         {athleteRow?.people?.email && <p className="text-xs text-status-neutral">{athleteRow.people.email}</p>}
+        <div className="flex flex-wrap gap-x-4 gap-y-1 mt-2 text-xs text-status-neutral">
+          {athleteRow?.people?.birth_date && <span>Nacimiento: {athleteRow.people.birth_date}</span>}
+          {athleteRow?.people?.gender && <span>Género: {GENDER_LABELS[athleteRow.people.gender] ?? athleteRow.people.gender}</span>}
+          {athleteRow?.people?.phone && <span>Tel: {athleteRow.people.phone}</span>}
+          {athleteRow?.people?.club && <span>Club: {athleteRow.people.club}</span>}
+        </div>
       </div>
 
       <div className="flex gap-1 border-b border-gray-200 overflow-x-auto">

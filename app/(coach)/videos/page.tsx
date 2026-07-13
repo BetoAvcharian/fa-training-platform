@@ -28,6 +28,16 @@ export default async function VideosMenuPage() {
         <h1 className="font-display text-2xl font-bold text-navy">Elegí una categoría</h1>
       </div>
 
+      <Link
+        href="/videos/todos"
+        className="block rounded-xl border border-gold/40 bg-gold/5 p-4 hover:border-gold transition-colors"
+      >
+        <div className="flex items-center justify-between">
+          <p className="font-display text-base font-bold text-navy">Ver todos los videos</p>
+          <span className="text-xs text-status-neutral">{videos.length} en total</span>
+        </div>
+      </Link>
+
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         {CATEGORIES.map((c) => (
           <Link

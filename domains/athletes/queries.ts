@@ -137,7 +137,7 @@ export async function getMyProfile(client?: AppSupabaseClient) {
 
   const { data, error } = await supabase
     .from('memberships')
-    .select('role, coach_membership_id, person:people(first_name, last_name, email), organization:organizations(name)')
+    .select('role, coach_membership_id, person:people(first_name, last_name, email, birth_date, gender, phone, club), organization:organizations(name)')
     .eq('id', membership.id)
     .maybeSingle()
 
@@ -165,6 +165,10 @@ export async function getMyProfile(client?: AppSupabaseClient) {
     role: row.role as string,
     organizationName: row.organization?.name ?? '',
     coachName,
+    birthDate: row.person?.birth_date ?? null,
+    gender: row.person?.gender ?? null,
+    phone: row.person?.phone ?? null,
+    club: row.person?.club ?? null,
   }
 }
 

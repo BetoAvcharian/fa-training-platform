@@ -12,6 +12,7 @@ const CATEGORY_LABELS: Record<string, string> = {
   tecnica: 'Técnica',
   musculacion: 'Musculación',
   entrenamientos: 'Entrenamientos',
+  todos: 'Todos los videos',
 }
 
 export default async function VideoCategoryPage({
@@ -19,7 +20,7 @@ export default async function VideoCategoryPage({
   searchParams,
 }: {
   params: Promise<{ category: string }>
-  searchParams: Promise<{ atleta?: string; desde?: string; hasta?: string }>
+  searchParams: Promise<{ atleta?: string; desde?: string; hasta?: string; etiquetados?: string }>
 }) {
   const { category } = await params
   const sParams = await searchParams
@@ -43,7 +44,7 @@ export default async function VideoCategoryPage({
   ])
   const canManage = membership.role === 'manager' || membership.role === 'coach'
 
-  let filtered = videos.filter((v) => v.category === category)
+  let filtered = category === 'todos' ? videos : videos.filter((v) => v.category === category)
   if (sParams.desde) filtered = filtered.filter((v) => v.createdAt.slice(0, 10) >= sParams.desde!)
   if (sParams.hasta) filtered = filtered.filter((v) => v.createdAt.slice(0, 10) <= sParams.hasta!)
 
@@ -51,9 +52,13 @@ export default async function VideoCategoryPage({
     filtered.map(async (v) => ({ video: v, tags: await getAthletesForVideo(v.id) }))
   )
 
-  const visible = sParams.atleta
+  let visible = sParams.atleta
     ? videosWithTags.filter(({ tags }) => tags.some((t) => t.id === sParams.atleta))
     : videosWithTags
+
+  if (sParams.etiquetados === '1') {
+    visible = visible.filter(({ tags }) => tags.length > 0)
+  }
 
   return (
     <div className="space-y-6">
@@ -66,7 +71,7 @@ export default async function VideoCategoryPage({
             <p className="text-xs uppercase tracking-wider text-gold font-medium">Videos</p>
             <h1 className="font-display text-2xl font-bold text-navy">{CATEGORY_LABELS[category]}</h1>
           </div>
-          {canManage && <VideoForm organizationId={membership.organizationId} roster={roster} category={category} />}
+          {canManage && category !== 'todos' && <VideoForm organizationId={membership.organizationId} roster={roster} category={category} />}
         </div>
       </div>
 
@@ -90,6 +95,10 @@ export default async function VideoCategoryPage({
           <label className="text-xs text-status-neutral block mb-1">Hasta</label>
           <input type="date" name="hasta" defaultValue={sParams.hasta ?? ''} className="rounded-lg border border-gray-200 px-3 py-1.5 text-sm" />
         </div>
+        <label className="flex items-center gap-1.5 text-xs text-navy pb-2">
+          <input type="checkbox" name="etiquetados" value="1" defaultChecked={sParams.etiquetados === '1'} />
+          Solo etiquetados
+        </label>
         <button type="submit" className="rounded-lg bg-navy text-white px-4 py-1.5 text-sm font-medium">
           Filtrar
         </button>

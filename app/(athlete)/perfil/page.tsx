@@ -1,6 +1,7 @@
 import { getMyProfile } from '@/domains/athletes/queries'
 import { createServerClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
+import { ProfileEditForm } from './profile-edit-form'
 
 export const dynamic = 'force-dynamic'
 
@@ -50,6 +51,8 @@ export default async function PerfilPage() {
           </div>
         )}
       </div>
+
+      <ProfileEditForm birthDate={profile.birthDate} gender={profile.gender} phone={profile.phone} club={profile.club} />
 
       <a href="/mis-objetivos" className="block rounded-2xl border border-gray-100 bg-white p-4 shadow-sm text-sm text-navy">
         Mis objetivos →
