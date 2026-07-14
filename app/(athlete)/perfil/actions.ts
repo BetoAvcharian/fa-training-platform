@@ -10,7 +10,6 @@ export async function updateProfileAction(formData: FormData) {
       birthDate: String(formData.get('birthDate') ?? ''),
       gender: String(formData.get('gender') ?? ''),
       phone: String(formData.get('phone') ?? ''),
-      club: String(formData.get('club') ?? ''),
     })
   } catch (e) {
     return { error: e instanceof DomainError ? e.message : 'No se pudo guardar' }

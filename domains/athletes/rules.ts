@@ -50,15 +50,17 @@ export async function requireRole(
   const { data: memberships, error } = await supabase
     .from('memberships')
     .select(
-      'id, organization_id, person_id, invited_email, role, status, coach_membership_id, created_at'
+      'id, organization_id, person_id, invited_email, role, status, coach_membership_id, created_at, people!inner(auth_user_id)'
     )
     .eq('status', 'activo')
+    .eq('organization_id', organizationId)
+    .eq('people.auth_user_id', user.id)
 
   if (error) {
     throw new DomainError('NOT_FOUND', 'No se pudieron resolver las membresías del usuario')
   }
 
-  const raw = memberships?.find((m) => m.organization_id === organizationId)
+  const raw = memberships?.[0]
 
   if (!raw) {
     throw new DomainError('PERMISSION', 'No pertenecés a esta organización')
