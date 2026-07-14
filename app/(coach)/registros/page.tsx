@@ -51,6 +51,13 @@ export default async function RegistrosPage() {
         observables={registrableObservables.map((o) => ({ id: o.id, name: o.name, unitSymbol: unitById.get(o.unitId)?.symbol ?? null }))}
       />
 
+      <details className="text-sm">
+        <summary className="cursor-pointer text-navy underline">¿No está en la lista? Agregar una prueba nueva</summary>
+        <div className="mt-2">
+          <ObservableForm sports={sports} units={units} />
+        </div>
+      </details>
+
       <section className="space-y-2">
         <h2 className="text-sm font-semibold text-navy">Últimos registros</h2>
         {recent.length === 0 && (

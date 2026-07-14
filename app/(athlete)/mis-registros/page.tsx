@@ -1,7 +1,8 @@
 import { getMyActiveMembership } from '@/domains/athletes/queries'
-import { getObservables, getUnits } from '@/domains/catalog/queries'
+import { getObservables, getUnits, getSports } from '@/domains/catalog/queries'
 import { getAthleteResults } from '@/domains/performance/queries'
 import { MyRecordForm } from './record-form'
+import { MyObservableForm } from './observable-form'
 
 export const dynamic = 'force-dynamic'
 
@@ -13,10 +14,11 @@ export default async function MisRegistrosPage() {
   const membership = await getMyActiveMembership()
   if (!membership) return null
 
-  const [observables, units, recent] = await Promise.all([
+  const [observables, units, recent, sports] = await Promise.all([
     getObservables(membership.organizationId),
     getUnits(membership.organizationId),
     getAthleteResults(membership.id, membership.organizationId, 20),
+    getSports(membership.organizationId),
   ])
 
   const unitById = new Map(units.map((u) => [u.id, u]))
@@ -32,6 +34,13 @@ export default async function MisRegistrosPage() {
       </div>
 
       <MyRecordForm observables={registrable} />
+
+      <details className="text-sm">
+        <summary className="cursor-pointer text-navy underline">¿No está en la lista? Agregar una prueba nueva</summary>
+        <div className="mt-2">
+          <MyObservableForm sports={sports} units={units} />
+        </div>
+      </details>
 
       <div>
         <p className="text-xs text-status-neutral uppercase tracking-wide mb-2">Últimos registros</p>
