@@ -2,6 +2,7 @@ import { getMyProfile } from '@/domains/athletes/queries'
 import { createServerClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { ProfileEditForm } from './profile-edit-form'
+import { AvatarUpload } from './avatar-upload'
 
 export const dynamic = 'force-dynamic'
 
@@ -31,6 +32,11 @@ export default async function PerfilPage() {
         </h1>
       </div>
 
+      <AvatarUpload
+        initialUrl={profile.photoUrl}
+        initials={`${profile.firstName[0] ?? ''}${profile.lastName[0] ?? ''}`}
+      />
+
       <div className="rounded-2xl border border-gray-100 bg-white p-4 shadow-sm space-y-3">
         <div>
           <p className="text-xs text-status-neutral">Email</p>
@@ -52,7 +58,7 @@ export default async function PerfilPage() {
         )}
       </div>
 
-      <ProfileEditForm birthDate={profile.birthDate} gender={profile.gender} phone={profile.phone} club={profile.club} />
+      <ProfileEditForm birthDate={profile.birthDate} gender={profile.gender} phone={profile.phone} />
 
       <a href="/mis-objetivos" className="block rounded-2xl border border-gray-100 bg-white p-4 shadow-sm text-sm text-navy">
         Mis objetivos →

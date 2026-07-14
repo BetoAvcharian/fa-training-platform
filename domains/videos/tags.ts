@@ -1,6 +1,6 @@
 import { createServerClient, type AppSupabaseClient } from '@/lib/supabase/server'
 import { DomainError } from '@/types/errors'
-import { requireRole } from '@/domains/athletes/rules'
+import { getMyActiveMembership } from '@/domains/athletes/queries'
 
 export interface TaggedAthlete {
   id: string
@@ -28,7 +28,8 @@ export async function tagAthletesOnVideo(
   client?: AppSupabaseClient
 ): Promise<void> {
   const supabase = client ?? (await createServerClient())
-  await requireRole(input.organizationId, ['manager', 'coach'], supabase)
+  const actor = await getMyActiveMembership(supabase)
+  if (!actor || actor.organizationId !== input.organizationId) throw new DomainError('PERMISSION', 'No autenticado')
 
   if (input.athleteMembershipIds.length === 0) return
 
@@ -44,7 +45,8 @@ export async function untagAthlete(
   client?: AppSupabaseClient
 ): Promise<void> {
   const supabase = client ?? (await createServerClient())
-  await requireRole(input.organizationId, ['manager', 'coach'], supabase)
+  const actor = await getMyActiveMembership(supabase)
+  if (!actor || actor.organizationId !== input.organizationId) throw new DomainError('PERMISSION', 'No autenticado')
 
   const { error } = await supabase
     .from('video_athlete_tags')

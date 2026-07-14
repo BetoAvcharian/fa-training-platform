@@ -106,9 +106,19 @@ export default async function AthleteProfilePage({
 }
 
 async function ResumenTab({ athleteId, organizationId }: { athleteId: string; organizationId: string }) {
-  const [events, records] = await Promise.all([
+  const supabase = await createServerClient()
+  const [events, records, checkins] = await Promise.all([
     getEventsForAthlete(athleteId, 5),
     getAthleteRecords(athleteId, organizationId),
+    supabase
+      .from('observations')
+      .select('date, value, observables!inner(name, tags)')
+      .eq('athlete_membership_id', athleteId)
+      .overlaps('observables.tags', ['checkin'])
+      .is('superseded_by', null)
+      .order('date', { ascending: false })
+      .limit(12)
+      .then((r) => r.data ?? []),
   ])
 
   return (
@@ -134,6 +144,18 @@ async function ResumenTab({ athleteId, organizationId }: { athleteId: string; or
               {r.observableName}: <span className="font-medium">{r.value}{r.unitSymbol ? ` ${r.unitSymbol}` : ''}</span>
             </p>
           ))}
+      </div>
+      <div className="card p-4 sm:col-span-2">
+        <p className="text-sm font-semibold text-navy mb-2">Bienestar (check-in diario)</p>
+        {checkins.length === 0 && <p className="text-sm text-status-neutral">Sin check-ins registrados todavía.</p>}
+        <div className="flex flex-wrap gap-2">
+          {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+          {(checkins as any[]).map((c, i) => (
+            <span key={i} className="text-xs bg-gray-50 rounded-full px-2 py-1 text-navy">
+              {formatDate(c.date)} · {c.observables?.name}: <span className="font-medium">{c.value}</span>
+            </span>
+          ))}
+        </div>
       </div>
     </div>
   )
