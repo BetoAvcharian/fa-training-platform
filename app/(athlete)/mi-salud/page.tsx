@@ -4,6 +4,7 @@ import { getAnthropometryObservables, getAnthropometryHistory } from '@/domains/
 import { HealthForm } from './health-form'
 import { EditableHealthCard } from './editable-health-card'
 import { AnthropometryForm } from './anthropometry-form'
+import { AnthropometryHistory } from './anthropometry-history'
 
 export const dynamic = 'force-dynamic'
 
@@ -70,25 +71,7 @@ export default async function MiSaludPage() {
       <section className="space-y-3">
         <h2 className="text-sm font-semibold text-navy">Antropometría y signos vitales</h2>
         <AnthropometryForm observables={observables} />
-        {history.length === 0 && (
-          <div className="rounded-2xl border border-gray-100 bg-white p-4 text-sm text-status-neutral">
-            Todavía no cargaste nada.
-          </div>
-        )}
-        <div className="rounded-2xl border border-gray-100 bg-white shadow-sm divide-y divide-gray-50">
-          {history.map((h) => (
-            <div key={h.id} className="p-4 flex items-center justify-between">
-              <div>
-                <p className="font-medium text-navy text-sm">{h.observableName}</p>
-                <p className="text-xs text-status-neutral">{formatDate(h.date)}</p>
-              </div>
-              <p className="font-semibold text-navy">
-                {h.value}
-                {h.unitSymbol ? ` ${h.unitSymbol}` : ''}
-              </p>
-            </div>
-          ))}
-        </div>
+        <AnthropometryHistory history={history} />
       </section>
     </div>
   )
