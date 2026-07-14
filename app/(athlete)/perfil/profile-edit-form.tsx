@@ -14,12 +14,10 @@ export function ProfileEditForm({
   birthDate,
   gender,
   phone,
-  club,
 }: {
   birthDate: string | null
   gender: string | null
   phone: string | null
-  club: string | null
 }) {
   const [editing, setEditing] = useState(false)
   const [pending, startTransition] = useTransition()
@@ -57,10 +55,6 @@ export function ProfileEditForm({
           <p className="text-xs text-status-neutral">Teléfono</p>
           <p className="text-sm text-navy">{phone ?? '—'}</p>
         </div>
-        <div>
-          <p className="text-xs text-status-neutral">Club</p>
-          <p className="text-sm text-navy">{club ?? '—'}</p>
-        </div>
       </div>
     )
   }
@@ -86,10 +80,6 @@ export function ProfileEditForm({
       <div>
         <label className="text-xs text-status-neutral">Teléfono</label>
         <input name="phone" defaultValue={phone ?? ''} className="input-field mt-1" />
-      </div>
-      <div>
-        <label className="text-xs text-status-neutral">Club</label>
-        <input name="club" defaultValue={club ?? ''} className="input-field mt-1" />
       </div>
       {error && <p className="text-xs text-status-critical">{error}</p>}
       <div className="flex gap-2">

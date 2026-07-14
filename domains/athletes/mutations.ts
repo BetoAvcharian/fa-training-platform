@@ -330,7 +330,7 @@ export async function signUpAthlete(input: SignUpAthleteInput) {
 
 /** El propio usuario edita sus datos personales (género, fecha de nacimiento, teléfono, club). */
 export async function updateMyProfile(
-  input: { birthDate?: string; gender?: string; phone?: string; club?: string },
+  input: { birthDate?: string; gender?: string; phone?: string; club?: string; photoUrl?: string },
   client?: AppSupabaseClient
 ): Promise<void> {
   const supabase = client ?? (await createServerClient())
@@ -344,6 +344,7 @@ export async function updateMyProfile(
   if (input.gender !== undefined) patch.gender = input.gender || null
   if (input.phone !== undefined) patch.phone = input.phone || null
   if (input.club !== undefined) patch.club = input.club || null
+  if (input.photoUrl !== undefined) patch.photo_url = input.photoUrl || null
 
   const { error } = await supabase.from('people').update(patch).eq('auth_user_id', user.id)
   if (error) throw new DomainError('CONFLICT', error.message)

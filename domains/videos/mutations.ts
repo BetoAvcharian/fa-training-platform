@@ -1,12 +1,16 @@
 import { createServerClient, type AppSupabaseClient } from '@/lib/supabase/server'
 import { DomainError } from '@/types/errors'
 import { requireRole } from '@/domains/athletes/rules'
+import { getMyActiveMembership } from '@/domains/athletes/queries'
 import { logAudit } from '@/domains/audit/mutations'
 import type { CreateVideoInput } from './types'
 
 export async function createVideo(input: CreateVideoInput, client?: AppSupabaseClient): Promise<{ id: string }> {
   const supabase = client ?? (await createServerClient())
-  const actor = await requireRole(input.organizationId, ['manager', 'coach'], supabase)
+  const actor = await getMyActiveMembership(supabase)
+  if (!actor || actor.organizationId !== input.organizationId) {
+    throw new DomainError('PERMISSION', 'No autenticado')
+  }
 
   const { data, error } = await supabase
     .from('videos')
@@ -41,7 +45,19 @@ export async function deleteVideo(
   client?: AppSupabaseClient
 ): Promise<void> {
   const supabase = client ?? (await createServerClient())
-  const actor = await requireRole(input.organizationId, ['manager', 'coach'], supabase)
+  const actor = await getMyActiveMembership(supabase)
+  if (!actor) throw new DomainError('PERMISSION', 'No autenticado')
+
+  // Cualquiera puede borrar lo que subió; manager/coach pueden borrar
+  // cualquier video del org — la RLS (creator_manage_own_video +
+  // staff_manage_videos) es la garantía final, esto es sólo para dar
+  // un mensaje de error claro antes de intentarlo.
+  if (actor.role === 'athlete') {
+    const { data: video } = await supabase.from('videos').select('created_by_membership_id').eq('id', input.id).maybeSingle()
+    if (video?.created_by_membership_id !== actor.id) {
+      throw new DomainError('PERMISSION', 'Solo podés borrar los videos que subiste vos')
+    }
+  }
 
   const { error } = await supabase.from('videos').delete().eq('id', input.id)
   if (error) throw new DomainError('CONFLICT', error.message)

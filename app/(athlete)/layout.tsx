@@ -13,6 +13,8 @@ const NAV_ITEMS = [
   { href: '/hoy', label: 'Hoy', icon: '🏠', ready: true },
   { href: '/mi-calendario', label: 'Calendario', icon: '📅', ready: true },
   { href: '/mi-rendimiento', label: 'Rendimiento', icon: '📈', ready: true },
+  { href: '/mis-registros', label: 'Registrar marca', icon: '⏱️', ready: true },
+  { href: '/mis-objetivos', label: 'Mis objetivos', icon: '🎯', ready: true },
   { href: '/mi-salud', label: 'Salud', icon: '❤️', ready: true },
   { href: '/mis-videos', label: 'Videos', icon: '🎥', ready: true },
   { href: '/perfil', label: 'Perfil', icon: '👤', ready: true },

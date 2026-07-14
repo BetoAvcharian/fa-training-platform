@@ -1,8 +1,9 @@
 import Link from 'next/link'
-import { getMyActiveMembership } from '@/domains/athletes/queries'
+import { getMyActiveMembership, getRoster } from '@/domains/athletes/queries'
 import { getVideos } from '@/domains/videos/queries'
 import { getAthletesForVideo } from '@/domains/videos/tags'
 import { VideoCard } from '@/app/(coach)/videos/video-card'
+import { VideoForm } from '@/app/(coach)/videos/video-form'
 
 export const dynamic = 'force-dynamic'
 
@@ -38,6 +39,7 @@ export default async function MisVideosCategoryPage({
   }
 
   const videos = await getVideos(membership.organizationId)
+  const roster = await getRoster(membership.organizationId)
   const filtered = category === 'todos' ? videos : videos.filter((v) => v.category === category)
 
   const videosWithTags = await Promise.all(
@@ -57,6 +59,8 @@ export default async function MisVideosCategoryPage({
         </Link>
         <h1 className="font-display text-2xl font-bold text-navy mt-1">{CATEGORY_LABELS[category]}</h1>
       </div>
+
+      {category !== 'todos' && <VideoForm organizationId={membership.organizationId} roster={roster} category={category} />}
 
       <a
         href={`?mios=${sParams.mios === '1' ? '' : '1'}`}

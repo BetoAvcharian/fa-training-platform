@@ -19,3 +19,14 @@ export async function updateProfileAction(formData: FormData) {
   revalidatePath('/perfil')
   return { error: null }
 }
+
+export async function updatePhotoAction(photoUrl: string) {
+  try {
+    await updateMyProfile({ photoUrl })
+  } catch (e) {
+    return { error: e instanceof DomainError ? e.message : 'No se pudo guardar la foto' }
+  }
+
+  revalidatePath('/perfil')
+  return { error: null }
+}
