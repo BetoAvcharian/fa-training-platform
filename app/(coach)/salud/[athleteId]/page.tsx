@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { getAthleteHealthEpisodes } from '@/domains/health/queries'
 import { getAnthropometryHistory } from '@/domains/observations/anthropometry'
 import { createServerClient } from '@/lib/supabase/server'
+import { AnthropometryHistory } from '@/app/(athlete)/mi-salud/anthropometry-history'
 
 export const dynamic = 'force-dynamic'
 
@@ -73,20 +74,7 @@ export default async function AthleteSaludPage({
       {anthropometry.length > 0 && (
         <div className="space-y-3">
           <h2 className="text-sm font-semibold text-navy">Antropometría y signos vitales</h2>
-          <div className="rounded-xl border border-gray-100 bg-white shadow-sm divide-y divide-gray-50">
-            {anthropometry.map((h) => (
-              <div key={h.id} className="p-4 flex items-center justify-between">
-                <div>
-                  <p className="font-medium text-navy text-sm">{h.observableName}</p>
-                  <p className="text-xs text-status-neutral">{formatDate(h.date)}</p>
-                </div>
-                <p className="font-semibold text-navy">
-                  {h.value}
-                  {h.unitSymbol ? ` ${h.unitSymbol}` : ''}
-                </p>
-              </div>
-            ))}
-          </div>
+          <AnthropometryHistory history={anthropometry} />
         </div>
       )}
     </div>
