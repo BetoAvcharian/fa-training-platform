@@ -1,6 +1,7 @@
 import { createServerClient, type AppSupabaseClient } from '@/lib/supabase/server'
 import { DomainError } from '@/types/errors'
 import { requireRole } from '@/domains/athletes/rules'
+import { getMyActiveMembership } from '@/domains/athletes/queries'
 import { logAudit } from '@/domains/audit/mutations'
 import type { CreateObservableInput, HideGlobalItemInput } from './types'
 
@@ -13,7 +14,10 @@ import type { CreateObservableInput, HideGlobalItemInput } from './types'
  */
 export async function createObservable(input: CreateObservableInput, client?: AppSupabaseClient) {
   const supabase = client ?? (await createServerClient())
-  const actor = await requireRole(input.organizationId, ['manager', 'coach'], supabase)
+  const actor = await getMyActiveMembership(supabase)
+  if (!actor || actor.organizationId !== input.organizationId) {
+    throw new DomainError('PERMISSION', 'No autenticado')
+  }
 
   const { data, error } = await supabase
     .from('observables')
