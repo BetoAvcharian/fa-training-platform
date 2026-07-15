@@ -1,4 +1,5 @@
 import { getMyRecords, getMyResults } from '@/domains/performance/queries'
+import { formatMark } from '@/lib/format-mark'
 
 export const dynamic = 'force-dynamic'
 
@@ -50,10 +51,7 @@ export default async function MiRendimientoPage() {
                 <p className="font-medium text-navy">{r.observableName}</p>
                 <p className="text-xs text-status-neutral">{formatDate(r.achievedDate)}</p>
               </div>
-              <p className="font-display font-bold text-navy">
-                {r.value}
-                {r.unitSymbol ? ` ${r.unitSymbol}` : ''}
-              </p>
+              <p className="font-display font-bold text-navy tabular-nums">{formatMark(r.value, r.unitSymbol)}</p>
             </div>
           ))}
         </div>
@@ -69,10 +67,7 @@ export default async function MiRendimientoPage() {
                   <p className="font-medium text-navy">{r.observableName}</p>
                   <p className="text-xs text-status-neutral">{formatDate(r.achievedDate)}</p>
                 </div>
-                <p className="font-display font-bold text-navy">
-                  {r.value}
-                  {r.unitSymbol ? ` ${r.unitSymbol}` : ''}
-                </p>
+                <p className="font-display font-bold text-navy tabular-nums">{formatMark(r.value, r.unitSymbol)}</p>
               </div>
             ))}
           </div>
@@ -98,10 +93,7 @@ export default async function MiRendimientoPage() {
                   )}
                 </p>
               </div>
-              <p className="font-semibold text-navy">
-                {row.value}
-                {row.unitSymbol ? ` ${row.unitSymbol}` : ''}
-              </p>
+              <p className="font-display font-semibold text-navy tabular-nums">{formatMark(row.value, row.unitSymbol)}</p>
             </div>
           ))}
         </div>

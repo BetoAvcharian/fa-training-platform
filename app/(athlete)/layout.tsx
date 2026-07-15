@@ -3,6 +3,7 @@ import { getMyActiveMembership } from '@/domains/athletes/queries'
 import { getUnreadCount } from '@/domains/notifications/queries'
 import { redirect } from 'next/navigation'
 import { createServerClient } from '@/lib/supabase/server'
+import { Logo } from '@/components/logo'
 import { SideDrawer } from './side-drawer'
 
 // Rediseño (feedback del usuario: la barra de 6 ítems abajo se veía
@@ -39,7 +40,10 @@ export default async function AthleteLayout({ children }: { children: React.Reac
   return (
     <div className="min-h-screen bg-cream pb-24">
       <header className="px-5 pt-5 pb-3 flex items-center justify-between">
-        <p className="font-display font-bold text-navy">ENTRENAME</p>
+        <div className="flex items-center gap-2">
+          <Logo className="w-7 h-7" />
+          <p className="font-display font-bold text-navy tracking-wide">ENTRENAME</p>
+        </div>
         <div className="flex items-center gap-3">
           <Link href="/mis-notificaciones" className="relative text-navy">
             🔔

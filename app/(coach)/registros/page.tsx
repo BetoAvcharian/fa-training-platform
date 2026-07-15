@@ -4,6 +4,7 @@ import { getRecentRecords } from '@/domains/observations/manual-entry'
 import { RecordForm } from './record-form'
 import { ObservableForm } from './observable-form'
 import { HideButton, UnhideButton } from './hide-button'
+import { formatMark } from '@/lib/format-mark'
 
 export const dynamic = 'force-dynamic'
 
@@ -75,8 +76,7 @@ export default async function RegistrosPage() {
                 </p>
               </div>
               <p className="font-semibold text-navy">
-                {r.value}
-                {r.unitSymbol ? ` ${r.unitSymbol}` : ''}
+                {formatMark(r.value, r.unitSymbol)}
               </p>
             </div>
           ))}

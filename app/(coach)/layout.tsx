@@ -3,6 +3,7 @@ import { getMyActiveMembership } from '@/domains/athletes/queries'
 import { getUnreadCount } from '@/domains/notifications/queries'
 import { redirect } from 'next/navigation'
 import { SignOutButton } from '@/components/ui/sign-out-button'
+import { Logo } from '@/components/logo'
 
 // Los 8 ítems de la Fase 7 — bajado de los 15 de la V1. Las pantallas
 // que todavía no se construyeron (Atletas, Salud, Planificación,
@@ -36,11 +37,14 @@ export default async function CoachLayout({ children }: { children: React.ReactN
       {/* Mobile: barra superior + nav horizontal scrolleable. Desktop: oculto, usa el sidebar de abajo. */}
       <header className="md:hidden sticky top-0 z-10 bg-navy text-white">
         <div className="flex items-center justify-between px-4 pt-4 pb-2">
-          <div>
-            <p className="font-display font-bold text-lg leading-none">ENTRENAME</p>
-            <p className="text-[10px] text-white/50 uppercase tracking-wide mt-1">
-              {membership.role === 'manager' ? 'Panel Manager' : 'Panel Entrenador'}
-            </p>
+          <div className="flex items-center gap-2">
+            <Logo className="w-7 h-7" />
+            <div>
+              <p className="font-display font-bold text-lg leading-none tracking-wide">ENTRENAME</p>
+              <p className="text-[10px] text-white/50 uppercase tracking-wide mt-1">
+                {membership.role === 'manager' ? 'Panel Manager' : 'Panel Entrenador'}
+              </p>
+            </div>
           </div>
           <SignOutButton />
         </div>
@@ -62,11 +66,14 @@ export default async function CoachLayout({ children }: { children: React.ReactN
 
       {/* Desktop: sidebar fijo. */}
       <aside className="hidden md:flex w-56 shrink-0 bg-navy text-white flex-col p-4 min-h-screen sticky top-0">
-        <div className="mb-8 px-1 pt-1">
-          <p className="font-display font-bold text-lg">ENTRENAME</p>
-          <p className="text-[11px] text-white/50 uppercase tracking-wide mt-0.5">
-            {membership.role === 'manager' ? 'Panel Manager' : 'Panel Entrenador'}
-          </p>
+        <div className="mb-8 px-1 pt-1 flex items-center gap-2">
+          <Logo className="w-8 h-8" />
+          <div>
+            <p className="font-display font-bold text-lg tracking-wide">ENTRENAME</p>
+            <p className="text-[11px] text-white/50 uppercase tracking-wide mt-0.5">
+              {membership.role === 'manager' ? 'Panel Manager' : 'Panel Entrenador'}
+            </p>
+          </div>
         </div>
         <nav className="flex flex-col gap-1 flex-1">
           {NAV_ITEMS.map((item) =>

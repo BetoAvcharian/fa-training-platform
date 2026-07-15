@@ -4,6 +4,7 @@ import { getCompetitionEntries } from '@/domains/competitions/queries'
 import { getObservables, getUnits } from '@/domains/catalog/queries'
 import { createServerClient } from '@/lib/supabase/server'
 import { EnrollForm, UnenrollButton, ResultForm } from './forms'
+import { formatMark } from '@/lib/format-mark'
 
 export const dynamic = 'force-dynamic'
 
@@ -65,7 +66,7 @@ export default async function CompetitionDetailPage({ params }: { params: Promis
               <div className="mt-2 space-y-1">
                 {entry.results.map((r) => (
                   <p key={r.id} className="text-xs text-status-neutral">
-                    {r.observableName}: <span className="font-medium text-navy">{r.value}{r.unitSymbol ? ` ${r.unitSymbol}` : ''}</span>
+                    {r.observableName}: <span className="font-medium text-navy">{formatMark(r.value, r.unitSymbol)}</span>
                   </p>
                 ))}
               </div>

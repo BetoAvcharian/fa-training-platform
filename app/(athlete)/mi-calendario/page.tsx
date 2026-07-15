@@ -1,6 +1,7 @@
 import { getMyActiveMembership } from '@/domains/athletes/queries'
 import { getEventsForRange } from '@/domains/events/queries'
 import { getResolvedSessionForAthlete } from '@/domains/observations/session-view'
+import { SessionAccordion } from './session-accordion'
 
 export const dynamic = 'force-dynamic'
 
@@ -75,18 +76,7 @@ export default async function MiCalendarioPage({
                 {DAY_NAMES[i]} {day.getDate()}
               </p>
               {daySessions.map(({ event, lines }) => (
-                <div key={event.id} className="rounded-2xl border border-gray-100 bg-white p-4 shadow-sm mb-2">
-                  <p className="font-medium text-navy text-sm mb-1">{event.title}</p>
-                  <div className="space-y-1">
-                    {lines.map((resolved) => (
-                      <p key={resolved.line.id} className="text-xs text-status-neutral">
-                        {resolved.line.rawText}
-                        {resolved.executed && <span className="text-status-positive"> ✓</span>}
-                      </p>
-                    ))}
-                    {lines.length === 0 && <p className="text-xs text-gray-300">Sin líneas cargadas</p>}
-                  </div>
-                </div>
+                <SessionAccordion key={event.id} title={event.title} lines={lines} />
               ))}
             </div>
           )
