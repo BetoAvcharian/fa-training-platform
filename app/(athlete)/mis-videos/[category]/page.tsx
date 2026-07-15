@@ -3,7 +3,6 @@ import { getMyActiveMembership, getRoster } from '@/domains/athletes/queries'
 import { getVideos } from '@/domains/videos/queries'
 import { getAthletesForVideo } from '@/domains/videos/tags'
 import { VideoCard } from '@/app/(coach)/videos/video-card'
-import { VideoForm } from '@/app/(coach)/videos/video-form'
 
 export const dynamic = 'force-dynamic'
 
@@ -60,7 +59,9 @@ export default async function MisVideosCategoryPage({
         <h1 className="font-display text-2xl font-bold text-navy mt-1">{CATEGORY_LABELS[category]}</h1>
       </div>
 
-      <VideoForm organizationId={membership.organizationId} roster={roster} category={category} />
+      <Link href="/mis-videos" className="text-xs text-navy underline">
+        + Subir video
+      </Link>
 
       <a
         href={`?mios=${sParams.mios === '1' ? '' : '1'}`}

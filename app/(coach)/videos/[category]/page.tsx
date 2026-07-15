@@ -2,7 +2,6 @@ import Link from 'next/link'
 import { getMyActiveMembership, getRoster } from '@/domains/athletes/queries'
 import { getVideos } from '@/domains/videos/queries'
 import { getAthletesForVideo } from '@/domains/videos/tags'
-import { VideoForm } from '../video-form'
 import { VideoCard } from '../video-card'
 
 export const dynamic = 'force-dynamic'
@@ -71,7 +70,11 @@ export default async function VideoCategoryPage({
             <p className="text-xs uppercase tracking-wider text-gold font-medium">Videos</p>
             <h1 className="font-display text-2xl font-bold text-navy">{CATEGORY_LABELS[category]}</h1>
           </div>
-          {canManage && <VideoForm organizationId={membership.organizationId} roster={roster} category={category} />}
+          {canManage && (
+            <Link href="/videos" className="text-xs text-navy underline">
+              + Subir video
+            </Link>
+          )}
         </div>
       </div>
 

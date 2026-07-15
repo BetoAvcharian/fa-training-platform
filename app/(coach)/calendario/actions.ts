@@ -19,19 +19,25 @@ export async function createEventAction(formData: FormData) {
   const date = String(formData.get('date') ?? '')
   const athleteId = String(formData.get('athleteId') ?? '')
   const groupId = String(formData.get('groupId') ?? '')
+  const firstLine = String(formData.get('firstLine') ?? '')
+  const firstLineSport = String(formData.get('firstLineSport') ?? 'Atletismo') as 'Atletismo' | 'Fuerza'
 
   if (!title || !date || (!athleteId && !groupId)) {
     return { error: 'Faltan datos para crear el entrenamiento' }
   }
 
   try {
-    await createEventDomain({
+    const event = await createEventDomain({
       organizationId: membership.organizationId,
       type: 'entrenamiento',
       title,
       date,
       assignments: groupId ? [{ type: 'group', id: groupId }] : [{ type: 'person', id: athleteId }],
     })
+
+    if (firstLine.trim()) {
+      await addSessionLineDomain({ eventId: event.id, sportName: firstLineSport, rawText: firstLine })
+    }
   } catch (e) {
     return { error: e instanceof DomainError ? e.message : 'No se pudo crear' }
   }
