@@ -1,3 +1,4 @@
+import { getTodayISO } from '@/lib/today'
 import { NextRequest, NextResponse } from 'next/server'
 import * as XLSX from 'xlsx'
 import { getMyActiveMembership } from '@/domains/athletes/queries'
@@ -43,7 +44,7 @@ export async function GET(request: NextRequest) {
   return new NextResponse(buffer, {
     headers: {
       'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-      'Content-Disposition': `attachment; filename="reporte-${new Date().toISOString().slice(0, 10)}.xlsx"`,
+      'Content-Disposition': `attachment; filename="reporte-${getTodayISO()}.xlsx"`,
     },
   })
 }

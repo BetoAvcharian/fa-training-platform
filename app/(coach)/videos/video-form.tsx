@@ -15,6 +15,7 @@ export function VideoForm({
 }) {
   const [open, setOpen] = useState(false)
   const [mode, setMode] = useState<'link' | 'upload'>('link')
+  const [selectedCategory, setSelectedCategory] = useState(category === 'todos' ? 'entrenamientos' : category)
   const [pending, startTransition] = useTransition()
   const [uploading, setUploading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -40,7 +41,7 @@ export function VideoForm({
       fd.set('title', title)
       fd.set('description', description)
       fd.set('sourceType', 'link')
-      fd.set('category', category)
+      fd.set('category', selectedCategory)
       fd.set('url', url)
       athleteIds.forEach((id) => fd.append('athleteIds', id))
       startTransition(async () => {
@@ -77,7 +78,7 @@ export function VideoForm({
       fd.set('title', title)
       fd.set('description', description)
       fd.set('sourceType', 'upload')
-      fd.set('category', category)
+      fd.set('category', selectedCategory)
       fd.set('url', publicUrl.publicUrl)
       athleteIds.forEach((id) => fd.append('athleteIds', id))
       startTransition(async () => {
@@ -126,6 +127,15 @@ export function VideoForm({
 
       <input name="title" placeholder="Título" className="input-field" required />
       <textarea name="description" placeholder="Descripción (opcional)" rows={2} className="input-field" />
+
+      {category === 'todos' && (
+        <select value={selectedCategory} onChange={(e) => setSelectedCategory(e.target.value)} className="input-field">
+          <option value="carreras">Carreras</option>
+          <option value="tecnica">Técnica</option>
+          <option value="musculacion">Musculación</option>
+          <option value="entrenamientos">Entrenamientos</option>
+        </select>
+      )}
 
       {mode === 'link' ? (
         <input name="url" placeholder="https://youtube.com/..." className="input-field" />

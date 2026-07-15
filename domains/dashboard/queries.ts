@@ -1,3 +1,4 @@
+import { getTodayISO } from '@/lib/today'
 import { createServerClient, type AppSupabaseClient } from '@/lib/supabase/server'
 import { DomainError } from '@/types/errors'
 
@@ -88,7 +89,7 @@ export async function getUpcomingEventsOrg(
   Array<{ id: string; title: string; type: string; date: string; assignedCount: number; completedCount: number }>
 > {
   const supabase = client ?? (await createServerClient())
-  const today = new Date().toISOString().slice(0, 10)
+  const today = getTodayISO()
 
   const { data: events, error } = await supabase
     .from('events')
@@ -142,7 +143,7 @@ export async function getAttendanceSeries(
   client?: AppSupabaseClient
 ): Promise<Array<{ date: string; assigned: number; completed: number }>> {
   const supabase = client ?? (await createServerClient())
-  const today = new Date().toISOString().slice(0, 10)
+  const today = getTodayISO()
 
   const { data: events, error } = await supabase
     .from('events')

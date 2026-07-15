@@ -1,3 +1,4 @@
+import { getTodayISO } from '@/lib/today'
 import { createServerClient, type AppSupabaseClient } from '@/lib/supabase/server'
 import { DomainError } from '@/types/errors'
 import { getMyActiveMembership } from '@/domains/athletes/queries'
@@ -30,7 +31,7 @@ export async function createHealthEpisode(
       type: input.type,
       title: input.title,
       severity: input.severity ?? null,
-      start_date: input.startDate ?? new Date().toISOString().slice(0, 10),
+      start_date: input.startDate ?? getTodayISO(),
       notes: input.notes ?? null,
       created_by_membership_id: membership.id,
     })
@@ -90,7 +91,7 @@ export async function resolveHealthEpisode(
 
   const { error } = await supabase
     .from('health_episodes')
-    .update({ status: 'resuelto', end_date: new Date().toISOString().slice(0, 10) })
+    .update({ status: 'resuelto', end_date: getTodayISO() })
     .eq('id', id)
 
   if (error) {

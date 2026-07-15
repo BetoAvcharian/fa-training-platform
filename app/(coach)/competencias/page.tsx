@@ -1,3 +1,4 @@
+import { getTodayISO } from '@/lib/today'
 import Link from 'next/link'
 import { getMyActiveMembership } from '@/domains/athletes/queries'
 import { getCompetitions } from '@/domains/competitions/queries'
@@ -15,7 +16,7 @@ export default async function CompetenciasPage() {
   if (!membership) return null
 
   const competitions = await getCompetitions(membership.organizationId)
-  const today = new Date().toISOString().slice(0, 10)
+  const today = getTodayISO()
   const upcoming = competitions.filter((c) => (c.date ?? '') >= today)
   const past = competitions.filter((c) => (c.date ?? '') < today)
 

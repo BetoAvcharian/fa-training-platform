@@ -1,5 +1,6 @@
 'use server'
 
+import { getTodayISO } from '@/lib/today'
 import { revalidatePath } from 'next/cache'
 import { getMyActiveMembership } from '@/domains/athletes/queries'
 import { submitCheckin as submitCheckinDomain } from '@/domains/observations/checkin'
@@ -18,7 +19,7 @@ export async function submitCheckinAction(formData: FormData) {
     await submitCheckinDomain({
       organizationId: membership.organizationId,
       athleteMembershipId: membership.id,
-      date: new Date().toISOString().slice(0, 10),
+      date: getTodayISO(),
       energia: energia ? Number(energia) : undefined,
       fatiga: fatiga ? Number(fatiga) : undefined,
     })

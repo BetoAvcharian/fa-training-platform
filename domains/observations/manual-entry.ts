@@ -1,3 +1,4 @@
+import { getTodayISO } from '@/lib/today'
 import { createServerClient, type AppSupabaseClient } from '@/lib/supabase/server'
 import { DomainError } from '@/types/errors'
 import { getMyActiveMembership } from '@/domains/athletes/queries'
@@ -32,7 +33,7 @@ export async function recordObservation(
     p_athlete_membership_id: input.athleteMembershipId,
     p_observable_id: input.observableId,
     p_value: input.value,
-    p_date: input.date ?? new Date().toISOString().slice(0, 10),
+    p_date: input.date ?? getTodayISO(),
     p_source_type: 'manual',
     p_created_by_membership_id: actor.id,
     p_notes: input.notes ?? null,
