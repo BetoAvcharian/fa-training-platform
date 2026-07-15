@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { formatMark } from '@/lib/format-mark'
 
 interface Entry {
   id: string
@@ -62,8 +63,7 @@ export function AnthropometryHistory({ history }: { history: Entry[] }) {
               <p className="text-xs text-status-neutral">{formatDate(h.date)}</p>
             </div>
             <p className="font-semibold text-navy">
-              {h.value}
-              {h.unitSymbol ? ` ${h.unitSymbol}` : ''}
+              {formatMark(h.value, h.unitSymbol)}
             </p>
           </div>
         ))}

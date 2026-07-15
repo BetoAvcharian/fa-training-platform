@@ -6,6 +6,7 @@ import { getAthleteHealthEpisodes } from '@/domains/health/queries'
 import { getAnthropometryHistory } from '@/domains/observations/anthropometry'
 import { getVideosForAthlete } from '@/domains/videos/tags'
 import { getMyActiveMembership } from '@/domains/athletes/queries'
+import { formatMark } from '@/lib/format-mark'
 
 export const dynamic = 'force-dynamic'
 
@@ -141,7 +142,7 @@ async function ResumenTab({ athleteId, organizationId }: { athleteId: string; or
           .filter((r) => r.recordType === 'oficial')
           .map((r) => (
             <p key={r.id} className="text-sm text-navy py-1 border-b border-gray-50 last:border-0">
-              {r.observableName}: <span className="font-medium">{r.value}{r.unitSymbol ? ` ${r.unitSymbol}` : ''}</span>
+              {r.observableName}: <span className="font-medium">{formatMark(r.value, r.unitSymbol)}</span>
             </p>
           ))}
       </div>
@@ -193,7 +194,7 @@ async function ResultadosTab({ athleteId, organizationId }: { athleteId: string;
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
           {records.map((r) => (
             <div key={r.id} className="text-sm text-navy border border-gray-100 rounded-lg p-2">
-              {r.observableName}: <span className="font-medium">{r.value}{r.unitSymbol ? ` ${r.unitSymbol}` : ''}</span>
+              {r.observableName}: <span className="font-medium">{formatMark(r.value, r.unitSymbol)}</span>
               <span className="text-xs text-status-neutral"> ({r.recordType})</span>
             </div>
           ))}
@@ -208,7 +209,7 @@ async function ResultadosTab({ athleteId, organizationId }: { athleteId: string;
               <p className="text-navy">{r.observableName}</p>
               <p className="text-xs text-status-neutral">{formatDate(r.date)}</p>
             </div>
-            <p className="font-medium text-navy">{r.value}{r.unitSymbol ? ` ${r.unitSymbol}` : ''}</p>
+            <p className="font-medium text-navy">{formatMark(r.value, r.unitSymbol)}</p>
           </div>
         ))}
       </div>
@@ -256,7 +257,7 @@ async function SaludTab({ athleteId }: { athleteId: string }) {
           {anthropometry.map((h) => (
             <div key={h.id} className="p-3 flex items-center justify-between text-sm">
               <p className="text-navy">{h.observableName}</p>
-              <p className="font-medium text-navy">{h.value}{h.unitSymbol ? ` ${h.unitSymbol}` : ''}</p>
+              <p className="font-medium text-navy">{formatMark(h.value, h.unitSymbol)}</p>
             </div>
           ))}
         </div>

@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { getMyActiveMembership } from '@/domains/athletes/queries'
 import { getAthleteRecords, getAthleteResults } from '@/domains/performance/queries'
 import { createServerClient } from '@/lib/supabase/server'
+import { formatMark } from '@/lib/format-mark'
 
 export const dynamic = 'force-dynamic'
 
@@ -71,8 +72,7 @@ export default async function AthleteRendimientoPage({
                 <p className="text-xs text-status-neutral">{formatDate(r.achievedDate)}</p>
               </div>
               <p className="font-display font-bold text-navy">
-                {r.value}
-                {r.unitSymbol ? ` ${r.unitSymbol}` : ''}
+                {formatMark(r.value, r.unitSymbol)}
               </p>
             </div>
           ))}
@@ -96,8 +96,7 @@ export default async function AthleteRendimientoPage({
                 </p>
               </div>
               <p className="font-semibold text-navy">
-                {row.value}
-                {row.unitSymbol ? ` ${row.unitSymbol}` : ''}
+                {formatMark(row.value, row.unitSymbol)}
               </p>
             </div>
           ))}

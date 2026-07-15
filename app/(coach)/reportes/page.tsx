@@ -1,5 +1,6 @@
 import { getMyActiveMembership, getRoster, getGroups } from '@/domains/athletes/queries'
 import { getReportData } from '@/domains/reports/queries'
+import { formatMark } from '@/lib/format-mark'
 
 export const dynamic = 'force-dynamic'
 
@@ -123,8 +124,7 @@ export default async function ReportesPage({
                 <td className="p-2 text-navy">{r.athleteName}</td>
                 <td className="p-2 text-navy">{r.observableName}</td>
                 <td className="p-2 font-medium text-navy">
-                  {r.value}
-                  {r.unitSymbol ? ` ${r.unitSymbol}` : ''}
+                  {formatMark(r.value, r.unitSymbol)}
                 </td>
                 <td className="p-2 text-xs text-status-neutral">{SOURCE_LABELS[r.sourceType] ?? r.sourceType}</td>
               </tr>

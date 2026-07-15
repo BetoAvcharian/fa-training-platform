@@ -1,8 +1,9 @@
 import { getMyActiveMembership } from '@/domains/athletes/queries'
 import { getObservables, getUnits, getSports } from '@/domains/catalog/queries'
-import { getAthleteResults } from '@/domains/performance/queries'
+import { getMyResults } from '@/domains/performance/queries'
 import { MyRecordForm } from './record-form'
 import { MyObservableForm } from './observable-form'
+import { formatMark } from '@/lib/format-mark'
 
 export const dynamic = 'force-dynamic'
 
@@ -17,7 +18,7 @@ export default async function MisRegistrosPage() {
   const [observables, units, recent, sports] = await Promise.all([
     getObservables(membership.organizationId),
     getUnits(membership.organizationId),
-    getAthleteResults(membership.id, membership.organizationId, 20),
+    getMyResults(20),
     getSports(membership.organizationId),
   ])
 
@@ -53,8 +54,7 @@ export default async function MisRegistrosPage() {
                 <p className="text-xs text-status-neutral">{formatDate(r.date)}</p>
               </div>
               <p className="font-medium text-navy">
-                {r.value}
-                {r.unitSymbol ? ` ${r.unitSymbol}` : ''}
+                {formatMark(r.value, r.unitSymbol)}
               </p>
             </div>
           ))}
