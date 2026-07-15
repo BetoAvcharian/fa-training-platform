@@ -1,8 +1,8 @@
 'use server'
 
 import { revalidatePath } from 'next/cache'
-import { createCompetition, recordCompetitionResult } from '@/domains/competitions/mutations'
-import { assignAthleteToEvent, unassignAthlete } from '@/domains/events/mutations'
+import { createCompetition, selfEnrollInCompetition, recordCompetitionResult } from '@/domains/competitions/mutations'
+import { unassignAthlete } from '@/domains/events/mutations'
 import { getMyActiveMembership } from '@/domains/athletes/queries'
 import { DomainError } from '@/types/errors'
 
@@ -32,47 +32,43 @@ export async function createCompetitionAction(formData: FormData) {
   return { error: null }
 }
 
-export async function enrollAthleteAction(eventId: string, formData: FormData) {
+export async function selfEnrollAction(eventId: string) {
   const membership = await getMyActiveMembership()
   if (!membership) return { error: 'No autenticado' }
 
-  const athleteMembershipId = String(formData.get('athleteMembershipId') ?? '')
-  if (!athleteMembershipId) return { error: 'Falta elegir atleta' }
-
   try {
-    await assignAthleteToEvent({ eventId, athleteMembershipId, organizationId: membership.organizationId })
+    await selfEnrollInCompetition({ eventId, organizationId: membership.organizationId })
   } catch (e) {
-    return { error: e instanceof DomainError ? e.message : 'No se pudo inscribir' }
+    return { error: e instanceof DomainError ? e.message : 'No se pudo anotar' }
   }
 
   revalidatePath(`/competencias/${eventId}`)
   return { error: null }
 }
 
-export async function unenrollAthleteAction(eventId: string, athleteMembershipId: string) {
+export async function selfUnenrollAction(eventId: string) {
   const membership = await getMyActiveMembership()
   if (!membership) return
 
-  await unassignAthlete({ eventId, athleteMembershipId, organizationId: membership.organizationId })
+  await unassignAthlete({ eventId, athleteMembershipId: membership.id, organizationId: membership.organizationId })
   revalidatePath(`/competencias/${eventId}`)
 }
 
-export async function recordResultAction(eventId: string, formData: FormData) {
+export async function recordMyResultAction(eventId: string, formData: FormData) {
   const membership = await getMyActiveMembership()
   if (!membership) return { error: 'No autenticado' }
 
-  const athleteMembershipId = String(formData.get('athleteMembershipId') ?? '')
   const observableId = String(formData.get('observableId') ?? '')
   const value = Number(formData.get('value'))
   const windRaw = String(formData.get('windMs') ?? '')
 
-  if (!athleteMembershipId || !observableId) return { error: 'Faltan datos' }
+  if (!observableId) return { error: 'Faltan datos' }
   if (!value || Number.isNaN(value)) return { error: 'Valor inválido' }
 
   try {
     await recordCompetitionResult({
       eventId,
-      athleteMembershipId,
+      athleteMembershipId: membership.id,
       organizationId: membership.organizationId,
       observableId,
       value,

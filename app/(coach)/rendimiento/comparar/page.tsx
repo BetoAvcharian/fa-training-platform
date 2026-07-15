@@ -6,10 +6,25 @@ import { compareAction } from './actions'
 
 export const dynamic = 'force-dynamic'
 
+const SOURCE_OPTIONS = [
+  { value: 'entrenamiento', label: 'Entrenamiento' },
+  { value: 'competencia', label: 'Competencia' },
+  { value: 'assessment', label: 'Evaluación' },
+  { value: 'manual', label: 'Manual' },
+]
+
 export default async function CompararPage({
   searchParams,
 }: {
-  searchParams: Promise<{ observableId?: string; groupId?: string; athletes?: string }>
+  searchParams: Promise<{
+    observableId?: string
+    groupId?: string
+    athletes?: string
+    desde?: string
+    hasta?: string
+    oficiales?: string
+    origenes?: string
+  }>
 }) {
   const params = await searchParams
   const membership = await getMyActiveMembership()
@@ -29,6 +44,7 @@ export default async function CompararPage({
     athleteIds = members.map((m) => m.id)
   }
 
+  const origenesSeleccionados = params.origenes ? params.origenes.split(',').filter(Boolean) : []
   const showResult = params.observableId && athleteIds.length >= 2
 
   let chartData: Array<{ date: string; [key: string]: string | number }> = []
@@ -39,6 +55,10 @@ export default async function CompararPage({
       organizationId: membership.organizationId,
       athleteMembershipIds: athleteIds,
       observableId: params.observableId!,
+      from: params.desde || undefined,
+      to: params.hasta || undefined,
+      officialOnly: params.oficiales === '1',
+      sourceTypes: origenesSeleccionados.length > 0 ? origenesSeleccionados : undefined,
     })
     athleteNames = series.map((s) => s.athleteName)
     const average = computeGroupAverage(series)
@@ -96,6 +116,28 @@ export default async function CompararPage({
             ))}
           </div>
         </div>
+
+        <div className="flex gap-2">
+          <input name="desde" type="date" defaultValue={params.desde ?? ''} className="input-field flex-1" placeholder="Desde" />
+          <input name="hasta" type="date" defaultValue={params.hasta ?? ''} className="input-field flex-1" placeholder="Hasta" />
+        </div>
+
+        <div>
+          <p className="text-xs text-status-neutral mb-1">Origen (vacío = todos)</p>
+          <div className="flex flex-wrap gap-2">
+            {SOURCE_OPTIONS.map((opt) => (
+              <label key={opt.value} className="flex items-center gap-1 text-xs bg-gray-50 rounded-full px-2 py-1">
+                <input type="checkbox" name="origenes" value={opt.value} defaultChecked={origenesSeleccionados.includes(opt.value)} />
+                {opt.label}
+              </label>
+            ))}
+          </div>
+        </div>
+
+        <label className="flex items-center gap-2 text-xs text-navy">
+          <input type="checkbox" name="soloOficiales" value="1" defaultChecked={params.oficiales === '1'} />
+          Solo resultados oficiales
+        </label>
 
         <button type="submit" className="btn-primary px-4 py-2 text-sm">
           Comparar

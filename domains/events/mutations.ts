@@ -1,6 +1,7 @@
 import { createServerClient, type AppSupabaseClient } from '@/lib/supabase/server'
 import { DomainError } from '@/types/errors'
 import { requireRole } from '@/domains/athletes/rules'
+import { getMyActiveMembership } from '@/domains/athletes/queries'
 import { logAudit } from '@/domains/audit/mutations'
 import { parseLine } from './rules'
 import type { CreateEventInput, AddSessionLineInput } from './types'
@@ -78,7 +79,16 @@ export async function unassignAthlete(
   client?: AppSupabaseClient
 ): Promise<void> {
   const supabase = client ?? (await createServerClient())
-  await requireRole(input.organizationId, ['manager', 'coach'], supabase)
+  const actor = await getMyActiveMembership(supabase)
+  if (!actor || actor.organizationId !== input.organizationId) {
+    throw new DomainError('PERMISSION', 'No autenticado')
+  }
+  if (actor.role === 'athlete' && actor.id !== input.athleteMembershipId) {
+    throw new DomainError('PERMISSION', 'Solo te podés desinscribir a vos mismo')
+  }
+  if (actor.role !== 'athlete') {
+    await requireRole(input.organizationId, ['manager', 'coach'], supabase)
+  }
 
   const { error } = await supabase
     .from('event_assignments')

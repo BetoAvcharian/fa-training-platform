@@ -5,26 +5,36 @@ export interface Competition {
   id: string
   title: string
   date: string | null
+  location: string | null
+  locationMapUrl: string | null
+  createdByMembershipId: string
 }
 
 export async function getCompetitions(organizationId: string, client?: AppSupabaseClient): Promise<Competition[]> {
   const supabase = client ?? (await createServerClient())
   const { data, error } = await supabase
     .from('events')
-    .select('id, title, date')
+    .select('id, title, date, location, location_map_url, created_by_membership_id')
     .eq('organization_id', organizationId)
     .eq('type', 'competencia')
     .eq('is_template', false)
     .order('date', { ascending: false })
 
   if (error) throw new DomainError('NOT_FOUND', error.message)
-  return data ?? []
+  return (data ?? []).map((row) => ({
+    id: row.id,
+    title: row.title,
+    date: row.date,
+    location: row.location,
+    locationMapUrl: row.location_map_url,
+    createdByMembershipId: row.created_by_membership_id,
+  }))
 }
 
 export interface CompetitionEntry {
   athleteMembershipId: string
   athleteName: string
-  results: Array<{ id: string; observableName: string; unitSymbol: string | null; value: number }>
+  results: Array<{ id: string; observableName: string; unitSymbol: string | null; value: number; windMs: number | null }>
 }
 
 /** Inscriptos en la competencia, con sus resultados ya cargados (si los hay). */
@@ -53,7 +63,7 @@ export async function getCompetitionEntries(
 
   const { data: observations, error: obsError } = await supabase
     .from('observations')
-    .select('id, athlete_membership_id, value, observables(name, units(symbol))')
+    .select('id, athlete_membership_id, value, wind_ms, observables(name, units(symbol))')
     .eq('event_id', eventId)
     .eq('state', 'ejecutado')
     .is('superseded_by', null)
@@ -74,6 +84,7 @@ export async function getCompetitionEntries(
         observableName: o.observables?.name ?? '—',
         unitSymbol: o.observables?.units?.symbol ?? null,
         value: o.value,
+        windMs: o.wind_ms,
       }))
 
     return {

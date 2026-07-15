@@ -14,7 +14,7 @@ export default async function CompetitionDetailPage({ params }: { params: Promis
   if (!membership) return null
 
   const supabase = await createServerClient()
-  const { data: event } = await supabase.from('events').select('title, date').eq('id', id).maybeSingle()
+  const { data: event } = await supabase.from('events').select('title, date, location, location_map_url').eq('id', id).maybeSingle()
 
   const [entries, roster, observables, units] = await Promise.all([
     getCompetitionEntries(id),
@@ -43,6 +43,18 @@ export default async function CompetitionDetailPage({ params }: { params: Promis
             {new Date(event.date + 'T00:00:00').toLocaleDateString('es-AR', { day: 'numeric', month: 'long', year: 'numeric' })}
           </p>
         )}
+        {event?.location && (
+          <p className="text-xs text-status-neutral">
+            📍{' '}
+            {event.location_map_url ? (
+              <a href={event.location_map_url} target="_blank" rel="noreferrer" className="underline text-navy">
+                {event.location}
+              </a>
+            ) : (
+              event.location
+            )}
+          </p>
+        )}
       </div>
 
       <div className="rounded-xl border border-gray-200 bg-white p-4 max-w-sm">
@@ -67,6 +79,7 @@ export default async function CompetitionDetailPage({ params }: { params: Promis
                 {entry.results.map((r) => (
                   <p key={r.id} className="text-xs text-status-neutral">
                     {r.observableName}: <span className="font-medium text-navy">{formatMark(r.value, r.unitSymbol)}</span>
+                    {r.windMs !== null && <span> (viento {r.windMs > 0 ? '+' : ''}{r.windMs} m/s)</span>}
                   </p>
                 ))}
               </div>
