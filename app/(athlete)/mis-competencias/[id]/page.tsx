@@ -38,7 +38,7 @@ export default async function CompetitionDetailPage({ params }: { params: Promis
   return (
     <div className="space-y-6">
       <div>
-        <Link href="/competencias" className="text-xs text-status-neutral hover:text-navy">
+        <Link href="/mis-competencias" className="text-xs text-status-neutral hover:text-navy">
           ← Volver a competencias
         </Link>
         <h1 className="font-display text-2xl font-bold text-navy mt-2">{event?.title ?? 'Competencia'}</h1>

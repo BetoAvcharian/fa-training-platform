@@ -34,7 +34,7 @@ export default async function CompetenciasPage() {
         {upcoming.length === 0 && <p className="text-sm text-status-neutral">Ninguna cargada.</p>}
         <div className="space-y-2">
           {upcoming.map((c) => (
-            <Link key={c.id} href={`/competencias/${c.id}`} className="block card p-4">
+            <Link key={c.id} href={`/mis-competencias/${c.id}`} className="block card p-4">
               <p className="font-medium text-navy">{c.title}</p>
               <p className="text-xs text-status-neutral">
                 {formatDate(c.date)}
@@ -50,7 +50,7 @@ export default async function CompetenciasPage() {
           <h2 className="text-sm font-semibold text-navy">Pasadas</h2>
           <div className="space-y-2">
             {past.map((c) => (
-              <Link key={c.id} href={`/competencias/${c.id}`} className="block card p-4 opacity-70">
+              <Link key={c.id} href={`/mis-competencias/${c.id}`} className="block card p-4 opacity-70">
                 <p className="font-medium text-navy">{c.title}</p>
                 <p className="text-xs text-status-neutral">{formatDate(c.date)}</p>
               </Link>

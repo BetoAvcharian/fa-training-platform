@@ -28,7 +28,7 @@ export async function createCompetitionAction(formData: FormData) {
     return { error: e instanceof DomainError ? e.message : 'No se pudo crear' }
   }
 
-  revalidatePath('/competencias')
+  revalidatePath('/mis-competencias')
   return { error: null }
 }
 
@@ -42,7 +42,7 @@ export async function selfEnrollAction(eventId: string) {
     return { error: e instanceof DomainError ? e.message : 'No se pudo anotar' }
   }
 
-  revalidatePath(`/competencias/${eventId}`)
+  revalidatePath(`/mis-competencias/${eventId}`)
   return { error: null }
 }
 
@@ -51,7 +51,7 @@ export async function selfUnenrollAction(eventId: string) {
   if (!membership) return
 
   await unassignAthlete({ eventId, athleteMembershipId: membership.id, organizationId: membership.organizationId })
-  revalidatePath(`/competencias/${eventId}`)
+  revalidatePath(`/mis-competencias/${eventId}`)
 }
 
 export async function recordMyResultAction(eventId: string, formData: FormData) {
@@ -78,6 +78,6 @@ export async function recordMyResultAction(eventId: string, formData: FormData) 
     return { error: e instanceof DomainError ? e.message : 'No se pudo guardar' }
   }
 
-  revalidatePath(`/competencias/${eventId}`)
+  revalidatePath(`/mis-competencias/${eventId}`)
   return { error: null }
 }
