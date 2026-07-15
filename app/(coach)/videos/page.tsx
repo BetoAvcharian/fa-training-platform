@@ -1,6 +1,7 @@
 import Link from 'next/link'
-import { getMyActiveMembership } from '@/domains/athletes/queries'
+import { getMyActiveMembership, getRoster } from '@/domains/athletes/queries'
 import { getVideos } from '@/domains/videos/queries'
+import { VideoForm } from './video-form'
 
 export const dynamic = 'force-dynamic'
 
@@ -15,7 +16,10 @@ export default async function VideosMenuPage() {
   const membership = await getMyActiveMembership()
   if (!membership) return null
 
-  const videos = await getVideos(membership.organizationId)
+  const [videos, roster] = await Promise.all([
+    getVideos(membership.organizationId),
+    getRoster(membership.organizationId),
+  ])
   const countByCategory = new Map<string, number>()
   for (const v of videos) {
     countByCategory.set(v.category, (countByCategory.get(v.category) ?? 0) + 1)
@@ -23,9 +27,12 @@ export default async function VideosMenuPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <p className="text-xs uppercase tracking-wider text-gold font-medium">Videos</p>
-        <h1 className="font-display text-2xl font-bold text-navy">Elegí una categoría</h1>
+      <div className="flex items-start justify-between gap-3 flex-wrap">
+        <div>
+          <p className="text-xs uppercase tracking-wider text-gold font-medium">Videos</p>
+          <h1 className="font-display text-2xl font-bold text-navy">Elegí una categoría</h1>
+        </div>
+        <VideoForm organizationId={membership.organizationId} roster={roster} />
       </div>
 
       <Link

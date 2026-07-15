@@ -1,8 +1,80 @@
 'use client'
 
-import { useState, useTransition } from 'react'
+import { useState, useTransition, useMemo } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { createVideoAction } from './actions'
+
+interface RosterEntry {
+  id: string
+  person: { firstName: string; lastName: string } | null
+}
+
+function AthleteTagPicker({ roster, selected, onChange }: { roster: RosterEntry[]; selected: string[]; onChange: (ids: string[]) => void }) {
+  const [query, setQuery] = useState('')
+  const [focused, setFocused] = useState(false)
+
+  const nameOf = (id: string) => {
+    const r = roster.find((x) => x.id === id)
+    return r?.person ? `${r.person.firstName} ${r.person.lastName}` : '—'
+  }
+
+  const filtered = useMemo(() => {
+    const q = query.trim().toLowerCase()
+    return roster
+      .filter((r) => !selected.includes(r.id))
+      .filter((r) => {
+        if (!q) return true
+        const name = r.person ? `${r.person.firstName} ${r.person.lastName}`.toLowerCase() : ''
+        return name.includes(q)
+      })
+      .slice(0, 8)
+  }, [roster, selected, query])
+
+  return (
+    <div>
+      <p className="text-xs text-status-neutral mb-1">Etiquetar atletas</p>
+      {selected.length > 0 && (
+        <div className="flex flex-wrap gap-1 mb-1.5">
+          {selected.map((id) => (
+            <span key={id} className="text-xs bg-gold/10 text-navy rounded-full px-2 py-1 flex items-center gap-1">
+              {nameOf(id)}
+              <button type="button" onClick={() => onChange(selected.filter((x) => x !== id))} className="text-status-neutral hover:text-status-critical">
+                ×
+              </button>
+            </span>
+          ))}
+        </div>
+      )}
+      <div className="relative">
+        <input
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          onFocus={() => setFocused(true)}
+          onBlur={() => setTimeout(() => setFocused(false), 150)}
+          placeholder="Buscar atleta por nombre…"
+          className="input-field"
+        />
+        {focused && filtered.length > 0 && (
+          <div className="absolute z-10 mt-1 w-full max-h-48 overflow-y-auto rounded-lg border border-gray-200 bg-white shadow-lg">
+            {filtered.map((r) => (
+              <button
+                key={r.id}
+                type="button"
+                onClick={() => {
+                  onChange([...selected, r.id])
+                  setQuery('')
+                }}
+                className="w-full text-left px-3 py-2 text-sm text-navy hover:bg-gray-50"
+              >
+                {r.person ? `${r.person.firstName} ${r.person.lastName}` : '—'}
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
 
 export function VideoForm({
   organizationId,
@@ -10,12 +82,13 @@ export function VideoForm({
   category,
 }: {
   organizationId: string
-  roster: Array<{ id: string; person: { firstName: string; lastName: string } | null }>
-  category: string
+  roster: RosterEntry[]
+  category?: string
 }) {
   const [open, setOpen] = useState(false)
   const [mode, setMode] = useState<'link' | 'upload'>('link')
-  const [selectedCategory, setSelectedCategory] = useState(category === 'todos' ? 'entrenamientos' : category)
+  const [selectedCategory, setSelectedCategory] = useState(category && category !== 'todos' ? category : 'entrenamientos')
+  const [athleteIds, setAthleteIds] = useState<string[]>([])
   const [pending, startTransition] = useTransition()
   const [uploading, setUploading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -24,7 +97,6 @@ export function VideoForm({
     setError(null)
     const title = String(formData.get('title') ?? '')
     const description = String(formData.get('description') ?? '')
-    const athleteIds = formData.getAll('athleteIds').map(String)
 
     if (!title.trim()) {
       setError('Falta el título')
@@ -47,7 +119,10 @@ export function VideoForm({
       startTransition(async () => {
         const result = await createVideoAction(fd)
         if (result?.error) setError(result.error)
-        else setOpen(false)
+        else {
+          setOpen(false)
+          setAthleteIds([])
+        }
       })
       return
     }
@@ -84,7 +159,10 @@ export function VideoForm({
       startTransition(async () => {
         const result = await createVideoAction(fd)
         if (result?.error) setError(result.error)
-        else setOpen(false)
+        else {
+          setOpen(false)
+          setAthleteIds([])
+        }
         setUploading(false)
       })
     } catch {
@@ -95,11 +173,8 @@ export function VideoForm({
 
   if (!open) {
     return (
-      <button
-        onClick={() => setOpen(true)}
-        className="rounded-lg border border-dashed border-gray-200 bg-white px-4 py-2 text-sm font-medium text-navy"
-      >
-        + Agregar video
+      <button onClick={() => setOpen(true)} className="btn-primary px-4 py-2 text-sm">
+        + Subir video
       </button>
     )
   }
@@ -128,14 +203,15 @@ export function VideoForm({
       <input name="title" placeholder="Título" className="input-field" required />
       <textarea name="description" placeholder="Descripción (opcional)" rows={2} className="input-field" />
 
-      {category === 'todos' && (
+      <div>
+        <p className="text-xs text-status-neutral mb-1">Categoría</p>
         <select value={selectedCategory} onChange={(e) => setSelectedCategory(e.target.value)} className="input-field">
           <option value="carreras">Carreras</option>
           <option value="tecnica">Técnica</option>
           <option value="musculacion">Musculación</option>
           <option value="entrenamientos">Entrenamientos</option>
         </select>
-      )}
+      </div>
 
       {mode === 'link' ? (
         <input name="url" placeholder="https://youtube.com/..." className="input-field" />
@@ -143,19 +219,7 @@ export function VideoForm({
         <input name="file" type="file" accept="video/*" className="w-full text-sm" />
       )}
 
-      {roster.length > 0 && (
-        <div>
-          <p className="text-xs text-status-neutral mb-1">Etiquetar atletas</p>
-          <div className="flex flex-wrap gap-2 max-h-28 overflow-y-auto">
-            {roster.map((r) => (
-              <label key={r.id} className="flex items-center gap-1 text-xs bg-gray-50 rounded-full px-2 py-1">
-                <input type="checkbox" name="athleteIds" value={r.id} />
-                {r.person ? `${r.person.firstName} ${r.person.lastName}` : '—'}
-              </label>
-            ))}
-          </div>
-        </div>
-      )}
+      {roster.length > 0 && <AthleteTagPicker roster={roster} selected={athleteIds} onChange={setAthleteIds} />}
 
       {error && <p className="text-xs text-status-critical">{error}</p>}
 

@@ -4,7 +4,7 @@ import { getTodayDate } from '@/lib/today'
 import { EventCard } from './event-card'
 import { EventCompareCard } from './event-compare-card'
 import { CopyWeekForm } from './copy-week-form'
-import { createEventAction } from './actions'
+import { NewTrainingForm } from './new-training-form'
 
 export const dynamic = 'force-dynamic'
 
@@ -106,38 +106,7 @@ export default async function CalendarioPage({
       </div>
 
       {mode === 'planificar' && (
-        <details className="mb-6 max-w-md">
-          <summary className="cursor-pointer text-sm font-medium text-navy">+ Nuevo entrenamiento</summary>
-          <form
-            action={async (formData: FormData) => {
-              'use server'
-              await createEventAction(formData)
-            }}
-            className="mt-3 space-y-2 bg-white border border-gray-200 rounded-xl p-4"
-          >
-            <input name="title" placeholder="Título (ej: Series de pista)" required className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm" />
-            <input name="date" type="date" required defaultValue={weekStartStr} className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm" />
-            <select name="athleteId" className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm">
-              <option value="">Elegí un atleta</option>
-              {roster.map((a) => (
-                <option key={a.id} value={a.id}>
-                  {a.person?.firstName} {a.person?.lastName}
-                </option>
-              ))}
-            </select>
-            {groups.length > 0 && (
-              <select name="groupId" className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm">
-                <option value="">— O elegí un grupo completo —</option>
-                {groups.map((g) => (
-                  <option key={g.id} value={g.id}>
-                    {g.name}
-                  </option>
-                ))}
-              </select>
-            )}
-            <button type="submit" className="w-full btn-primary py-2 text-sm">Crear</button>
-          </form>
-        </details>
+        <NewTrainingForm roster={roster} groups={groups} defaultDate={weekStartStr} />
       )}
 
       <div className="grid grid-cols-1 md:grid-cols-7 gap-3">
