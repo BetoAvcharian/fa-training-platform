@@ -185,7 +185,15 @@ export interface AthleteSeries {
  * es N series de getProgressionSeries juntas.
  */
 export async function compareAthletes(
-  input: { organizationId: string; athleteMembershipIds: string[]; observableId: string; from?: string; to?: string },
+  input: {
+    organizationId: string
+    athleteMembershipIds: string[]
+    observableId: string
+    from?: string
+    to?: string
+    officialOnly?: boolean
+    sourceTypes?: string[]
+  },
   client?: AppSupabaseClient
 ): Promise<AthleteSeries[]> {
   const supabase = client ?? (await createServerClient())
@@ -204,15 +212,19 @@ export async function compareAthletes(
 
   const results: AthleteSeries[] = []
   for (const athleteMembershipId of input.athleteMembershipIds) {
-    const { data: observations, error } = await supabase
+    let query = supabase
       .from('observations')
-      .select('date, value')
+      .select('date, value, source_type, validation_status')
       .eq('athlete_membership_id', athleteMembershipId)
       .eq('observable_id', input.observableId)
       .eq('state', 'ejecutado')
       .is('superseded_by', null)
       .order('date')
 
+    if (input.officialOnly) query = query.eq('validation_status', 'oficial')
+    if (input.sourceTypes && input.sourceTypes.length > 0) query = query.in('source_type', input.sourceTypes)
+
+    const { data: observations, error } = await query
     if (error) throw new DomainError('NOT_FOUND', error.message)
 
     let points = observations ?? []
@@ -225,7 +237,7 @@ export async function compareAthletes(
     results.push({
       athleteMembershipId,
       athleteName: personData ? `${personData.first_name} ${personData.last_name}` : '—',
-      points,
+      points: points.map((p) => ({ date: p.date, value: p.value })),
     })
   }
 

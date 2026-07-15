@@ -19,13 +19,20 @@ export default async function PersonasPage() {
   const members = await getAllMembers(membership.organizationId)
   const isManager = membership.role === 'manager'
 
+  // Un entrenador solo ve sus propios atletas acá — no tiene sentido
+  // (ni permiso real) que vea al resto del organigrama. El manager
+  // sigue viendo todo, es quien administra la organización.
+  const visibleMembers = isManager
+    ? members
+    : members.filter((m) => m.role === 'athlete' && m.coachMembershipId === membership.id)
+
   const coaches = members
     .filter((m) => m.role === 'coach' && m.status === 'activo')
     .map((c) => ({ id: c.id, name: c.name }))
 
-  const invitados = members.filter((m) => m.status === 'invitado')
-  const activos = members.filter((m) => m.status === 'activo')
-  const inactivos = members.filter((m) => m.status === 'inactivo')
+  const invitados = visibleMembers.filter((m) => m.status === 'invitado')
+  const activos = visibleMembers.filter((m) => m.status === 'activo')
+  const inactivos = visibleMembers.filter((m) => m.status === 'inactivo')
 
   return (
     <div className="space-y-8 max-w-2xl">

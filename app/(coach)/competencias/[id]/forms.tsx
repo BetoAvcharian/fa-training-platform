@@ -104,6 +104,7 @@ export function ResultForm({
         ))}
       </select>
       <input name="value" type="number" step="0.01" placeholder="Valor" className="w-20 rounded-md border border-gray-200 px-2 py-1 text-xs" required />
+      <input name="windMs" type="number" step="0.1" placeholder="Viento m/s" className="w-24 rounded-md border border-gray-200 px-2 py-1 text-xs" />
       <button type="submit" disabled={pending} className="bg-navy text-white rounded-md px-2 py-1 text-xs disabled:opacity-50">
         Guardar
       </button>

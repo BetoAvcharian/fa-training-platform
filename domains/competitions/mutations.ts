@@ -1,16 +1,18 @@
 import { getTodayISO } from '@/lib/today'
 import { createServerClient, type AppSupabaseClient } from '@/lib/supabase/server'
 import { DomainError } from '@/types/errors'
-import { requireRole } from '@/domains/athletes/rules'
 import { getMyActiveMembership } from '@/domains/athletes/queries'
 import { logAudit } from '@/domains/audit/mutations'
 
 export async function createCompetition(
-  input: { organizationId: string; title: string; date: string },
+  input: { organizationId: string; title: string; date: string; location?: string; locationMapUrl?: string },
   client?: AppSupabaseClient
 ): Promise<{ id: string }> {
   const supabase = client ?? (await createServerClient())
-  const actor = await requireRole(input.organizationId, ['manager', 'coach'], supabase)
+  const actor = await getMyActiveMembership(supabase)
+  if (!actor || actor.organizationId !== input.organizationId) {
+    throw new DomainError('PERMISSION', 'No autenticado')
+  }
 
   const { data, error } = await supabase
     .from('events')
@@ -19,6 +21,8 @@ export async function createCompetition(
       type: 'competencia',
       title: input.title,
       date: input.date,
+      location: input.location ?? null,
+      location_map_url: input.locationMapUrl ?? null,
       created_by_membership_id: actor.id,
     })
     .select('id')
@@ -38,14 +42,53 @@ export async function createCompetition(
   return { id: data.id }
 }
 
-/** Carga un resultado de competencia — mismo mecanismo que Registros, pero source_type='competencia' y vinculado al Event. */
+/**
+ * Un atleta se inscribe a sí mismo a una competencia (a diferencia de
+ * assignAthleteToEvent, que un coach usa para inscribir a cualquiera
+ * — acá el propio atleta solo puede anotarse a sí mismo).
+ */
+export async function selfEnrollInCompetition(
+  input: { eventId: string; organizationId: string },
+  client?: AppSupabaseClient
+): Promise<void> {
+  const supabase = client ?? (await createServerClient())
+  const actor = await getMyActiveMembership(supabase)
+  if (!actor) throw new DomainError('PERMISSION', 'No autenticado')
+
+  const { error } = await supabase
+    .from('event_assignments')
+    .insert({ event_id: input.eventId, assignee_type: 'person', assignee_id: actor.id })
+
+  if (error) throw new DomainError('CONFLICT', error.message)
+
+  await logAudit({
+    organizationId: input.organizationId,
+    actorMembershipId: actor.id,
+    action: 'event.assign',
+    entityType: 'event',
+    entityId: input.eventId,
+    metadata: { selfEnrolled: true },
+  })
+}
+
+/** Carga un resultado de competencia — mismo mecanismo que Registros, pero source_type='competencia' y vinculado al Event. Un atleta solo puede cargar el propio. */
 export async function recordCompetitionResult(
-  input: { eventId: string; athleteMembershipId: string; organizationId: string; observableId: string; value: number },
+  input: {
+    eventId: string
+    athleteMembershipId: string
+    organizationId: string
+    observableId: string
+    value: number
+    windMs?: number
+  },
   client?: AppSupabaseClient
 ): Promise<{ id: string }> {
   const supabase = client ?? (await createServerClient())
   const actor = await getMyActiveMembership(supabase)
   if (!actor) throw new DomainError('PERMISSION', 'No autenticado')
+  if (actor.role === 'athlete' && actor.id !== input.athleteMembershipId) {
+    throw new DomainError('PERMISSION', 'Solo podés cargar tu propio resultado')
+  }
 
   const { data: event } = await supabase.from('events').select('date').eq('id', input.eventId).maybeSingle()
 
@@ -61,6 +104,10 @@ export async function recordCompetitionResult(
   })
 
   if (error || !data) throw new DomainError('CONFLICT', error?.message ?? 'No se pudo guardar el resultado')
+
+  if (input.windMs !== undefined) {
+    await supabase.from('observations').update({ wind_ms: input.windMs }).eq('id', data as string)
+  }
 
   await logAudit({
     organizationId: input.organizationId,

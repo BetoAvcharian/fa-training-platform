@@ -1,8 +1,8 @@
-import { getTodayISO } from '@/lib/today'
 import Link from 'next/link'
 import { getMyActiveMembership } from '@/domains/athletes/queries'
 import { getCompetitions } from '@/domains/competitions/queries'
 import { CompetitionForm } from './competition-form'
+import { getTodayISO } from '@/lib/today'
 
 export const dynamic = 'force-dynamic'
 
@@ -22,22 +22,24 @@ export default async function CompetenciasPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-start justify-between gap-3 flex-wrap">
-        <div>
-          <p className="text-xs uppercase tracking-wider text-gold font-medium">Competencias</p>
-          <h1 className="font-display text-2xl font-bold text-navy">Competencias</h1>
-        </div>
-        <CompetitionForm />
+      <div>
+        <p className="text-xs uppercase tracking-wider text-gold font-medium">Competencias</p>
+        <h1 className="font-display text-2xl font-bold text-navy">Competencias</h1>
       </div>
+
+      <CompetitionForm />
 
       <section className="space-y-2">
         <h2 className="text-sm font-semibold text-navy">Próximas</h2>
         {upcoming.length === 0 && <p className="text-sm text-status-neutral">Ninguna cargada.</p>}
         <div className="space-y-2">
           {upcoming.map((c) => (
-            <Link key={c.id} href={`/competencias/${c.id}`} className="block rounded-xl border border-gray-200 bg-white p-4 hover:border-gold/40">
+            <Link key={c.id} href={`/mis-competencias/${c.id}`} className="block card p-4">
               <p className="font-medium text-navy">{c.title}</p>
-              <p className="text-xs text-status-neutral">{formatDate(c.date)}{c.location ? ` · ${c.location}` : ''}</p>
+              <p className="text-xs text-status-neutral">
+                {formatDate(c.date)}
+                {c.location ? ` · ${c.location}` : ''}
+              </p>
             </Link>
           ))}
         </div>
@@ -48,9 +50,9 @@ export default async function CompetenciasPage() {
           <h2 className="text-sm font-semibold text-navy">Pasadas</h2>
           <div className="space-y-2">
             {past.map((c) => (
-              <Link key={c.id} href={`/competencias/${c.id}`} className="block rounded-xl border border-gray-200 bg-white p-4 opacity-70 hover:opacity-100">
+              <Link key={c.id} href={`/mis-competencias/${c.id}`} className="block card p-4 opacity-70">
                 <p className="font-medium text-navy">{c.title}</p>
-                <p className="text-xs text-status-neutral">{formatDate(c.date)}{c.location ? ` · ${c.location}` : ''}</p>
+                <p className="text-xs text-status-neutral">{formatDate(c.date)}</p>
               </Link>
             ))}
           </div>
