@@ -1,3 +1,4 @@
+import { getTodayISO } from '@/lib/today'
 import { createServerClient, type AppSupabaseClient } from '@/lib/supabase/server'
 import { DomainError } from '@/types/errors'
 import { requireRole } from '@/domains/athletes/rules'
@@ -53,7 +54,7 @@ export async function recordCompetitionResult(
     p_athlete_membership_id: input.athleteMembershipId,
     p_observable_id: input.observableId,
     p_value: input.value,
-    p_date: event?.date ?? new Date().toISOString().slice(0, 10),
+    p_date: event?.date ?? getTodayISO(),
     p_source_type: 'competencia',
     p_created_by_membership_id: actor.id,
     p_event_id: input.eventId,

@@ -1,3 +1,4 @@
+import { getTodayISO } from '@/lib/today'
 import Link from 'next/link'
 import { getMyActiveMembership } from '@/domains/athletes/queries'
 import {
@@ -36,7 +37,7 @@ export default async function ResumenPage() {
   const membership = await getMyActiveMembership()
   if (!membership) return null
 
-  const today = new Date().toISOString().slice(0, 10)
+  const today = getTodayISO()
   const in14Days = new Date(Date.now() + 14 * 86400000).toISOString().slice(0, 10)
 
   const [withoutExecution, wellness, competitions, stats, upcoming, attendance] = await Promise.all([

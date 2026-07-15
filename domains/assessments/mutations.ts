@@ -1,3 +1,4 @@
+import { getTodayISO } from '@/lib/today'
 import { createServerClient, type AppSupabaseClient } from '@/lib/supabase/server'
 import { DomainError } from '@/types/errors'
 import { requireRole } from '@/domains/athletes/rules'
@@ -51,7 +52,7 @@ export async function createAssessment(
   const supabase = client ?? (await createServerClient())
   const actor = await requireRole(input.organizationId, ['manager', 'coach'], supabase)
 
-  const date = input.date ?? new Date().toISOString().slice(0, 10)
+  const date = input.date ?? getTodayISO()
 
   const { data: assessment, error } = await supabase
     .from('assessments')

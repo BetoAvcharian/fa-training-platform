@@ -1,6 +1,7 @@
 import { getMyActiveMembership } from '@/domains/athletes/queries'
 import { getEventsForRange } from '@/domains/events/queries'
 import { getResolvedSessionForAthlete } from '@/domains/observations/session-view'
+import { getTodayDate } from '@/lib/today'
 import { SessionAccordion } from './session-accordion'
 
 export const dynamic = 'force-dynamic'
@@ -29,7 +30,7 @@ export default async function MiCalendarioPage({
   const membership = await getMyActiveMembership()
   if (!membership) return null
 
-  const base = params.week ? new Date(params.week + 'T00:00:00') : new Date()
+  const base = params.week ? new Date(params.week + 'T00:00:00') : getTodayDate()
   const weekStart = startOfWeek(base)
   const days = Array.from({ length: 7 }, (_, i) => {
     const d = new Date(weekStart)

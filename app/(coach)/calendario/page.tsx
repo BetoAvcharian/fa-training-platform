@@ -1,5 +1,6 @@
 import { getMyActiveMembership, getRoster, getGroups } from '@/domains/athletes/queries'
 import { getEventsForRange, getSessionExercises } from '@/domains/events/queries'
+import { getTodayDate } from '@/lib/today'
 import { EventCard } from './event-card'
 import { EventCompareCard } from './event-compare-card'
 import { CopyWeekForm } from './copy-week-form'
@@ -41,7 +42,7 @@ export default async function CalendarioPage({
     return <MonthView monthParam={params.month} mode={mode} organizationId={membership.organizationId} />
   }
 
-  const base = params.week ? new Date(params.week + 'T00:00:00') : new Date()
+  const base = params.week ? new Date(params.week + 'T00:00:00') : getTodayDate()
   const weekStart = startOfWeek(base)
   const days = Array.from({ length: 7 }, (_, i) => {
     const d = new Date(weekStart)
@@ -175,7 +176,7 @@ async function MonthView({
   mode: string
   organizationId: string
 }) {
-  const base = monthParam ? new Date(monthParam + '-01T00:00:00') : new Date()
+  const base = monthParam ? new Date(monthParam + '-01T00:00:00') : getTodayDate()
   const year = base.getFullYear()
   const month = base.getMonth()
   const monthStr = `${year}-${String(month + 1).padStart(2, '0')}`

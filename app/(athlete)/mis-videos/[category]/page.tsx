@@ -60,7 +60,7 @@ export default async function MisVideosCategoryPage({
         <h1 className="font-display text-2xl font-bold text-navy mt-1">{CATEGORY_LABELS[category]}</h1>
       </div>
 
-      {category !== 'todos' && <VideoForm organizationId={membership.organizationId} roster={roster} category={category} />}
+      <VideoForm organizationId={membership.organizationId} roster={roster} category={category} />
 
       <a
         href={`?mios=${sParams.mios === '1' ? '' : '1'}`}

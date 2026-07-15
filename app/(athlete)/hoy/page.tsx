@@ -1,3 +1,4 @@
+import { getTodayISO } from '@/lib/today'
 import { getMyActiveMembership } from '@/domains/athletes/queries'
 import { getEventsForRange } from '@/domains/events/queries'
 import { getResolvedSessionForAthlete } from '@/domains/observations/session-view'
@@ -13,7 +14,7 @@ export default async function HoyPage() {
   const membership = await getMyActiveMembership()
   if (!membership) return null
 
-  const today = new Date().toISOString().slice(0, 10)
+  const today = getTodayISO()
 
   const [events, checkinDone] = await Promise.all([
     getEventsForRange(membership.organizationId, today, today),

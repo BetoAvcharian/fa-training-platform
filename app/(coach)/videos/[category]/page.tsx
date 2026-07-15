@@ -71,7 +71,7 @@ export default async function VideoCategoryPage({
             <p className="text-xs uppercase tracking-wider text-gold font-medium">Videos</p>
             <h1 className="font-display text-2xl font-bold text-navy">{CATEGORY_LABELS[category]}</h1>
           </div>
-          {canManage && category !== 'todos' && <VideoForm organizationId={membership.organizationId} roster={roster} category={category} />}
+          {canManage && <VideoForm organizationId={membership.organizationId} roster={roster} category={category} />}
         </div>
       </div>
 
