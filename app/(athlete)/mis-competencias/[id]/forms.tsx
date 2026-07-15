@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useTransition } from 'react'
-import { selfEnrollAction, selfUnenrollAction, recordMyResultAction } from './actions'
+import { selfEnrollAction, selfUnenrollAction, recordMyResultAction } from '../actions'
 
 export function SelfEnrollButton({ eventId, enrolled }: { eventId: string; enrolled: boolean }) {
   const [pending, startTransition] = useTransition()
