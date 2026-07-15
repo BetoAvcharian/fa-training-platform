@@ -72,6 +72,8 @@ export function ResultForm({
   const [pending, startTransition] = useTransition()
   const [error, setError] = useState<string | null>(null)
   const [open, setOpen] = useState(false)
+  const [selectedObs, setSelectedObs] = useState('')
+  const selectedUnit = observables.find((o) => o.id === selectedObs)?.unitSymbol ?? null
 
   function handleSubmit(formData: FormData) {
     formData.set('athleteMembershipId', athleteMembershipId)
@@ -95,7 +97,13 @@ export function ResultForm({
 
   return (
     <form action={handleSubmit} className="flex flex-wrap items-center gap-1.5 mt-1">
-      <select name="observableId" className="rounded-md border border-gray-200 px-2 py-1 text-xs" required>
+      <select
+        name="observableId"
+        value={selectedObs}
+        onChange={(e) => setSelectedObs(e.target.value)}
+        className="rounded-md border border-gray-200 px-2 py-1 text-xs"
+        required
+      >
         <option value="">Prueba</option>
         {observables.map((o) => (
           <option key={o.id} value={o.id}>
@@ -103,7 +111,10 @@ export function ResultForm({
           </option>
         ))}
       </select>
-      <input name="value" type="number" step="0.01" placeholder="Valor" className="w-20 rounded-md border border-gray-200 px-2 py-1 text-xs" required />
+      <div className="flex items-center gap-1">
+        <input name="value" type="number" step="0.01" placeholder="Valor" className="w-20 rounded-md border border-gray-200 px-2 py-1 text-xs" required />
+        {selectedUnit && <span className="text-[10px] text-status-neutral">{selectedUnit}</span>}
+      </div>
       <input name="windMs" type="number" step="0.1" placeholder="Viento m/s" className="w-24 rounded-md border border-gray-200 px-2 py-1 text-xs" />
       <button type="submit" disabled={pending} className="bg-navy text-white rounded-md px-2 py-1 text-xs disabled:opacity-50">
         Guardar
