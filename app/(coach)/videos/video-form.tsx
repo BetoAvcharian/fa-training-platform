@@ -3,6 +3,7 @@
 import { useState, useTransition, useMemo } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { createVideoAction } from './actions'
+import { Modal } from '@/components/ui/modal'
 
 interface RosterEntry {
   id: string
@@ -182,55 +183,71 @@ export function VideoForm({
   const busy = pending || uploading
 
   return (
-    <form action={handleSubmit} className="rounded-xl border border-gray-200 bg-white p-4 space-y-3 max-w-md">
-      <div className="flex gap-2 text-xs">
-        <button
-          type="button"
-          onClick={() => setMode('link')}
-          className={`flex-1 py-1.5 rounded-lg border ${mode === 'link' ? 'bg-navy text-white border-navy' : 'border-gray-300 text-status-neutral'}`}
-        >
-          Link (YouTube/Vimeo)
-        </button>
-        <button
-          type="button"
-          onClick={() => setMode('upload')}
-          className={`flex-1 py-1.5 rounded-lg border ${mode === 'upload' ? 'bg-navy text-white border-navy' : 'border-gray-300 text-status-neutral'}`}
-        >
-          Subir archivo
-        </button>
-      </div>
+    <>
+      <button onClick={() => setOpen(true)} className="btn-primary px-4 py-2 text-sm">
+        + Subir video
+      </button>
+      <Modal open={open} onClose={() => setOpen(false)} title="Subir video">
+        <form action={handleSubmit} className="space-y-4">
+          <div className="flex gap-2 text-xs">
+            <button
+              type="button"
+              onClick={() => setMode('link')}
+              className={`flex-1 py-2 rounded-lg border ${mode === 'link' ? 'bg-navy text-white border-navy' : 'border-gray-300 text-status-neutral'}`}
+            >
+              Link (YouTube/Vimeo)
+            </button>
+            <button
+              type="button"
+              onClick={() => setMode('upload')}
+              className={`flex-1 py-2 rounded-lg border ${mode === 'upload' ? 'bg-navy text-white border-navy' : 'border-gray-300 text-status-neutral'}`}
+            >
+              Subir archivo
+            </button>
+          </div>
 
-      <input name="title" placeholder="Título" className="input-field" required />
-      <textarea name="description" placeholder="Descripción (opcional)" rows={2} className="input-field" />
+          <div>
+            <label className="text-xs text-status-neutral mb-1 block">Título</label>
+            <input name="title" placeholder="Título" className="input-field" required />
+          </div>
+          <div>
+            <label className="text-xs text-status-neutral mb-1 block">Descripción (opcional)</label>
+            <textarea name="description" rows={2} className="input-field" />
+          </div>
 
-      <div>
-        <p className="text-xs text-status-neutral mb-1">Categoría</p>
-        <select value={selectedCategory} onChange={(e) => setSelectedCategory(e.target.value)} className="input-field">
-          <option value="carreras">Carreras</option>
-          <option value="tecnica">Técnica</option>
-          <option value="musculacion">Musculación</option>
-          <option value="entrenamientos">Entrenamientos</option>
-        </select>
-      </div>
+          <div>
+            <label className="text-xs text-status-neutral mb-1 block">Categoría</label>
+            <select value={selectedCategory} onChange={(e) => setSelectedCategory(e.target.value)} className="input-field">
+              <option value="carreras">Carreras</option>
+              <option value="tecnica">Técnica</option>
+              <option value="musculacion">Musculación</option>
+              <option value="entrenamientos">Entrenamientos</option>
+            </select>
+          </div>
 
-      {mode === 'link' ? (
-        <input name="url" placeholder="https://youtube.com/..." className="input-field" />
-      ) : (
-        <input name="file" type="file" accept="video/*" className="w-full text-sm" />
-      )}
+          <div>
+            <label className="text-xs text-status-neutral mb-1 block">{mode === 'link' ? 'Link' : 'Archivo'}</label>
+            {mode === 'link' ? (
+              <input name="url" placeholder="https://youtube.com/..." className="input-field" />
+            ) : (
+              <input name="file" type="file" accept="video/*" className="w-full text-sm" />
+            )}
+          </div>
 
-      {roster.length > 0 && <AthleteTagPicker roster={roster} selected={athleteIds} onChange={setAthleteIds} />}
+          {roster.length > 0 && <AthleteTagPicker roster={roster} selected={athleteIds} onChange={setAthleteIds} />}
 
-      {error && <p className="text-xs text-status-critical">{error}</p>}
+          {error && <p className="text-xs text-status-critical">{error}</p>}
 
-      <div className="flex gap-2">
-        <button type="submit" disabled={busy} className="flex-1 btn-primary py-2 text-sm">
-          {uploading ? 'Subiendo…' : pending ? 'Guardando…' : 'Guardar'}
-        </button>
-        <button type="button" onClick={() => setOpen(false)} className="btn-secondary px-4 text-sm">
-          Cancelar
-        </button>
-      </div>
-    </form>
+          <div className="flex gap-2 pt-2">
+            <button type="submit" disabled={busy} className="flex-1 btn-primary py-2.5 text-sm">
+              {uploading ? 'Subiendo…' : pending ? 'Guardando…' : 'Guardar'}
+            </button>
+            <button type="button" onClick={() => setOpen(false)} className="btn-secondary px-4 text-sm">
+              Cancelar
+            </button>
+          </div>
+        </form>
+      </Modal>
+    </>
   )
 }
