@@ -19,8 +19,8 @@ export async function createEventAction(formData: FormData) {
   const date = String(formData.get('date') ?? '')
   const athleteId = String(formData.get('athleteId') ?? '')
   const groupId = String(formData.get('groupId') ?? '')
-  const firstLine = String(formData.get('firstLine') ?? '')
-  const firstLineSport = String(formData.get('firstLineSport') ?? 'Atletismo') as 'Atletismo' | 'Fuerza'
+  const lineTexts = formData.getAll('lineText').map(String)
+  const lineSports = formData.getAll('lineSport').map(String) as Array<'Atletismo' | 'Fuerza'>
 
   if (!title || !date || (!athleteId && !groupId)) {
     return { error: 'Faltan datos para crear el entrenamiento' }
@@ -35,8 +35,10 @@ export async function createEventAction(formData: FormData) {
       assignments: groupId ? [{ type: 'group', id: groupId }] : [{ type: 'person', id: athleteId }],
     })
 
-    if (firstLine.trim()) {
-      await addSessionLineDomain({ eventId: event.id, sportName: firstLineSport, rawText: firstLine })
+    for (let i = 0; i < lineTexts.length; i++) {
+      if (lineTexts[i].trim()) {
+        await addSessionLineDomain({ eventId: event.id, sportName: lineSports[i] ?? 'Atletismo', rawText: lineTexts[i] })
+      }
     }
   } catch (e) {
     return { error: e instanceof DomainError ? e.message : 'No se pudo crear' }

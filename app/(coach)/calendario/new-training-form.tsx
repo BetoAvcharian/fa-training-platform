@@ -23,7 +23,9 @@ export function NewTrainingForm({
   defaultDate: string
 }) {
   const [open, setOpen] = useState(false)
-  const [sport, setSport] = useState<'Atletismo' | 'Fuerza'>('Atletismo')
+  const [lines, setLines] = useState<Array<{ text: string; sport: 'Atletismo' | 'Fuerza' }>>([
+    { text: '', sport: 'Atletismo' },
+  ])
   const [pending, startTransition] = useTransition()
   const [error, setError] = useState<string | null>(null)
   const [ok, setOk] = useState(false)
@@ -41,9 +43,18 @@ export function NewTrainingForm({
 
   const selectedAthlete = roster.find((r) => r.id === athleteId)
 
+  function updateLine(i: number, patch: Partial<{ text: string; sport: 'Atletismo' | 'Fuerza' }>) {
+    setLines((prev) => prev.map((l, idx) => (idx === i ? { ...l, ...patch } : l)))
+  }
+
   function handleSubmit(formData: FormData) {
-    formData.set('firstLineSport', sport)
     formData.set('athleteId', athleteId)
+    for (const l of lines) {
+      if (l.text.trim()) {
+        formData.append('lineText', l.text)
+        formData.append('lineSport', l.sport)
+      }
+    }
     startTransition(async () => {
       const result = await createEventAction(formData)
       if (result?.error) {
@@ -55,6 +66,7 @@ export function NewTrainingForm({
         setOpen(false)
         setAthleteId('')
         setAthleteSearch('')
+        setLines([{ text: '', sport: 'Atletismo' }])
         setTimeout(() => setOk(false), 3000)
       }
     })
@@ -130,22 +142,43 @@ export function NewTrainingForm({
           )}
 
           <div className="pt-3 border-t border-gray-100">
-            <label className="text-xs text-status-neutral mb-1 block">Primer ejercicio (opcional — podés agregar más después)</label>
-            <div className="flex gap-2">
-              <select
-                value={sport}
-                onChange={(e) => setSport(e.target.value as 'Atletismo' | 'Fuerza')}
-                className="input-field w-24"
-              >
-                <option value="Atletismo">Atl.</option>
-                <option value="Fuerza">Fza.</option>
-              </select>
-              <input
-                name="firstLine"
-                placeholder={sport === 'Atletismo' ? "6x400m 1:10 r2'" : 'Sentadilla 4x8x100kg'}
-                className="flex-1 min-w-0 input-field"
-              />
+            <label className="text-xs text-status-neutral mb-1 block">Ejercicios (opcional — podés agregar más después también)</label>
+            <div className="space-y-2">
+              {lines.map((line, i) => (
+                <div key={i} className="flex gap-2">
+                  <select
+                    value={line.sport}
+                    onChange={(e) => updateLine(i, { sport: e.target.value as 'Atletismo' | 'Fuerza' })}
+                    className="input-field w-24"
+                  >
+                    <option value="Atletismo">Atl.</option>
+                    <option value="Fuerza">Fza.</option>
+                  </select>
+                  <input
+                    value={line.text}
+                    onChange={(e) => updateLine(i, { text: e.target.value })}
+                    placeholder={line.sport === 'Atletismo' ? "6x400m 1:10 r2'" : 'Sentadilla 4x8x100kg'}
+                    className="flex-1 min-w-0 input-field"
+                  />
+                  {lines.length > 1 && (
+                    <button
+                      type="button"
+                      onClick={() => setLines((prev) => prev.filter((_, idx) => idx !== i))}
+                      className="text-status-critical text-lg leading-none px-1"
+                    >
+                      ×
+                    </button>
+                  )}
+                </div>
+              ))}
             </div>
+            <button
+              type="button"
+              onClick={() => setLines((prev) => [...prev, { text: '', sport: 'Atletismo' }])}
+              className="text-xs text-navy underline mt-2"
+            >
+              + Agregar otro ejercicio
+            </button>
           </div>
 
           {error && <p className="text-xs text-status-critical">{error}</p>}
