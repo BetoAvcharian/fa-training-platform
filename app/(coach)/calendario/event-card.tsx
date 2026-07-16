@@ -67,13 +67,11 @@ export function EventCard({ event, lines, roster }: { event: Event; lines: Sessi
           {lines.map((line) => (
             <div key={line.id} className="border-b border-gray-50 pb-2 last:border-0">
               <div className="flex items-center gap-2">
-                <span
-                  className={`text-[10px] px-1.5 py-0.5 rounded-full shrink-0 ${
-                    line.isStructured ? 'bg-status-positive/10 text-status-positive' : 'bg-status-attention/10 text-status-attention'
-                  }`}
-                >
-                  {line.isStructured ? '✓' : '?'}
-                </span>
+                {line.isStructured && (
+                  <span className="text-[10px] px-1.5 py-0.5 rounded-full shrink-0 bg-status-positive/10 text-status-positive">
+                    ✓
+                  </span>
+                )}
                 <span className="text-sm text-navy flex-1">{line.rawText}</span>
                 <button
                   onClick={() => setExceptionFor(exceptionFor === line.id ? null : line.id)}
