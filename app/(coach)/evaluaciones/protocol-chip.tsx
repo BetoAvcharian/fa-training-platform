@@ -15,7 +15,11 @@ export function ProtocolChip({ id, name, deletable }: { id: string; name: string
           <>
             <button
               disabled={pending}
-              onClick={() => startTransition(() => deleteProtocolAction(id))}
+              onClick={() =>
+                startTransition(async () => {
+                  await deleteProtocolAction(id)
+                })
+              }
               className="text-status-critical font-medium"
             >
               Confirmar
