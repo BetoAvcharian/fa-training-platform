@@ -1,6 +1,6 @@
 import Link from 'next/link'
-import { getMyActiveMembership, getRoster } from '@/domains/athletes/queries'
-import { getVideos } from '@/domains/videos/queries'
+import { getMyActiveMembership, getRoster, getMyCoachMembershipId, getAthletesForCoach } from '@/domains/athletes/queries'
+import { getVideosForAthlete } from '@/domains/videos/queries'
 import { VideoForm } from '@/app/(coach)/videos/video-form'
 
 export const dynamic = 'force-dynamic'
@@ -16,9 +16,10 @@ export default async function MisVideosMenuPage() {
   const membership = await getMyActiveMembership()
   if (!membership) return null
 
+  const coachMembershipId = await getMyCoachMembershipId()
   const [videos, roster] = await Promise.all([
-    getVideos(membership.organizationId),
-    getRoster(membership.organizationId),
+    getVideosForAthlete(membership.id, coachMembershipId, membership.organizationId),
+    coachMembershipId ? getAthletesForCoach(coachMembershipId) : getRoster(membership.organizationId),
   ])
   const countByCategory = new Map<string, number>()
   for (const v of videos) {
