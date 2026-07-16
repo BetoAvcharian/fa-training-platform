@@ -1,4 +1,4 @@
-import { getMyActiveMembership, getOrganization, getGroups, getRoster, getGroupMembers } from '@/domains/athletes/queries'
+import { getMyActiveMembership, getOrganization, getGroups, getRoster, getGroupMembers, getAthletesForCoach } from '@/domains/athletes/queries'
 import { GroupForm } from './group-form'
 import { CopyJoinCode } from './copy-join-code'
 import { GroupMembersEditor } from './group-members-editor'
