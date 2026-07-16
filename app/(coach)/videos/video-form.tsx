@@ -65,7 +65,7 @@ function AthleteTagPicker({ roster, selected, onChange }: { roster: RosterEntry[
                   onChange([...selected, r.id])
                   setQuery('')
                 }}
-                className="w-full text-left px-3 py-2 text-sm text-ink hover:bg-gray-50"
+                className="w-full text-left px-3 py-2 text-sm text-ink hover:bg-outline/40"
               >
                 {r.person ? `${r.person.firstName} ${r.person.lastName}` : '—'}
               </button>
@@ -193,14 +193,14 @@ export function VideoForm({
             <button
               type="button"
               onClick={() => setMode('link')}
-              className={`flex-1 py-2 rounded-lg border ${mode === 'link' ? 'bg-navy text-white border-navy' : 'border-gray-300 text-status-neutral'}`}
+              className={`flex-1 py-2 rounded-lg border ${mode === 'link' ? 'bg-navy text-white border-navy' : 'border-outline text-status-neutral'}`}
             >
               Link (YouTube/Vimeo)
             </button>
             <button
               type="button"
               onClick={() => setMode('upload')}
-              className={`flex-1 py-2 rounded-lg border ${mode === 'upload' ? 'bg-navy text-white border-navy' : 'border-gray-300 text-status-neutral'}`}
+              className={`flex-1 py-2 rounded-lg border ${mode === 'upload' ? 'bg-navy text-white border-navy' : 'border-outline text-status-neutral'}`}
             >
               Subir archivo
             </button>

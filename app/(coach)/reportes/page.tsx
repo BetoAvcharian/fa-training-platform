@@ -53,7 +53,7 @@ export default async function ReportesPage({
       <form className="rounded-xl border border-outline bg-panel p-4 grid grid-cols-2 sm:grid-cols-3 gap-2 items-end">
         <div>
           <label className="text-xs text-status-neutral block mb-1">Atleta</label>
-          <select name="atleta" defaultValue={params.atleta ?? ''} className="w-full rounded-lg border border-outline px-2 py-1.5 text-sm">
+          <select name="atleta" defaultValue={params.atleta ?? ''} className="w-full rounded-lg border border-outline bg-panel text-ink px-2 py-1.5 text-sm">
             <option value="">Todos</option>
             {roster.map((r) => (
               <option key={r.id} value={r.id}>
@@ -65,7 +65,7 @@ export default async function ReportesPage({
         {groups.length > 0 && (
           <div>
             <label className="text-xs text-status-neutral block mb-1">Grupo</label>
-            <select name="grupo" defaultValue={params.grupo ?? ''} className="w-full rounded-lg border border-outline px-2 py-1.5 text-sm">
+            <select name="grupo" defaultValue={params.grupo ?? ''} className="w-full rounded-lg border border-outline bg-panel text-ink px-2 py-1.5 text-sm">
               <option value="">Todos</option>
               {groups.map((g) => (
                 <option key={g.id} value={g.id}>
@@ -77,7 +77,7 @@ export default async function ReportesPage({
         )}
         <div>
           <label className="text-xs text-status-neutral block mb-1">Origen</label>
-          <select name="origen" defaultValue={params.origen ?? ''} className="w-full rounded-lg border border-outline px-2 py-1.5 text-sm">
+          <select name="origen" defaultValue={params.origen ?? ''} className="w-full rounded-lg border border-outline bg-panel text-ink px-2 py-1.5 text-sm">
             <option value="">Todos</option>
             {Object.entries(SOURCE_LABELS).map(([value, label]) => (
               <option key={value} value={value}>
@@ -88,11 +88,11 @@ export default async function ReportesPage({
         </div>
         <div>
           <label className="text-xs text-status-neutral block mb-1">Desde</label>
-          <input type="date" name="desde" defaultValue={params.desde ?? ''} className="w-full rounded-lg border border-outline px-2 py-1.5 text-sm" />
+          <input type="date" name="desde" defaultValue={params.desde ?? ''} className="w-full rounded-lg border border-outline bg-panel text-ink px-2 py-1.5 text-sm" />
         </div>
         <div>
           <label className="text-xs text-status-neutral block mb-1">Hasta</label>
-          <input type="date" name="hasta" defaultValue={params.hasta ?? ''} className="w-full rounded-lg border border-outline px-2 py-1.5 text-sm" />
+          <input type="date" name="hasta" defaultValue={params.hasta ?? ''} className="w-full rounded-lg border border-outline bg-panel text-ink px-2 py-1.5 text-sm" />
         </div>
         <button type="submit" className="btn-primary px-4 py-1.5 text-sm h-fit">
           Filtrar

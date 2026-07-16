@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { signUpManagerAction, signUpCoachAction, signUpAthleteAction } from './actions'
 import type { CoachDirectoryEntry } from '@/domains/athletes/types'
 
-const inputClass = 'w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-gold'
+const inputClass = 'w-full rounded-lg border border-outline bg-panel text-ink px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-gold'
 
 export function SignupForm({
   coaches,
@@ -28,7 +28,7 @@ export function SignupForm({
             type="button"
             onClick={() => setRole(r)}
             className={`flex-1 py-2 rounded-lg border ${
-              role === r ? 'bg-navy text-white border-navy' : 'border-gray-300 text-status-neutral'
+              role === r ? 'bg-navy text-white border-navy' : 'border-outline text-status-neutral'
             }`}
           >
             {r === 'manager' ? 'Manager' : r === 'coach' ? 'Entrenador' : 'Atleta'}

@@ -97,9 +97,9 @@ export default async function CalendarioPage({
             </a>
           </div>
           <div className="flex items-center gap-2 text-sm">
-            <a href={`?week=${prevWeek}&mode=${mode}`} className="px-3 py-1.5 rounded-md border border-gray-300">◀</a>
+            <a href={`?week=${prevWeek}&mode=${mode}`} className="px-3 py-1.5 rounded-md border border-outline">◀</a>
             <span className="text-status-neutral">{weekStartStr} — {weekEndStr}</span>
-            <a href={`?week=${nextWeek}&mode=${mode}`} className="px-3 py-1.5 rounded-md border border-gray-300">▶</a>
+            <a href={`?week=${nextWeek}&mode=${mode}`} className="px-3 py-1.5 rounded-md border border-outline">▶</a>
           </div>
           {mode === 'planificar' && <CopyWeekForm weekStart={weekStartStr} />}
         </div>
@@ -190,8 +190,8 @@ async function MonthView({
             </a>
           </div>
           <div className="flex items-center gap-2 text-sm">
-            <a href={`?month=${prevMonthStr}&mode=${mode}&view=mes`} className="px-3 py-1.5 rounded-md border border-gray-300">◀</a>
-            <a href={`?month=${nextMonthStr}&mode=${mode}&view=mes`} className="px-3 py-1.5 rounded-md border border-gray-300">▶</a>
+            <a href={`?month=${prevMonthStr}&mode=${mode}&view=mes`} className="px-3 py-1.5 rounded-md border border-outline">◀</a>
+            <a href={`?month=${nextMonthStr}&mode=${mode}&view=mes`} className="px-3 py-1.5 rounded-md border border-outline">▶</a>
           </div>
         </div>
       </div>
@@ -213,7 +213,7 @@ async function MonthView({
             <a
               key={i}
               href={`?week=${dayWeekStart}&mode=${mode}&view=semana`}
-              className={`min-h-[80px] rounded-lg border p-1.5 ${inMonth ? 'bg-panel border-outline' : 'bg-gray-50 border-gray-100'}`}
+              className={`min-h-[80px] rounded-lg border p-1.5 ${inMonth ? 'bg-panel border-outline' : 'bg-outline/40 border-gray-100'}`}
             >
               <p className={`text-xs ${inMonth ? 'text-ink' : 'text-gray-300'}`}>{day.getDate()}</p>
               <div className="space-y-0.5 mt-1">

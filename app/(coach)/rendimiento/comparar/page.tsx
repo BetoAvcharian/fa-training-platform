@@ -109,7 +109,7 @@ export default async function CompararPage({
           <p className="text-xs text-status-neutral mb-1">O elegí atletas individuales (mín. 2)</p>
           <div className="flex flex-wrap gap-2 max-h-32 overflow-y-auto">
             {roster.map((r) => (
-              <label key={r.id} className="flex items-center gap-1 text-xs bg-gray-50 rounded-full px-2 py-1">
+              <label key={r.id} className="flex items-center gap-1 text-xs bg-outline/40 rounded-full px-2 py-1">
                 <input type="checkbox" name="athleteIds" value={r.id} defaultChecked={athleteIds.includes(r.id)} />
                 {r.person ? `${r.person.firstName} ${r.person.lastName}` : '—'}
               </label>
@@ -126,7 +126,7 @@ export default async function CompararPage({
           <p className="text-xs text-status-neutral mb-1">Origen (vacío = todos)</p>
           <div className="flex flex-wrap gap-2">
             {SOURCE_OPTIONS.map((opt) => (
-              <label key={opt.value} className="flex items-center gap-1 text-xs bg-gray-50 rounded-full px-2 py-1">
+              <label key={opt.value} className="flex items-center gap-1 text-xs bg-outline/40 rounded-full px-2 py-1">
                 <input type="checkbox" name="origenes" value={opt.value} defaultChecked={origenesSeleccionados.includes(opt.value)} />
                 {opt.label}
               </label>

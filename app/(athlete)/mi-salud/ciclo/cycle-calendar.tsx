@@ -52,7 +52,7 @@ export function CycleCalendar({
                   onClick={() => setSelectedDate(d.date)}
                   className={`aspect-square rounded-lg flex items-center justify-center text-xs relative ${
                     d.inMonth ? 'text-ink' : 'text-gray-300'
-                  } ${log?.flow ? `${FLOW_COLORS[log.flow]} text-white font-medium` : 'bg-gray-50'} ${
+                  } ${log?.flow ? `${FLOW_COLORS[log.flow]} text-white font-medium` : 'bg-outline/40'} ${
                     isPredicted && !log?.flow ? 'ring-2 ring-red-300 ring-dashed' : ''
                   }`}
                 >

@@ -74,7 +74,7 @@ export default async function MisVideosCategoryPage({
           name="q"
           defaultValue={sParams.q ?? ''}
           placeholder="Buscar por título o descripción…"
-          className="flex-1 rounded-lg border border-outline px-3 py-1.5 text-sm"
+          className="flex-1 rounded-lg border border-outline bg-panel text-ink px-3 py-1.5 text-sm"
         />
         {sParams.mios === '1' && <input type="hidden" name="mios" value="1" />}
         <button type="submit" className="btn-primary px-4 py-1.5 text-sm">

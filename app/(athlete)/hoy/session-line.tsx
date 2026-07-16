@@ -23,7 +23,7 @@ export function SessionLine({ line, executed }: Props) {
   }
 
   return (
-    <div className="flex items-start justify-between gap-3 bg-gray-50 rounded-lg px-3 py-2.5">
+    <div className="flex items-start justify-between gap-3 bg-outline/40 rounded-lg px-3 py-2.5">
       <div className="flex-1 min-w-0">
         <p className="text-sm text-ink">{line.rawText}</p>
         {!line.isStructured && (

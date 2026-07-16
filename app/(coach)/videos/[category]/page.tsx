@@ -92,12 +92,12 @@ export default async function VideoCategoryPage({
             name="q"
             defaultValue={sParams.q ?? ''}
             placeholder="Título o descripción…"
-            className="w-full rounded-lg border border-outline px-3 py-1.5 text-sm"
+            className="w-full rounded-lg border border-outline bg-panel text-ink px-3 py-1.5 text-sm"
           />
         </div>
         <div>
           <label className="text-xs text-status-neutral block mb-1">Atleta</label>
-          <select name="atleta" defaultValue={sParams.atleta ?? ''} className="rounded-lg border border-outline px-3 py-1.5 text-sm">
+          <select name="atleta" defaultValue={sParams.atleta ?? ''} className="rounded-lg border border-outline bg-panel text-ink px-3 py-1.5 text-sm">
             <option value="">Todos</option>
             {roster.map((r) => (
               <option key={r.id} value={r.id}>
@@ -108,11 +108,11 @@ export default async function VideoCategoryPage({
         </div>
         <div>
           <label className="text-xs text-status-neutral block mb-1">Desde</label>
-          <input type="date" name="desde" defaultValue={sParams.desde ?? ''} className="rounded-lg border border-outline px-3 py-1.5 text-sm" />
+          <input type="date" name="desde" defaultValue={sParams.desde ?? ''} className="rounded-lg border border-outline bg-panel text-ink px-3 py-1.5 text-sm" />
         </div>
         <div>
           <label className="text-xs text-status-neutral block mb-1">Hasta</label>
-          <input type="date" name="hasta" defaultValue={sParams.hasta ?? ''} className="rounded-lg border border-outline px-3 py-1.5 text-sm" />
+          <input type="date" name="hasta" defaultValue={sParams.hasta ?? ''} className="rounded-lg border border-outline bg-panel text-ink px-3 py-1.5 text-sm" />
         </div>
         <label className="flex items-center gap-1.5 text-xs text-ink pb-2">
           <input type="checkbox" name="etiquetados" value="1" defaultChecked={sParams.etiquetados === '1'} />
