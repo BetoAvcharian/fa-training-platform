@@ -2,7 +2,7 @@
 
 import { revalidatePath } from 'next/cache'
 import { createObservable, hideGlobalItem, unhideGlobalItem, updateObservable } from '@/domains/catalog/mutations'
-import { recordObservation } from '@/domains/observations/manual-entry'
+import { recordObservation, editObservation, deleteObservation } from '@/domains/observations/manual-entry'
 import { getMyActiveMembership } from '@/domains/athletes/queries'
 import { DomainError } from '@/types/errors'
 
@@ -113,4 +113,23 @@ export async function unhideObservableAction(observableId: string) {
 
   revalidatePath('/registros')
   return { error: null }
+}
+
+export async function editRecordAction(id: string, value: number) {
+  const membership = await getMyActiveMembership()
+  if (!membership) return { error: 'No autenticado' }
+
+  try {
+    await editObservation({ observationId: id, organizationId: membership.organizationId, value })
+  } catch (e) {
+    return { error: e instanceof DomainError ? e.message : 'No se pudo corregir' }
+  }
+
+  revalidatePath('/registros')
+  return { error: null }
+}
+
+export async function deleteRecordAction(id: string) {
+  await deleteObservation({ observationId: id })
+  revalidatePath('/registros')
 }

@@ -3,7 +3,8 @@ import { getObservables, getUnits, getSports } from '@/domains/catalog/queries'
 import { getMyResults } from '@/domains/performance/queries'
 import { MyRecordForm } from './record-form'
 import { MyObservableForm } from './observable-form'
-import { formatMark } from '@/lib/format-mark'
+import { EditableRecordRow } from '@/components/ui/editable-record-row'
+import { editMyRecordAction, deleteMyRecordAction } from './actions'
 
 export const dynamic = 'force-dynamic'
 
@@ -48,15 +49,16 @@ export default async function MisRegistrosPage() {
         <div className="rounded-2xl border border-gray-100 bg-white shadow-sm divide-y divide-gray-50">
           {recent.length === 0 && <p className="p-4 text-sm text-status-neutral">Todavía no cargaste nada.</p>}
           {recent.map((r) => (
-            <div key={r.id} className="p-3 flex items-center justify-between text-sm">
-              <div>
-                <p className="text-navy">{r.observableName}</p>
-                <p className="text-xs text-status-neutral">{formatDate(r.date)}</p>
-              </div>
-              <p className="font-medium text-navy">
-                {formatMark(r.value, r.unitSymbol)}
-              </p>
-            </div>
+            <EditableRecordRow
+              key={r.id}
+              id={r.id}
+              title={r.observableName}
+              subtitle={formatDate(r.date)}
+              value={r.value}
+              unitSymbol={r.unitSymbol}
+              onEdit={editMyRecordAction}
+              onDelete={deleteMyRecordAction}
+            />
           ))}
         </div>
       </div>

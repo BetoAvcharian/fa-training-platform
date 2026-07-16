@@ -4,7 +4,8 @@ import { getRecentRecords } from '@/domains/observations/manual-entry'
 import { RecordForm } from './record-form'
 import { ObservableForm } from './observable-form'
 import { HideButton, UnhideButton } from './hide-button'
-import { formatMark } from '@/lib/format-mark'
+import { EditableRecordRow } from '@/components/ui/editable-record-row'
+import { editRecordAction, deleteRecordAction } from './actions'
 
 export const dynamic = 'force-dynamic'
 
@@ -68,17 +69,16 @@ export default async function RegistrosPage() {
         )}
         <div className="rounded-xl border border-gray-200 bg-white divide-y divide-gray-100">
           {recent.map((r) => (
-            <div key={r.id} className="p-3 flex items-center justify-between text-sm">
-              <div>
-                <p className="text-navy font-medium">{r.athleteName}</p>
-                <p className="text-xs text-status-neutral">
-                  {r.observableName} · {formatDate(r.date)}
-                </p>
-              </div>
-              <p className="font-semibold text-navy">
-                {formatMark(r.value, r.unitSymbol)}
-              </p>
-            </div>
+            <EditableRecordRow
+              key={r.id}
+              id={r.id}
+              title={r.athleteName}
+              subtitle={`${r.observableName} · ${formatDate(r.date)}`}
+              value={r.value}
+              unitSymbol={r.unitSymbol}
+              onEdit={editRecordAction}
+              onDelete={deleteRecordAction}
+            />
           ))}
         </div>
       </section>
