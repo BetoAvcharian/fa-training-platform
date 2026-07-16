@@ -23,11 +23,11 @@ export default async function ConfiguracionPage() {
     <div className="space-y-8 max-w-2xl">
       <div>
         <p className="text-xs uppercase tracking-wider text-gold font-medium">Configuración</p>
-        <h1 className="font-display text-2xl font-bold text-navy">{org?.name ?? 'Organización'}</h1>
+        <h1 className="font-display text-2xl font-bold text-ink">{org?.name ?? 'Organización'}</h1>
       </div>
 
       <section className="space-y-2">
-        <h2 className="text-sm font-semibold text-navy">Código de invitación</h2>
+        <h2 className="text-sm font-semibold text-ink">Código de invitación</h2>
         <p className="text-xs text-status-neutral">
           Compartilo con entrenadores y atletas para que se sumen a tu equipo.
         </p>
@@ -38,20 +38,20 @@ export default async function ConfiguracionPage() {
 
       <section className="space-y-3">
         <div className="flex items-center justify-between">
-          <h2 className="text-sm font-semibold text-navy">Grupos</h2>
+          <h2 className="text-sm font-semibold text-ink">Grupos</h2>
           <GroupForm />
         </div>
 
         {groups.length === 0 && (
-          <div className="rounded-xl border border-gray-100 bg-white p-4 text-sm text-status-neutral">
+          <div className="rounded-xl border border-gray-100 bg-panel p-4 text-sm text-status-neutral">
             Todavía no armaste ningún grupo.
           </div>
         )}
 
         <div className="space-y-2">
           {groupsWithMembers.map(({ group: g, members }) => (
-            <div key={g.id} className="rounded-xl border border-gray-100 bg-white p-4 shadow-sm space-y-2">
-              <p className="font-medium text-navy text-sm">{g.name}</p>
+            <div key={g.id} className="rounded-xl border border-gray-100 bg-panel p-4 shadow-sm space-y-2">
+              <p className="font-medium text-ink text-sm">{g.name}</p>
               <GroupMembersEditor groupId={g.id} members={members} roster={roster} />
             </div>
           ))}
@@ -59,8 +59,8 @@ export default async function ConfiguracionPage() {
       </section>
 
       <section className="space-y-2">
-        <h2 className="text-sm font-semibold text-navy">Personas</h2>
-        <a href="/atletas" className="text-sm text-navy underline">
+        <h2 className="text-sm font-semibold text-ink">Personas</h2>
+        <a href="/atletas" className="text-sm text-ink underline">
           Invitar entrenadores/atletas y asignarlos →
         </a>
       </section>

@@ -52,7 +52,7 @@ export function EditableRecordRow({
   if (editing) {
     return (
       <div className="p-3 text-sm">
-        <p className="text-navy font-medium mb-1">{title}</p>
+        <p className="text-ink font-medium mb-1">{title}</p>
         <p className="text-xs text-status-neutral mb-2">{subtitle}</p>
         <div className="flex items-center gap-2">
           {isTime ? (
@@ -103,13 +103,13 @@ export function EditableRecordRow({
   return (
     <div className="p-3 flex items-center justify-between text-sm group">
       <div>
-        <p className="text-navy font-medium">{title}</p>
+        <p className="text-ink font-medium">{title}</p>
         <p className="text-xs text-status-neutral">{subtitle}</p>
       </div>
       <div className="flex items-center gap-3">
-        <p className="font-semibold text-navy">{formatMark(value, unitSymbol)}</p>
+        <p className="font-semibold text-ink">{formatMark(value, unitSymbol)}</p>
         <div className="flex gap-2">
-          <button onClick={() => setEditing(true)} className="text-xs text-navy underline">
+          <button onClick={() => setEditing(true)} className="text-xs text-ink underline">
             Editar
           </button>
           <button onClick={() => setConfirming(true)} className="text-xs text-status-critical underline">

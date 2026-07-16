@@ -30,7 +30,7 @@ export default async function MisVideosMenuPage() {
     <div className="space-y-4">
       <div>
         <p className="text-xs uppercase tracking-wider text-gold font-medium">Videos</p>
-        <h1 className="font-display text-2xl font-bold text-navy">Videos</h1>
+        <h1 className="font-display text-2xl font-bold text-ink">Videos</h1>
       </div>
 
       <VideoForm organizationId={membership.organizationId} roster={roster} />
@@ -40,16 +40,16 @@ export default async function MisVideosMenuPage() {
         className="block rounded-2xl border border-gold/40 bg-gold/5 p-4 shadow-sm"
       >
         <div className="flex items-center justify-between">
-          <p className="font-display text-base font-bold text-navy">Ver todos los videos</p>
+          <p className="font-display text-base font-bold text-ink">Ver todos los videos</p>
           <span className="text-xs text-status-neutral">{videos.length} en total</span>
         </div>
       </Link>
 
       <div className="space-y-2">
         {CATEGORIES.map((c) => (
-          <Link key={c.key} href={`/mis-videos/${c.key}`} className="block rounded-2xl border border-gray-100 bg-white p-4 shadow-sm">
+          <Link key={c.key} href={`/mis-videos/${c.key}`} className="block rounded-2xl border border-gray-100 bg-panel p-4 shadow-sm">
             <div className="flex items-center justify-between">
-              <p className="font-medium text-navy">{c.label}</p>
+              <p className="font-medium text-ink">{c.label}</p>
               <span className="text-xs text-status-neutral">{countByCategory.get(c.key) ?? 0}</span>
             </div>
             <p className="text-xs text-status-neutral mt-0.5">{c.description}</p>

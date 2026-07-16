@@ -32,13 +32,13 @@ export default async function MisRegistrosPage() {
     <div className="space-y-6">
       <div>
         <p className="text-xs uppercase tracking-wider text-gold font-medium">Registros</p>
-        <h1 className="font-display text-2xl font-bold text-navy">Cargar una marca</h1>
+        <h1 className="font-display text-2xl font-bold text-ink">Cargar una marca</h1>
       </div>
 
       <MyRecordForm observables={registrable} />
 
       <details className="text-sm">
-        <summary className="cursor-pointer text-navy underline">¿No está en la lista? Agregar una prueba nueva</summary>
+        <summary className="cursor-pointer text-ink underline">¿No está en la lista? Agregar una prueba nueva</summary>
         <div className="mt-2">
           <MyObservableForm sports={sports} units={units} />
         </div>
@@ -46,7 +46,7 @@ export default async function MisRegistrosPage() {
 
       <div>
         <p className="text-xs text-status-neutral uppercase tracking-wide mb-2">Últimos registros</p>
-        <div className="rounded-2xl border border-gray-100 bg-white shadow-sm divide-y divide-gray-50">
+        <div className="rounded-2xl border border-gray-100 bg-panel shadow-sm divide-y divide-gray-50">
           {recent.length === 0 && <p className="p-4 text-sm text-status-neutral">Todavía no cargaste nada.</p>}
           {recent.map((r) => (
             <EditableRecordRow

@@ -55,9 +55,9 @@ export function EventCard({ event, lines, roster }: { event: Event; lines: Sessi
     <>
       <button
         onClick={() => setOpen(true)}
-        className="w-full text-left bg-white border border-gray-200 rounded-lg p-2.5 text-xs hover:border-gold/40 transition-colors"
+        className="w-full text-left bg-panel border border-outline rounded-lg p-2.5 text-xs hover:border-gold/40 transition-colors"
       >
-        <p className="font-medium text-navy truncate">{event.title}</p>
+        <p className="font-medium text-ink truncate">{event.title}</p>
         <p className="text-[10px] text-status-neutral">{lines.length} línea(s)</p>
       </button>
 
@@ -72,7 +72,7 @@ export function EventCard({ event, lines, roster }: { event: Event; lines: Sessi
                     ✓
                   </span>
                 )}
-                <span className="text-sm text-navy flex-1">{line.rawText}</span>
+                <span className="text-sm text-ink flex-1">{line.rawText}</span>
                 <button
                   onClick={() => setExceptionFor(exceptionFor === line.id ? null : line.id)}
                   className="text-xs text-gold underline shrink-0"

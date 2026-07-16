@@ -55,7 +55,7 @@ export default async function ResumenPage() {
     <div className="space-y-6">
       <div>
         <p className="text-xs uppercase tracking-wider text-gold font-medium">Resumen</p>
-        <h1 className="font-display text-2xl font-bold text-navy">
+        <h1 className="font-display text-2xl font-bold text-ink">
           {new Date(today + 'T00:00:00').toLocaleDateString('es-AR', { weekday: 'long', day: 'numeric', month: 'long' })}
         </h1>
       </div>
@@ -68,7 +68,7 @@ export default async function ResumenPage() {
               <p className="text-sm font-medium text-status-critical mb-2">🔴 Atención requerida ({withoutExecution.length})</p>
               <ul className="space-y-1">
                 {withoutExecution.map((a) => (
-                  <li key={a.athleteMembershipId} className="text-sm text-navy">
+                  <li key={a.athleteMembershipId} className="text-sm text-ink">
                     {a.athleteName} — sin registrar hace más de 4 días
                   </li>
                 ))}
@@ -81,7 +81,7 @@ export default async function ResumenPage() {
               <p className="text-sm font-medium text-status-attention mb-2">🟠 Seguimiento ({wellness.length})</p>
               <ul className="space-y-1">
                 {wellness.map((a) => (
-                  <li key={a.athleteMembershipId} className="text-sm text-navy">
+                  <li key={a.athleteMembershipId} className="text-sm text-ink">
                     {a.athleteName} — energía {a.energia ?? '—'}/5, fatiga {a.fatiga ?? '—'}/5
                   </li>
                 ))}
@@ -93,7 +93,7 @@ export default async function ResumenPage() {
 
       {competitions.length > 0 && (
         <div className="card p-4">
-          <p className="text-sm font-medium text-navy mb-2">ℹ️ Próximas competencias</p>
+          <p className="text-sm font-medium text-ink mb-2">ℹ️ Próximas competencias</p>
           <ul className="space-y-1">
             {competitions.map((c) => (
               <li key={`${c.eventId}-${c.athleteName}`} className="text-sm text-status-neutral">
@@ -116,7 +116,7 @@ export default async function ResumenPage() {
         {/* Próximos eventos */}
         <div className="card p-4">
           <div className="flex items-center justify-between mb-3">
-            <p className="text-sm font-semibold text-navy">Próximos eventos</p>
+            <p className="text-sm font-semibold text-ink">Próximos eventos</p>
             <Link href="/calendario" className="text-xs text-gold font-medium">
               Ver todos →
             </Link>
@@ -127,7 +127,7 @@ export default async function ResumenPage() {
               <div key={e.id} className="py-3 flex items-center justify-between gap-2">
                 <div>
                   <p className="text-xs text-gold font-medium">{TYPE_LABELS[e.type] ?? e.type}</p>
-                  <p className="text-sm font-medium text-navy">{e.title}</p>
+                  <p className="text-sm font-medium text-ink">{e.title}</p>
                   <p className="text-xs text-status-neutral">{formatEventDate(e.date)}</p>
                 </div>
                 {e.assignedCount > 0 && (
@@ -143,7 +143,7 @@ export default async function ResumenPage() {
         {/* Gráficos */}
         <div className="space-y-4">
           <div className="card p-4">
-            <p className="text-sm font-semibold text-navy mb-2">Rendimiento (% completado, últimas sesiones)</p>
+            <p className="text-sm font-semibold text-ink mb-2">Rendimiento (% completado, últimas sesiones)</p>
             {attendance.length === 0 ? (
               <p className="text-sm text-status-neutral">Sin datos todavía.</p>
             ) : (
@@ -151,7 +151,7 @@ export default async function ResumenPage() {
             )}
           </div>
           <div className="card p-4">
-            <p className="text-sm font-semibold text-navy mb-2">Asistencia (últimas sesiones)</p>
+            <p className="text-sm font-semibold text-ink mb-2">Asistencia (últimas sesiones)</p>
             {attendance.length === 0 ? (
               <p className="text-sm text-status-neutral">Sin datos todavía.</p>
             ) : (
@@ -168,7 +168,7 @@ function StatCard({ label, value, delta }: { label: string; value: number; delta
   return (
     <div className="card p-4">
       <p className="text-xs text-status-neutral uppercase tracking-wide">{label}</p>
-      <p className="font-display text-2xl font-bold text-navy">{value}</p>
+      <p className="font-display text-2xl font-bold text-ink">{value}</p>
       {delta > 0 && <p className="text-xs text-status-positive mt-0.5">+{delta} esta semana</p>}
     </div>
   )

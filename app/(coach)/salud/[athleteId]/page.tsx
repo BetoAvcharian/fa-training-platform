@@ -44,15 +44,15 @@ export default async function AthleteSaludPage({
   return (
     <div className="space-y-6">
       <div>
-        <Link href="/salud" className="text-xs text-status-neutral hover:text-navy">
+        <Link href="/salud" className="text-xs text-status-neutral hover:text-ink">
           ← Volver a atletas
         </Link>
         <p className="text-xs uppercase tracking-wider text-gold font-medium mt-2">Salud</p>
-        <h1 className="font-display text-2xl font-bold text-navy">{athleteName}</h1>
+        <h1 className="font-display text-2xl font-bold text-ink">{athleteName}</h1>
       </div>
 
       {episodes.length === 0 && (
-        <div className="rounded-xl border border-gray-100 bg-white p-5 text-sm text-status-neutral">
+        <div className="rounded-xl border border-gray-100 bg-panel p-5 text-sm text-status-neutral">
           Sin episodios visibles para vos en este momento.
         </div>
       )}
@@ -61,19 +61,19 @@ export default async function AthleteSaludPage({
         {episodes.map((e) => (
           <div key={e.id} className="card p-4">
             <p className="text-xs uppercase tracking-wide text-gold font-semibold">{TYPE_LABELS[e.type]}</p>
-            <p className="font-medium text-navy">{e.title}</p>
+            <p className="font-medium text-ink">{e.title}</p>
             <p className="text-xs text-status-neutral mt-0.5">
               {formatDate(e.startDate)}
               {e.endDate ? ` — ${formatDate(e.endDate)}` : ''} · {e.status === 'activo' ? 'Activo' : 'Resuelto'}
             </p>
-            {e.notes && <p className="text-sm text-navy mt-2">{e.notes}</p>}
+            {e.notes && <p className="text-sm text-ink mt-2">{e.notes}</p>}
           </div>
         ))}
       </div>
 
       {anthropometry.length > 0 && (
         <div className="space-y-3">
-          <h2 className="text-sm font-semibold text-navy">Antropometría y signos vitales</h2>
+          <h2 className="text-sm font-semibold text-ink">Antropometría y signos vitales</h2>
           <AnthropometryHistory history={anthropometry} />
         </div>
       )}

@@ -31,7 +31,7 @@ export function PlanForm({ plans }: { plans: Array<{ id: string; title: string; 
     return (
       <button
         onClick={() => setOpen(true)}
-        className="rounded-lg border border-dashed border-gray-200 bg-white px-4 py-2 text-sm font-medium text-navy"
+        className="rounded-lg border border-dashed border-outline bg-panel px-4 py-2 text-sm font-medium text-ink"
       >
         + Nuevo plan
       </button>
@@ -39,7 +39,7 @@ export function PlanForm({ plans }: { plans: Array<{ id: string; title: string; 
   }
 
   return (
-    <form action={handleSubmit} className="rounded-xl border border-gray-100 bg-white p-4 shadow-sm space-y-3 max-w-md">
+    <form action={handleSubmit} className="rounded-xl border border-gray-100 bg-panel p-4 shadow-sm space-y-3 max-w-md">
       <select name="type" className="input-field" required>
         {TYPE_OPTIONS.map((opt) => (
           <option key={opt.value} value={opt.value}>

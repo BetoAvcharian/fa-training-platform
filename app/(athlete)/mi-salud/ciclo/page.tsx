@@ -50,22 +50,22 @@ export default async function CicloPage({ searchParams }: { searchParams: Promis
   return (
     <div className="space-y-6">
       <div>
-        <Link href="/mi-salud" className="text-xs text-status-neutral hover:text-navy">
+        <Link href="/mi-salud" className="text-xs text-status-neutral hover:text-ink">
           ← Volver a Salud
         </Link>
         <p className="text-xs uppercase tracking-wider text-gold font-medium mt-2">Salud</p>
-        <h1 className="font-display text-2xl font-bold text-navy">Ciclo menstrual</h1>
+        <h1 className="font-display text-2xl font-bold text-ink">Ciclo menstrual</h1>
       </div>
 
       <div className="grid grid-cols-2 gap-3">
         <div className="card p-3 text-center">
-          <p className="text-2xl font-display font-bold text-navy">
+          <p className="text-2xl font-display font-bold text-ink">
             {stats.currentCycleDay ?? '—'}
           </p>
           <p className="text-[11px] text-status-neutral">Día del ciclo</p>
         </div>
         <div className="card p-3 text-center">
-          <p className="text-2xl font-display font-bold text-navy">
+          <p className="text-2xl font-display font-bold text-ink">
             {stats.averageCycleLength ?? '—'}
           </p>
           <p className="text-[11px] text-status-neutral">Duración promedio (días)</p>
@@ -75,7 +75,7 @@ export default async function CicloPage({ searchParams }: { searchParams: Promis
       {stats.predictedNextPeriod && (
         <p className="text-xs text-status-neutral text-center">
           Próximo período estimado:{' '}
-          <span className="text-navy font-medium">
+          <span className="text-ink font-medium">
             {new Date(stats.predictedNextPeriod + 'T00:00:00').toLocaleDateString('es-AR', { day: 'numeric', month: 'long' })}
           </span>
         </p>
@@ -83,20 +83,16 @@ export default async function CicloPage({ searchParams }: { searchParams: Promis
 
       <div className="card p-4">
         <div className="flex items-center justify-between mb-3">
-          <Link href={`/mi-salud/ciclo?month=${prevMonth.toISOString().slice(0, 7)}`} className="text-navy px-2">
+          <Link href={`/mi-salud/ciclo?month=${prevMonth.toISOString().slice(0, 7)}`} className="text-ink px-2">
             ←
           </Link>
-          <p className="text-sm font-semibold text-navy capitalize">{monthLabel}</p>
-          <Link href={`/mi-salud/ciclo?month=${nextMonth.toISOString().slice(0, 7)}`} className="text-navy px-2">
+          <p className="text-sm font-semibold text-ink capitalize">{monthLabel}</p>
+          <Link href={`/mi-salud/ciclo?month=${nextMonth.toISOString().slice(0, 7)}`} className="text-ink px-2">
             →
           </Link>
         </div>
         <CycleCalendar days={days} logsByDate={logsByDate} predictedNextPeriod={stats.predictedNextPeriod} />
       </div>
-
-      <p className="text-[11px] text-status-neutral text-center">
-        Solo vos y tu entrenador pueden ver esto.
-      </p>
     </div>
   )
 }

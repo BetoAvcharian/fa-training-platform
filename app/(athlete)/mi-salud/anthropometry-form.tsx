@@ -33,7 +33,7 @@ export function AnthropometryForm({ observables }: { observables: Observable[] }
     return (
       <button
         onClick={() => setOpen(true)}
-        className="w-full rounded-2xl border border-dashed border-gray-200 bg-white p-4 text-sm font-medium text-navy"
+        className="w-full rounded-2xl border border-dashed border-outline bg-panel p-4 text-sm font-medium text-ink"
       >
         + Cargar peso, talla u otro dato
       </button>
@@ -41,7 +41,7 @@ export function AnthropometryForm({ observables }: { observables: Observable[] }
   }
 
   return (
-    <form action={handleSubmit} className="rounded-2xl border border-gray-100 bg-white p-4 shadow-sm space-y-3">
+    <form action={handleSubmit} className="rounded-2xl border border-gray-100 bg-panel p-4 shadow-sm space-y-3">
       <select name="observableId" value={observableId} onChange={(e) => setObservableId(e.target.value)} className="input-field" required>
         {observables.map((o) => (
           <option key={o.id} value={o.id}>

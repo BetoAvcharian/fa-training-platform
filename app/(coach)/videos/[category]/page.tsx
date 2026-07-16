@@ -29,7 +29,7 @@ export default async function VideoCategoryPage({
   if (!CATEGORY_LABELS[category]) {
     return (
       <div className="space-y-4">
-        <Link href="/videos" className="text-xs text-status-neutral hover:text-navy">
+        <Link href="/videos" className="text-xs text-status-neutral hover:text-ink">
           ← Volver
         </Link>
         <p className="text-sm text-status-neutral">Categoría no encontrada.</p>
@@ -68,16 +68,16 @@ export default async function VideoCategoryPage({
   return (
     <div className="space-y-6">
       <div>
-        <Link href="/videos" className="text-xs text-status-neutral hover:text-navy">
+        <Link href="/videos" className="text-xs text-status-neutral hover:text-ink">
           ← Volver a categorías
         </Link>
         <div className="flex items-start justify-between gap-3 flex-wrap mt-2">
           <div>
             <p className="text-xs uppercase tracking-wider text-gold font-medium">Videos</p>
-            <h1 className="font-display text-2xl font-bold text-navy">{CATEGORY_LABELS[category]}</h1>
+            <h1 className="font-display text-2xl font-bold text-ink">{CATEGORY_LABELS[category]}</h1>
           </div>
           {canManage && (
-            <Link href="/videos" className="text-xs text-navy underline">
+            <Link href="/videos" className="text-xs text-ink underline">
               + Subir video
             </Link>
           )}
@@ -92,12 +92,12 @@ export default async function VideoCategoryPage({
             name="q"
             defaultValue={sParams.q ?? ''}
             placeholder="Título o descripción…"
-            className="w-full rounded-lg border border-gray-200 px-3 py-1.5 text-sm"
+            className="w-full rounded-lg border border-outline px-3 py-1.5 text-sm"
           />
         </div>
         <div>
           <label className="text-xs text-status-neutral block mb-1">Atleta</label>
-          <select name="atleta" defaultValue={sParams.atleta ?? ''} className="rounded-lg border border-gray-200 px-3 py-1.5 text-sm">
+          <select name="atleta" defaultValue={sParams.atleta ?? ''} className="rounded-lg border border-outline px-3 py-1.5 text-sm">
             <option value="">Todos</option>
             {roster.map((r) => (
               <option key={r.id} value={r.id}>
@@ -108,13 +108,13 @@ export default async function VideoCategoryPage({
         </div>
         <div>
           <label className="text-xs text-status-neutral block mb-1">Desde</label>
-          <input type="date" name="desde" defaultValue={sParams.desde ?? ''} className="rounded-lg border border-gray-200 px-3 py-1.5 text-sm" />
+          <input type="date" name="desde" defaultValue={sParams.desde ?? ''} className="rounded-lg border border-outline px-3 py-1.5 text-sm" />
         </div>
         <div>
           <label className="text-xs text-status-neutral block mb-1">Hasta</label>
-          <input type="date" name="hasta" defaultValue={sParams.hasta ?? ''} className="rounded-lg border border-gray-200 px-3 py-1.5 text-sm" />
+          <input type="date" name="hasta" defaultValue={sParams.hasta ?? ''} className="rounded-lg border border-outline px-3 py-1.5 text-sm" />
         </div>
-        <label className="flex items-center gap-1.5 text-xs text-navy pb-2">
+        <label className="flex items-center gap-1.5 text-xs text-ink pb-2">
           <input type="checkbox" name="etiquetados" value="1" defaultChecked={sParams.etiquetados === '1'} />
           Solo etiquetados
         </label>
@@ -124,7 +124,7 @@ export default async function VideoCategoryPage({
       </form>
 
       {visible.length === 0 && (
-        <div className="rounded-xl border border-gray-200 bg-white p-6 text-center text-sm text-status-neutral">
+        <div className="rounded-xl border border-outline bg-panel p-6 text-center text-sm text-status-neutral">
           No hay videos acá todavía.
         </div>
       )}

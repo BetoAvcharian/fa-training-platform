@@ -38,24 +38,24 @@ export default async function PersonasPage() {
     <div className="space-y-8 max-w-2xl">
       <div>
         <p className="text-xs uppercase tracking-wider text-gold font-medium">Configuración</p>
-        <h1 className="font-display text-2xl font-bold text-navy">Personas</h1>
+        <h1 className="font-display text-2xl font-bold text-ink">Personas</h1>
       </div>
 
       {isManager && (
         <section className="space-y-3">
-          <h2 className="text-sm font-semibold text-navy">Invitar</h2>
+          <h2 className="text-sm font-semibold text-ink">Invitar</h2>
           <InviteForm coaches={coaches} />
         </section>
       )}
 
       {invitados.length > 0 && (
         <section className="space-y-3">
-          <h2 className="text-sm font-semibold text-navy">Invitaciones pendientes</h2>
+          <h2 className="text-sm font-semibold text-ink">Invitaciones pendientes</h2>
           <div className="space-y-2">
             {invitados.map((m) => (
-              <div key={m.id} className="rounded-xl border border-gray-100 bg-white p-4 shadow-sm flex items-center justify-between">
+              <div key={m.id} className="rounded-xl border border-gray-100 bg-panel p-4 shadow-sm flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-navy">{m.email}</p>
+                  <p className="text-sm text-ink">{m.email}</p>
                   <p className="text-xs text-status-neutral">{ROLE_LABELS[m.role]} · esperando que acepte</p>
                 </div>
                 {isManager && <DeactivateButton id={m.id} />}
@@ -66,17 +66,17 @@ export default async function PersonasPage() {
       )}
 
       <section className="space-y-3">
-        <h2 className="text-sm font-semibold text-navy">Activos</h2>
+        <h2 className="text-sm font-semibold text-ink">Activos</h2>
         <div className="space-y-2">
           {activos.map((m) => (
-            <div key={m.id} className="rounded-xl border border-gray-100 bg-white p-4 shadow-sm flex items-center justify-between gap-2">
+            <div key={m.id} className="rounded-xl border border-gray-100 bg-panel p-4 shadow-sm flex items-center justify-between gap-2">
               <div>
                 {m.role === 'athlete' ? (
-                  <Link href={`/atletas/${m.id}`} className="text-sm font-medium text-navy underline">
+                  <Link href={`/atletas/${m.id}`} className="text-sm font-medium text-ink underline">
                     {m.name ?? m.email ?? '—'}
                   </Link>
                 ) : (
-                  <p className="text-sm font-medium text-navy">{m.name ?? m.email ?? '—'}</p>
+                  <p className="text-sm font-medium text-ink">{m.name ?? m.email ?? '—'}</p>
                 )}
                 <p className="text-xs text-status-neutral">{ROLE_LABELS[m.role]}</p>
               </div>
@@ -93,11 +93,11 @@ export default async function PersonasPage() {
 
       {inactivos.length > 0 && (
         <section className="space-y-3">
-          <h2 className="text-sm font-semibold text-navy">Inactivos</h2>
+          <h2 className="text-sm font-semibold text-ink">Inactivos</h2>
           <div className="space-y-2">
             {inactivos.map((m) => (
-              <div key={m.id} className="rounded-xl border border-gray-100 bg-white p-4 opacity-60">
-                <p className="text-sm text-navy">{m.name ?? m.email ?? '—'}</p>
+              <div key={m.id} className="rounded-xl border border-gray-100 bg-panel p-4 opacity-60">
+                <p className="text-sm text-ink">{m.name ?? m.email ?? '—'}</p>
                 <p className="text-xs text-status-neutral">{ROLE_LABELS[m.role]}</p>
               </div>
             ))}

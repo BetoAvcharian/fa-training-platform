@@ -37,7 +37,7 @@ function AthleteTagPicker({ roster, selected, onChange }: { roster: RosterEntry[
       {selected.length > 0 && (
         <div className="flex flex-wrap gap-1 mb-1.5">
           {selected.map((id) => (
-            <span key={id} className="text-xs bg-gold/10 text-navy rounded-full px-2 py-1 flex items-center gap-1">
+            <span key={id} className="text-xs bg-gold/10 text-ink rounded-full px-2 py-1 flex items-center gap-1">
               {nameOf(id)}
               <button type="button" onClick={() => onChange(selected.filter((x) => x !== id))} className="text-status-neutral hover:text-status-critical">
                 ×
@@ -56,7 +56,7 @@ function AthleteTagPicker({ roster, selected, onChange }: { roster: RosterEntry[
           className="input-field"
         />
         {focused && filtered.length > 0 && (
-          <div className="absolute z-10 mt-1 w-full max-h-48 overflow-y-auto rounded-lg border border-gray-200 bg-white shadow-lg">
+          <div className="absolute z-10 mt-1 w-full max-h-48 overflow-y-auto rounded-lg border border-outline bg-panel shadow-lg">
             {filtered.map((r) => (
               <button
                 key={r.id}
@@ -65,7 +65,7 @@ function AthleteTagPicker({ roster, selected, onChange }: { roster: RosterEntry[
                   onChange([...selected, r.id])
                   setQuery('')
                 }}
-                className="w-full text-left px-3 py-2 text-sm text-navy hover:bg-gray-50"
+                className="w-full text-left px-3 py-2 text-sm text-ink hover:bg-gray-50"
               >
                 {r.person ? `${r.person.firstName} ${r.person.lastName}` : '—'}
               </button>

@@ -13,7 +13,7 @@ export function SignOutButton() {
     <form action={signOutAction}>
       <button
         type="submit"
-        className="text-sm text-white/50 hover:text-white text-left px-3 py-2.5 rounded-lg hover:bg-white/10 transition-colors w-full"
+        className="text-sm text-white/50 hover:text-white text-left px-3 py-2.5 rounded-lg hover:bg-panel/10 transition-colors w-full"
       >
         Cerrar sesión
       </button>

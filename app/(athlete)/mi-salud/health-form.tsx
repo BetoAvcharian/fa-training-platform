@@ -30,7 +30,7 @@ export function HealthForm({ gender: _gender }: { gender: string | null }) {
     return (
       <button
         onClick={() => setOpen(true)}
-        className="w-full rounded-2xl border border-dashed border-gray-200 bg-white p-4 text-sm font-medium text-navy"
+        className="w-full rounded-2xl border border-dashed border-outline bg-panel p-4 text-sm font-medium text-ink"
       >
         + Cargar episodio de salud
       </button>
@@ -38,7 +38,7 @@ export function HealthForm({ gender: _gender }: { gender: string | null }) {
   }
 
   return (
-    <form action={handleSubmit} className="rounded-2xl border border-gray-100 bg-white p-4 shadow-sm space-y-3">
+    <form action={handleSubmit} className="rounded-2xl border border-gray-100 bg-panel p-4 shadow-sm space-y-3">
       <select name="type" className="input-field" required>
         {TYPE_OPTIONS.map((opt) => (
           <option key={opt.value} value={opt.value}>

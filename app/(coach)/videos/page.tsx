@@ -30,7 +30,7 @@ export default async function VideosMenuPage() {
       <div className="flex items-start justify-between gap-3 flex-wrap">
         <div>
           <p className="text-xs uppercase tracking-wider text-gold font-medium">Videos</p>
-          <h1 className="font-display text-2xl font-bold text-navy">Elegí una categoría</h1>
+          <h1 className="font-display text-2xl font-bold text-ink">Elegí una categoría</h1>
         </div>
         <VideoForm organizationId={membership.organizationId} roster={roster} />
       </div>
@@ -40,7 +40,7 @@ export default async function VideosMenuPage() {
         className="block rounded-xl border border-gold/40 bg-gold/5 p-4 hover:border-gold transition-colors"
       >
         <div className="flex items-center justify-between">
-          <p className="font-display text-base font-bold text-navy">Ver todos los videos</p>
+          <p className="font-display text-base font-bold text-ink">Ver todos los videos</p>
           <span className="text-xs text-status-neutral">{videos.length} en total</span>
         </div>
       </Link>
@@ -50,10 +50,10 @@ export default async function VideosMenuPage() {
           <Link
             key={c.key}
             href={`/videos/${c.key}`}
-            className="rounded-xl border border-gray-200 bg-white p-5 hover:border-gold/50 transition-colors"
+            className="rounded-xl border border-outline bg-panel p-5 hover:border-gold/50 transition-colors"
           >
             <div className="flex items-center justify-between">
-              <p className="font-display text-lg font-bold text-navy">{c.label}</p>
+              <p className="font-display text-lg font-bold text-ink">{c.label}</p>
               <span className="text-xs text-status-neutral">{countByCategory.get(c.key) ?? 0} videos</span>
             </div>
             <p className="text-sm text-status-neutral mt-1">{c.description}</p>

@@ -3,6 +3,7 @@ import { getMyActiveMembership } from '@/domains/athletes/queries'
 import { getUnreadCount } from '@/domains/notifications/queries'
 import { redirect } from 'next/navigation'
 import { SignOutButton } from '@/components/ui/sign-out-button'
+import { ThemeToggle } from '@/components/ui/theme-toggle'
 import { Logo } from '@/components/logo'
 import { SideDrawer } from '@/app/(athlete)/side-drawer'
 
@@ -50,6 +51,7 @@ export default async function CoachLayout({ children }: { children: React.ReactN
             </div>
           </div>
           <div className="flex items-center gap-3">
+            <ThemeToggle className="text-lg leading-none text-white" />
             <Link href="/notificaciones" className="relative text-white">
               🔔
               {unreadCount > 0 && (
@@ -68,7 +70,7 @@ export default async function CoachLayout({ children }: { children: React.ReactN
           <Link
             key={item.href}
             href={item.href}
-            className="flex flex-col items-center justify-center w-16 h-12 rounded-full text-white/90 hover:bg-white/10 transition-colors"
+            className="flex flex-col items-center justify-center w-16 h-12 rounded-full text-white/90 hover:bg-panel/10 transition-colors"
           >
             <span className="text-base leading-none">{item.icon}</span>
             <span className="text-[9px] mt-0.5">{item.label}</span>
@@ -93,7 +95,7 @@ export default async function CoachLayout({ children }: { children: React.ReactN
               <Link
                 key={item.href}
                 href={item.href}
-                className="text-sm rounded-lg px-3 py-2.5 text-white/70 hover:bg-white/10 hover:text-white transition-colors flex items-center justify-between"
+                className="text-sm rounded-lg px-3 py-2.5 text-white/70 hover:bg-panel/10 hover:text-white transition-colors flex items-center justify-between"
               >
                 {item.label}
                 {item.href === '/notificaciones' && unreadCount > 0 && (
@@ -112,6 +114,10 @@ export default async function CoachLayout({ children }: { children: React.ReactN
             )
           )}
         </nav>
+        <div className="flex items-center justify-between px-1 mb-2">
+          <span className="text-xs text-white/50">Tema</span>
+          <ThemeToggle className="text-lg leading-none text-white" />
+        </div>
         <SignOutButton />
       </aside>
       <main className="flex-1 p-4 pb-28 md:pb-8 md:p-8 max-w-6xl overflow-x-hidden">{children}</main>

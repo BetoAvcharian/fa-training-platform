@@ -56,7 +56,7 @@ export function SessionFeedbackForm({
             key={opt.value}
             onClick={() => setStatus(opt.value)}
             className={`text-left text-xs rounded-lg px-3 py-2 border ${
-              status === opt.value ? `${opt.color} text-white border-transparent` : 'border-gray-200 text-navy'
+              status === opt.value ? `${opt.color} text-white border-transparent` : 'border-outline text-ink'
             }`}
           >
             {opt.label}
@@ -69,7 +69,7 @@ export function SessionFeedbackForm({
           onChange={(e) => setNotes(e.target.value)}
           placeholder="Contanos qué pasó (opcional)"
           rows={2}
-          className="w-full rounded-lg border border-gray-200 px-3 py-2 text-xs"
+          className="w-full rounded-lg border border-outline px-3 py-2 text-xs"
         />
       )}
       {error && <p className="text-xs text-status-critical">{error}</p>}

@@ -70,7 +70,7 @@ export function AssessmentForm({
             <label className="text-xs text-status-neutral mb-1 block">Atleta</label>
             {selectedAthlete ? (
               <div className="flex items-center justify-between bg-gold/10 rounded-lg px-3 py-2">
-                <span className="text-sm text-navy font-medium">
+                <span className="text-sm text-ink font-medium">
                   {selectedAthlete.person?.firstName} {selectedAthlete.person?.lastName}
                 </span>
                 <button type="button" onClick={() => setAthleteId('')} className="text-xs text-status-neutral">
@@ -91,7 +91,7 @@ export function AssessmentForm({
                       type="button"
                       key={r.id}
                       onClick={() => setAthleteId(r.id)}
-                      className="w-full text-left px-3 py-2 text-sm text-navy hover:bg-gold/5"
+                      className="w-full text-left px-3 py-2 text-sm text-ink hover:bg-gold/5"
                     >
                       {r.person ? `${r.person.firstName} ${r.person.lastName}` : '—'}
                     </button>
@@ -141,7 +141,7 @@ export function AssessmentForm({
                       setSelected(next)
                     }}
                   />
-                  <span className="text-sm text-navy flex-1">
+                  <span className="text-sm text-ink flex-1">
                     {o.name} {o.unitSymbol ? `(${o.unitSymbol})` : ''}
                   </span>
                   {selected.has(o.id) && (

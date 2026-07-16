@@ -40,7 +40,7 @@ export function UnhideButton({ id }: { id: string }) {
             setError(result?.error ?? null)
           })
         }
-        className="text-xs text-navy underline"
+        className="text-xs text-ink underline"
       >
         Mostrar de nuevo
       </button>

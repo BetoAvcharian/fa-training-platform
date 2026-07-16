@@ -45,7 +45,7 @@ export default async function RegistrosPage() {
     <div className="space-y-6">
       <div>
         <p className="text-xs uppercase tracking-wider text-gold font-medium">Registros</p>
-        <h1 className="font-display text-2xl font-bold text-navy">Cargar un resultado</h1>
+        <h1 className="font-display text-2xl font-bold text-ink">Cargar un resultado</h1>
       </div>
 
       <RecordForm
@@ -54,20 +54,20 @@ export default async function RegistrosPage() {
       />
 
       <details className="text-sm">
-        <summary className="cursor-pointer text-navy underline">¿No está en la lista? Agregar una prueba nueva</summary>
+        <summary className="cursor-pointer text-ink underline">¿No está en la lista? Agregar una prueba nueva</summary>
         <div className="mt-2">
           <ObservableForm sports={sports} units={units} />
         </div>
       </details>
 
       <section className="space-y-2">
-        <h2 className="text-sm font-semibold text-navy">Últimos registros</h2>
+        <h2 className="text-sm font-semibold text-ink">Últimos registros</h2>
         {recent.length === 0 && (
-          <div className="rounded-xl border border-gray-200 bg-white p-4 text-sm text-status-neutral">
+          <div className="rounded-xl border border-outline bg-panel p-4 text-sm text-status-neutral">
             Todavía no hay nada cargado acá.
           </div>
         )}
-        <div className="rounded-xl border border-gray-200 bg-white divide-y divide-gray-100">
+        <div className="rounded-xl border border-outline bg-panel divide-y divide-gray-100">
           {recent.map((r) => (
             <EditableRecordRow
               key={r.id}
@@ -83,8 +83,8 @@ export default async function RegistrosPage() {
         </div>
       </section>
 
-      <details className="rounded-xl border border-gray-200 bg-white">
-        <summary className="cursor-pointer px-4 py-3 text-sm font-medium text-navy">
+      <details className="rounded-xl border border-outline bg-panel">
+        <summary className="cursor-pointer px-4 py-3 text-sm font-medium text-ink">
           Catálogo de marcas ({registrableObservables.length} ítems) — avanzado
         </summary>
         <div className="p-4 pt-0 space-y-6">
@@ -106,7 +106,7 @@ export default async function RegistrosPage() {
                     <div key={obs.id} className="rounded-lg border border-gray-100 p-3">
                       <div className="flex items-start justify-between gap-2">
                         <div>
-                          <p className="font-medium text-navy text-sm">{obs.name}</p>
+                          <p className="font-medium text-ink text-sm">{obs.name}</p>
                           <p className="text-xs text-status-neutral">
                             {unitById.get(obs.unitId)?.symbol ?? ''}
                             {obs.isPerformance ? ' · récord' : ''}
@@ -129,7 +129,7 @@ export default async function RegistrosPage() {
                   .filter((o) => !sportById.has(o.sportId))
                   .map((obs) => (
                     <div key={obs.id} className="rounded-lg border border-gray-100 p-3">
-                      <p className="font-medium text-navy text-sm">{obs.name}</p>
+                      <p className="font-medium text-ink text-sm">{obs.name}</p>
                       <p className="text-xs text-status-neutral">{unitById.get(obs.unitId)?.symbol ?? ''}</p>
                     </div>
                   ))}

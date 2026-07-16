@@ -25,7 +25,7 @@ export function SessionLine({ line, executed }: Props) {
   return (
     <div className="flex items-start justify-between gap-3 bg-gray-50 rounded-lg px-3 py-2.5">
       <div className="flex-1 min-w-0">
-        <p className="text-sm text-navy">{line.rawText}</p>
+        <p className="text-sm text-ink">{line.rawText}</p>
         {!line.isStructured && (
           <p className="text-[11px] text-status-attention mt-0.5">Sin estructurar — tocá para completar igual</p>
         )}
@@ -37,7 +37,7 @@ export function SessionLine({ line, executed }: Props) {
       {!executed && line.isStructured && (
         <div className="shrink-0">
           {!expanded ? (
-            <button onClick={() => setExpanded(true)} className="text-xs text-navy underline">
+            <button onClick={() => setExpanded(true)} className="text-xs text-ink underline">
               Completar
             </button>
           ) : (

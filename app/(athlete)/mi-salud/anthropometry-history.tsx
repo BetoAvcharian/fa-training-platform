@@ -31,7 +31,7 @@ export function AnthropometryHistory({ history }: { history: Entry[] }) {
 
   if (history.length === 0) {
     return (
-      <div className="rounded-2xl border border-gray-100 bg-white p-4 text-sm text-status-neutral">
+      <div className="rounded-2xl border border-gray-100 bg-panel p-4 text-sm text-status-neutral">
         Todavía no cargaste nada.
       </div>
     )
@@ -46,7 +46,7 @@ export function AnthropometryHistory({ history }: { history: Entry[] }) {
               key={id}
               onClick={() => toggle(id)}
               className={`text-xs rounded-full px-3 py-1 border ${
-                selected.has(id) ? 'bg-navy text-white border-navy' : 'bg-white text-status-neutral border-gray-200'
+                selected.has(id) ? 'bg-navy text-white border-navy' : 'bg-panel text-status-neutral border-outline'
               }`}
             >
               {name}
@@ -54,15 +54,15 @@ export function AnthropometryHistory({ history }: { history: Entry[] }) {
           ))}
         </div>
       )}
-      <div className="rounded-2xl border border-gray-100 bg-white shadow-sm divide-y divide-gray-50">
+      <div className="rounded-2xl border border-gray-100 bg-panel shadow-sm divide-y divide-gray-50">
         {visible.length === 0 && <p className="p-4 text-sm text-status-neutral">Nada para mostrar con este filtro.</p>}
         {visible.map((h) => (
           <div key={h.id} className="p-4 flex items-center justify-between">
             <div>
-              <p className="font-medium text-navy text-sm">{h.observableName}</p>
+              <p className="font-medium text-ink text-sm">{h.observableName}</p>
               <p className="text-xs text-status-neutral">{formatDate(h.date)}</p>
             </div>
-            <p className="font-semibold text-navy">
+            <p className="font-semibold text-ink">
               {formatMark(h.value, h.unitSymbol)}
             </p>
           </div>

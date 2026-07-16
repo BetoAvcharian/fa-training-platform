@@ -51,7 +51,7 @@ export function CycleCalendar({
                   key={d.date}
                   onClick={() => setSelectedDate(d.date)}
                   className={`aspect-square rounded-lg flex items-center justify-center text-xs relative ${
-                    d.inMonth ? 'text-navy' : 'text-gray-300'
+                    d.inMonth ? 'text-ink' : 'text-gray-300'
                   } ${log?.flow ? `${FLOW_COLORS[log.flow]} text-white font-medium` : 'bg-gray-50'} ${
                     isPredicted && !log?.flow ? 'ring-2 ring-red-300 ring-dashed' : ''
                   }`}
@@ -127,7 +127,7 @@ function DayModal({ date, log, onClose }: { date: string; log: CycleDayLog | nul
             <button
               type="button"
               onClick={() => setFlow('')}
-              className={`text-xs rounded-full px-3 py-1.5 border ${flow === '' ? 'bg-navy text-white border-navy' : 'border-gray-200 text-status-neutral'}`}
+              className={`text-xs rounded-full px-3 py-1.5 border ${flow === '' ? 'bg-navy text-white border-navy' : 'border-outline text-status-neutral'}`}
             >
               Nada
             </button>
@@ -137,7 +137,7 @@ function DayModal({ date, log, onClose }: { date: string; log: CycleDayLog | nul
                 key={f.value}
                 onClick={() => setFlow(f.value)}
                 className={`text-xs rounded-full px-3 py-1.5 border ${
-                  flow === f.value ? `${FLOW_COLORS[f.value]} text-white border-transparent` : 'border-gray-200 text-status-neutral'
+                  flow === f.value ? `${FLOW_COLORS[f.value]} text-white border-transparent` : 'border-outline text-status-neutral'
                 }`}
               >
                 {f.label}
@@ -156,7 +156,7 @@ function DayModal({ date, log, onClose }: { date: string; log: CycleDayLog | nul
                 key={s}
                 onClick={() => toggleSymptom(s)}
                 className={`text-xs rounded-full px-3 py-1.5 border capitalize ${
-                  symptoms.has(s) ? 'bg-gold text-navy border-gold font-medium' : 'border-gray-200 text-status-neutral'
+                  symptoms.has(s) ? 'bg-gold text-navy border-gold font-medium' : 'border-outline text-status-neutral'
                 }`}
               >
                 {s}

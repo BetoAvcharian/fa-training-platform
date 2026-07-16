@@ -38,7 +38,7 @@ export function RecordForm({ roster, observables }: { roster: RosterOption[]; ob
   }
 
   return (
-    <form action={handleSubmit} className="rounded-xl border border-gray-200 bg-white p-4 space-y-3">
+    <form action={handleSubmit} className="rounded-xl border border-outline bg-panel p-4 space-y-3">
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
         <select name="athleteMembershipId" className="input-field" required>
           <option value="">Atleta</option>

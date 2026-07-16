@@ -30,7 +30,7 @@ export function InviteForm({ coaches }: { coaches: CoachOption[] }) {
     return (
       <button
         onClick={() => setOpen(true)}
-        className="rounded-lg border border-dashed border-gray-200 bg-white px-4 py-2 text-sm font-medium text-navy"
+        className="rounded-lg border border-dashed border-outline bg-panel px-4 py-2 text-sm font-medium text-ink"
       >
         + Invitar
       </button>
@@ -38,7 +38,7 @@ export function InviteForm({ coaches }: { coaches: CoachOption[] }) {
   }
 
   return (
-    <form action={handleSubmit} className="rounded-xl border border-gray-100 bg-white p-4 shadow-sm space-y-3 max-w-sm">
+    <form action={handleSubmit} className="rounded-xl border border-gray-100 bg-panel p-4 shadow-sm space-y-3 max-w-sm">
       <input
         name="email"
         type="email"

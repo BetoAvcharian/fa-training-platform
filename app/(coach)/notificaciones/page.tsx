@@ -23,11 +23,11 @@ export default async function NotificacionesPage() {
       <div className="flex items-start justify-between gap-3 flex-wrap">
         <div>
           <p className="text-xs uppercase tracking-wider text-gold font-medium">Notificaciones</p>
-          <h1 className="font-display text-2xl font-bold text-navy">Notificaciones</h1>
+          <h1 className="font-display text-2xl font-bold text-ink">Notificaciones</h1>
         </div>
         {unread.length > 0 && (
           <form action={markAllNotificationsReadAction}>
-            <button type="submit" className="text-sm text-navy underline">
+            <button type="submit" className="text-sm text-ink underline">
               Marcar todas como leídas
             </button>
           </form>
@@ -35,12 +35,12 @@ export default async function NotificacionesPage() {
       </div>
 
       {notifications.length === 0 && (
-        <div className="rounded-xl border border-gray-200 bg-white p-6 text-center text-sm text-status-neutral">
+        <div className="rounded-xl border border-outline bg-panel p-6 text-center text-sm text-status-neutral">
           Sin notificaciones todavía.
         </div>
       )}
 
-      <div className="rounded-xl border border-gray-200 bg-white divide-y divide-gray-100">
+      <div className="rounded-xl border border-outline bg-panel divide-y divide-gray-100">
         {notifications.map((n) => (
           <form
             key={n.id}
@@ -55,7 +55,7 @@ export default async function NotificacionesPage() {
             >
               <span className="text-lg shrink-0">{TYPE_ICONS[n.type] ?? '🔔'}</span>
               <div className="flex-1 min-w-0">
-                <p className={`text-sm ${!n.readAt ? 'font-semibold text-navy' : 'text-navy'}`}>{n.title}</p>
+                <p className={`text-sm ${!n.readAt ? 'font-semibold text-ink' : 'text-ink'}`}>{n.title}</p>
                 {n.body && <p className="text-xs text-status-neutral truncate">{n.body}</p>}
                 <p className="text-[10px] text-status-neutral mt-0.5">{formatDate(n.createdAt)}</p>
               </div>

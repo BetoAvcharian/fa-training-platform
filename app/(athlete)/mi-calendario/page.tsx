@@ -56,13 +56,13 @@ export default async function MiCalendarioPage({
     <div className="space-y-4">
       <div>
         <p className="text-xs uppercase tracking-wider text-gold font-medium">Calendario</p>
-        <h1 className="font-display text-2xl font-bold text-navy">Mi semana</h1>
+        <h1 className="font-display text-2xl font-bold text-ink">Mi semana</h1>
       </div>
 
       <div className="flex items-center justify-between text-sm">
-        <a href={`?week=${prevWeek}`} className="px-3 py-1.5 rounded-md border border-gray-200">◀</a>
+        <a href={`?week=${prevWeek}`} className="px-3 py-1.5 rounded-md border border-outline">◀</a>
         <span className="text-status-neutral text-xs">{weekStartStr} — {weekEndStr}</span>
-        <a href={`?week=${nextWeek}`} className="px-3 py-1.5 rounded-md border border-gray-200">▶</a>
+        <a href={`?week=${nextWeek}`} className="px-3 py-1.5 rounded-md border border-outline">▶</a>
       </div>
 
       <div className="space-y-3">
@@ -84,7 +84,7 @@ export default async function MiCalendarioPage({
         })}
 
         {sessions.length === 0 && (
-          <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm text-center text-sm text-status-neutral">
+          <div className="rounded-2xl border border-gray-100 bg-panel p-5 shadow-sm text-center text-sm text-status-neutral">
             Sin entrenamientos esta semana.
           </div>
         )}

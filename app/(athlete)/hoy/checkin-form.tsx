@@ -17,14 +17,14 @@ export function CheckinForm({ initialEnergia, initialFatiga, alreadySubmitted }:
   }
 
   return (
-    <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
-      <p className="text-sm font-medium text-navy mb-3">¿Cómo llegás hoy?</p>
+    <div className="rounded-2xl border border-gray-100 bg-panel p-5 shadow-sm">
+      <p className="text-sm font-medium text-ink mb-3">¿Cómo llegás hoy?</p>
 
       <form action={handleSubmit} className="space-y-4">
         <div>
           <div className="flex justify-between text-xs text-status-neutral mb-1">
             <span>Energía</span>
-            <span className="font-medium text-navy">{energia}/5</span>
+            <span className="font-medium text-ink">{energia}/5</span>
           </div>
           <input
             type="range"
@@ -40,7 +40,7 @@ export function CheckinForm({ initialEnergia, initialFatiga, alreadySubmitted }:
         <div>
           <div className="flex justify-between text-xs text-status-neutral mb-1">
             <span>Fatiga</span>
-            <span className="font-medium text-navy">{fatiga}/5</span>
+            <span className="font-medium text-ink">{fatiga}/5</span>
           </div>
           <input
             type="range"

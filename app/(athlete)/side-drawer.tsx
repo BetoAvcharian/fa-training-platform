@@ -17,7 +17,7 @@ export function SideDrawer({ items }: { items: NavItem[] }) {
     <>
       <button
         onClick={() => setOpen(true)}
-        className="w-9 h-9 flex items-center justify-center rounded-full bg-white shadow-sm text-navy"
+        className="w-9 h-9 flex items-center justify-center rounded-full bg-panel shadow-sm text-ink"
         aria-label="Abrir menú"
       >
         <span className="text-lg leading-none">☰</span>
@@ -26,10 +26,10 @@ export function SideDrawer({ items }: { items: NavItem[] }) {
       {open && (
         <div className="fixed inset-0 z-50">
           <div className="absolute inset-0 bg-navy/40" onClick={() => setOpen(false)} />
-          <div className="absolute right-0 top-0 bottom-0 w-64 bg-cream shadow-xl p-5 flex flex-col animate-[slideIn_0.2s_ease-out]">
+          <div className="absolute right-0 top-0 bottom-0 w-64 bg-surface shadow-xl p-5 flex flex-col animate-[slideIn_0.2s_ease-out]">
             <div className="flex items-center justify-between mb-6">
-              <p className="font-display font-bold text-navy text-lg">ENTRENAME</p>
-              <button onClick={() => setOpen(false)} className="text-navy text-xl leading-none">
+              <p className="font-display font-bold text-ink text-lg">ENTRENAME</p>
+              <button onClick={() => setOpen(false)} className="text-ink text-xl leading-none">
                 ×
               </button>
             </div>
@@ -40,7 +40,7 @@ export function SideDrawer({ items }: { items: NavItem[] }) {
                     key={item.href}
                     href={item.href}
                     onClick={() => setOpen(false)}
-                    className="flex items-center gap-3 px-3 py-3 rounded-xl text-navy hover:bg-white transition-colors"
+                    className="flex items-center gap-3 px-3 py-3 rounded-xl text-ink hover:bg-panel transition-colors"
                   >
                     <span className="text-lg">{item.icon}</span>
                     <span className="text-sm font-medium">{item.label}</span>

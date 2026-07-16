@@ -37,21 +37,21 @@ export function VideoCard({
   if (hidden) return null
 
   return (
-    <div className="rounded-xl border border-gray-200 bg-white overflow-hidden">
+    <div className="rounded-xl border border-outline bg-panel overflow-hidden">
       <div className="h-36 bg-navy/5">
         {sourceType === 'upload' ? (
           <video src={url} controls className="w-full h-full object-cover" />
         ) : embedUrl ? (
           <iframe src={embedUrl} className="w-full h-full" allowFullScreen />
         ) : (
-          <a href={url} target="_blank" rel="noreferrer" className="flex items-center justify-center h-full text-sm text-navy underline">
+          <a href={url} target="_blank" rel="noreferrer" className="flex items-center justify-center h-full text-sm text-ink underline">
             Ver video →
           </a>
         )}
       </div>
       <div className="p-3">
         <div className="flex items-start justify-between gap-2">
-          <p className="font-medium text-navy text-sm">{title}</p>
+          <p className="font-medium text-ink text-sm">{title}</p>
           {canManage && (
             <button
               disabled={pending}
@@ -71,7 +71,7 @@ export function VideoCard({
         {taggedAthletes.length > 0 && (
           <div className="flex flex-wrap gap-1 mt-2">
             {taggedAthletes.map((a) => (
-              <span key={a.id} className="text-[10px] bg-gold/10 text-navy rounded-full px-2 py-0.5">
+              <span key={a.id} className="text-[10px] bg-gold/10 text-ink rounded-full px-2 py-0.5">
                 {a.name}
               </span>
             ))}

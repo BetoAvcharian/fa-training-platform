@@ -71,10 +71,10 @@ export default async function AthleteProfilePage({
   return (
     <div className="space-y-6">
       <div>
-        <Link href="/atletas" className="text-xs text-status-neutral hover:text-navy">
+        <Link href="/atletas" className="text-xs text-status-neutral hover:text-ink">
           ← Volver a atletas
         </Link>
-        <h1 className="font-display text-2xl font-bold text-navy mt-2">{athleteName}</h1>
+        <h1 className="font-display text-2xl font-bold text-ink mt-2">{athleteName}</h1>
         {athleteRow?.people?.email && <p className="text-xs text-status-neutral">{athleteRow.people.email}</p>}
         <div className="flex flex-wrap gap-x-4 gap-y-1 mt-2 text-xs text-status-neutral">
           {athleteRow?.people?.birth_date && <span>Nacimiento: {athleteRow.people.birth_date}</span>}
@@ -84,13 +84,13 @@ export default async function AthleteProfilePage({
         </div>
       </div>
 
-      <div className="flex gap-1 border-b border-gray-200 overflow-x-auto">
+      <div className="flex gap-1 border-b border-outline overflow-x-auto">
         {TABS.map((t) => (
           <Link
             key={t.key}
             href={`/atletas/${athleteId}?tab=${t.key}`}
             className={`px-3 py-2 text-sm whitespace-nowrap border-b-2 -mb-px ${
-              tab === t.key ? 'border-gold text-navy font-medium' : 'border-transparent text-status-neutral'
+              tab === t.key ? 'border-gold text-ink font-medium' : 'border-transparent text-status-neutral'
             }`}
           >
             {t.label}
@@ -126,34 +126,34 @@ async function ResumenTab({ athleteId, organizationId }: { athleteId: string; or
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
       <div className="card p-4">
-        <p className="text-sm font-semibold text-navy mb-2">Últimos entrenamientos</p>
+        <p className="text-sm font-semibold text-ink mb-2">Últimos entrenamientos</p>
         {events.length === 0 && <p className="text-sm text-status-neutral">Sin actividad todavía.</p>}
         {events.map((e) => (
-          <p key={e.id} className="text-sm text-navy py-1 border-b border-gray-50 last:border-0">
+          <p key={e.id} className="text-sm text-ink py-1 border-b border-gray-50 last:border-0">
             {e.date ? formatDate(e.date) : ''} — {e.title}
           </p>
         ))}
       </div>
       <div className="card p-4">
-        <p className="text-sm font-semibold text-navy mb-2">Récords oficiales</p>
+        <p className="text-sm font-semibold text-ink mb-2">Récords oficiales</p>
         {records.filter((r) => r.recordType === 'oficial').length === 0 && (
           <p className="text-sm text-status-neutral">Sin récords todavía.</p>
         )}
         {records
           .filter((r) => r.recordType === 'oficial')
           .map((r) => (
-            <p key={r.id} className="text-sm text-navy py-1 border-b border-gray-50 last:border-0">
+            <p key={r.id} className="text-sm text-ink py-1 border-b border-gray-50 last:border-0">
               {r.observableName}: <span className="font-medium">{formatMark(r.value, r.unitSymbol)}</span>
             </p>
           ))}
       </div>
       <div className="card p-4 sm:col-span-2">
-        <p className="text-sm font-semibold text-navy mb-2">Bienestar (check-in diario)</p>
+        <p className="text-sm font-semibold text-ink mb-2">Bienestar (check-in diario)</p>
         {checkins.length === 0 && <p className="text-sm text-status-neutral">Sin check-ins registrados todavía.</p>}
         <div className="flex flex-wrap gap-2">
           {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
           {(checkins as any[]).map((c, i) => (
-            <span key={i} className="text-xs bg-gray-50 rounded-full px-2 py-1 text-navy">
+            <span key={i} className="text-xs bg-gray-50 rounded-full px-2 py-1 text-ink">
               {formatDate(c.date)} · {c.observables?.name}: <span className="font-medium">{c.value}</span>
             </span>
           ))}
@@ -166,13 +166,13 @@ async function ResumenTab({ athleteId, organizationId }: { athleteId: string; or
 async function EntrenamientosTab({ athleteId }: { athleteId: string }) {
   const events = await getEventsForAthlete(athleteId, 30)
   return (
-    <div className="rounded-xl border border-gray-200 bg-white divide-y divide-gray-100">
+    <div className="rounded-xl border border-outline bg-panel divide-y divide-gray-100">
       {events.length === 0 && <p className="p-4 text-sm text-status-neutral">Sin historial todavía.</p>}
       {events.map((e) => (
         <div key={e.id} className="p-3 flex items-center justify-between text-sm">
           <div>
             <p className="text-xs text-gold font-medium">{TYPE_LABELS[e.type] ?? e.type}</p>
-            <p className="text-navy">{e.title}</p>
+            <p className="text-ink">{e.title}</p>
           </div>
           <span className="text-xs text-status-neutral">{e.date ? formatDate(e.date) : ''}</span>
         </div>
@@ -190,27 +190,27 @@ async function ResultadosTab({ athleteId, organizationId }: { athleteId: string;
   return (
     <div className="space-y-4">
       <div className="card p-4">
-        <p className="text-sm font-semibold text-navy mb-2">Récords</p>
+        <p className="text-sm font-semibold text-ink mb-2">Récords</p>
         {records.length === 0 && <p className="text-sm text-status-neutral">Sin récords todavía.</p>}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
           {records.map((r) => (
-            <div key={r.id} className="text-sm text-navy border border-gray-100 rounded-lg p-2">
+            <div key={r.id} className="text-sm text-ink border border-gray-100 rounded-lg p-2">
               {r.observableName}: <span className="font-medium">{formatMark(r.value, r.unitSymbol)}</span>
               <span className="text-xs text-status-neutral"> ({r.recordType})</span>
             </div>
           ))}
         </div>
       </div>
-      <div className="rounded-xl border border-gray-200 bg-white divide-y divide-gray-100">
-        <p className="p-3 text-sm font-semibold text-navy">Todos los resultados</p>
+      <div className="rounded-xl border border-outline bg-panel divide-y divide-gray-100">
+        <p className="p-3 text-sm font-semibold text-ink">Todos los resultados</p>
         {results.length === 0 && <p className="p-4 text-sm text-status-neutral">Sin resultados todavía.</p>}
         {results.map((r) => (
           <div key={r.id} className="p-3 flex items-center justify-between text-sm">
             <div>
-              <p className="text-navy">{r.observableName}</p>
+              <p className="text-ink">{r.observableName}</p>
               <p className="text-xs text-status-neutral">{formatDate(r.date)}</p>
             </div>
-            <p className="font-medium text-navy">{formatMark(r.value, r.unitSymbol)}</p>
+            <p className="font-medium text-ink">{formatMark(r.value, r.unitSymbol)}</p>
           </div>
         ))}
       </div>
@@ -224,8 +224,8 @@ async function VideosTab({ athleteId }: { athleteId: string }) {
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
       {videos.length === 0 && <p className="text-sm text-status-neutral">Sin videos etiquetados todavía.</p>}
       {videos.map((v) => (
-        <div key={v.id} className="rounded-xl border border-gray-200 bg-white p-3">
-          <p className="font-medium text-navy text-sm">{v.title}</p>
+        <div key={v.id} className="rounded-xl border border-outline bg-panel p-3">
+          <p className="font-medium text-ink text-sm">{v.title}</p>
           {v.description && <p className="text-xs text-status-neutral mt-1">{v.description}</p>}
         </div>
       ))}
@@ -246,13 +246,13 @@ async function SaludTab({ athleteId, gender }: { athleteId: string; gender: stri
     <div className="space-y-4">
       {cycleStats && (
         <div className="card p-4">
-          <p className="text-sm font-semibold text-navy mb-2">Ciclo menstrual</p>
+          <p className="text-sm font-semibold text-ink mb-2">Ciclo menstrual</p>
           {cycleStats.currentCycleDay === null ? (
             <p className="text-sm text-status-neutral">Todavía no cargó datos de ciclo.</p>
           ) : (
             <div className="flex gap-4 text-sm">
               <p>
-                <span className="text-navy font-medium">Día {cycleStats.currentCycleDay}</span>{' '}
+                <span className="text-ink font-medium">Día {cycleStats.currentCycleDay}</span>{' '}
                 <span className="text-status-neutral">del ciclo</span>
               </p>
               {cycleStats.averageCycleLength && (
@@ -270,22 +270,22 @@ async function SaludTab({ athleteId, gender }: { athleteId: string; gender: stri
       )}
 
       <div className="card p-4">
-        <p className="text-sm font-semibold text-navy mb-2">Episodios activos</p>
+        <p className="text-sm font-semibold text-ink mb-2">Episodios activos</p>
         {activos.length === 0 && (
           <p className="text-sm text-status-neutral">Sin episodios activos visibles para vos en este momento.</p>
         )}
         {activos.map((e) => (
-          <div key={e.id} className="text-sm text-navy py-1 border-b border-gray-50 last:border-0">
+          <div key={e.id} className="text-sm text-ink py-1 border-b border-gray-50 last:border-0">
             <span className="text-xs text-gold font-medium">{HEALTH_LABELS[e.type]}</span> — {e.title}
           </div>
         ))}
       </div>
       {resueltos.length > 0 && (
         <details className="card">
-          <summary className="cursor-pointer px-4 py-3 text-sm font-medium text-navy">Mostrar resueltos ({resueltos.length})</summary>
+          <summary className="cursor-pointer px-4 py-3 text-sm font-medium text-ink">Mostrar resueltos ({resueltos.length})</summary>
           <div className="p-4 pt-0">
             {resueltos.map((e) => (
-              <div key={e.id} className="text-sm text-navy py-1 border-b border-gray-50 last:border-0 opacity-60">
+              <div key={e.id} className="text-sm text-ink py-1 border-b border-gray-50 last:border-0 opacity-60">
                 <span className="text-xs text-status-neutral font-medium">{HEALTH_LABELS[e.type]}</span> — {e.title}
               </div>
             ))}
@@ -293,12 +293,12 @@ async function SaludTab({ athleteId, gender }: { athleteId: string; gender: stri
         </details>
       )}
       {anthropometry.length > 0 && (
-        <div className="rounded-xl border border-gray-200 bg-white divide-y divide-gray-100">
-          <p className="p-3 text-sm font-semibold text-navy">Antropometría y signos vitales</p>
+        <div className="rounded-xl border border-outline bg-panel divide-y divide-gray-100">
+          <p className="p-3 text-sm font-semibold text-ink">Antropometría y signos vitales</p>
           {anthropometry.map((h) => (
             <div key={h.id} className="p-3 flex items-center justify-between text-sm">
-              <p className="text-navy">{h.observableName}</p>
-              <p className="font-medium text-navy">{formatMark(h.value, h.unitSymbol)}</p>
+              <p className="text-ink">{h.observableName}</p>
+              <p className="font-medium text-ink">{formatMark(h.value, h.unitSymbol)}</p>
             </div>
           ))}
         </div>

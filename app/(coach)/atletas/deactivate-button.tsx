@@ -18,7 +18,7 @@ export function DeactivateButton({ id }: { id: string }) {
         >
           Sí, desactivar
         </button>
-        <button onClick={() => setConfirming(false)} className="text-status-neutral hover:text-navy">
+        <button onClick={() => setConfirming(false)} className="text-status-neutral hover:text-ink">
           Cancelar
         </button>
       </div>
