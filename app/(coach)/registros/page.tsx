@@ -1,4 +1,4 @@
-import { getMyActiveMembership, getRoster } from '@/domains/athletes/queries'
+import { getMyActiveMembership, getAthletesForCoach, getRoster } from '@/domains/athletes/queries'
 import { getSports, getObservables, getUnits, getHiddenObservables } from '@/domains/catalog/queries'
 import { getRecentRecords } from '@/domains/observations/manual-entry'
 import { RecordForm } from './record-form'
@@ -21,7 +21,7 @@ export default async function RegistrosPage() {
     getSports(membership.organizationId),
     getObservables(membership.organizationId),
     getUnits(membership.organizationId),
-    getRoster(membership.organizationId),
+    (membership.role === 'manager' ? getRoster(membership.organizationId) : getAthletesForCoach(membership.id)),
     getRecentRecords(membership.organizationId),
     getHiddenObservables(membership.organizationId),
   ])

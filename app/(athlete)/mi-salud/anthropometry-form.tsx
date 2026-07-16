@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from 'react'
 import { logAnthropometryAction } from './actions'
+import { MarkValueInput } from '@/components/ui/mark-value-input'
 
 interface Observable {
   id: string
@@ -13,6 +14,8 @@ export function AnthropometryForm({ observables }: { observables: Observable[] }
   const [open, setOpen] = useState(false)
   const [pending, startTransition] = useTransition()
   const [error, setError] = useState<string | null>(null)
+  const [observableId, setObservableId] = useState(observables[0]?.id ?? '')
+  const selectedUnit = observables.find((o) => o.id === observableId)?.unitSymbol ?? null
 
   function handleSubmit(formData: FormData) {
     startTransition(async () => {
@@ -39,21 +42,14 @@ export function AnthropometryForm({ observables }: { observables: Observable[] }
 
   return (
     <form action={handleSubmit} className="rounded-2xl border border-gray-100 bg-white p-4 shadow-sm space-y-3">
-      <select name="observableId" className="input-field" required>
+      <select name="observableId" value={observableId} onChange={(e) => setObservableId(e.target.value)} className="input-field" required>
         {observables.map((o) => (
           <option key={o.id} value={o.id}>
             {o.name} {o.unitSymbol ? `(${o.unitSymbol})` : ''}
           </option>
         ))}
       </select>
-      <input
-        name="value"
-        type="number"
-        step="0.1"
-        placeholder="Valor"
-        className="input-field"
-        required
-      />
+      <MarkValueInput name="value" unitSymbol={selectedUnit} />
       {error && <p className="text-xs text-status-critical">{error}</p>}
       <div className="flex gap-2">
         <button

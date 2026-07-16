@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from 'react'
 import { recordObservationAction } from './actions'
+import { MarkValueInput } from '@/components/ui/mark-value-input'
 
 interface RosterOption {
   id: string
@@ -18,6 +19,9 @@ export function RecordForm({ roster, observables }: { roster: RosterOption[]; ob
   const [pending, startTransition] = useTransition()
   const [error, setError] = useState<string | null>(null)
   const [ok, setOk] = useState(false)
+  const [observableId, setObservableId] = useState('')
+
+  const selectedUnit = observables.find((o) => o.id === observableId)?.unitSymbol ?? null
 
   function handleSubmit(formData: FormData) {
     startTransition(async () => {
@@ -44,7 +48,7 @@ export function RecordForm({ roster, observables }: { roster: RosterOption[]; ob
             </option>
           ))}
         </select>
-        <select name="observableId" className="input-field" required>
+        <select name="observableId" value={observableId} onChange={(e) => setObservableId(e.target.value)} className="input-field" required>
           <option value="">Qué registrar</option>
           {observables.map((o) => (
             <option key={o.id} value={o.id}>
@@ -53,15 +57,8 @@ export function RecordForm({ roster, observables }: { roster: RosterOption[]; ob
           ))}
         </select>
       </div>
-      <div className="flex gap-2">
-        <input
-          name="value"
-          type="number"
-          step="0.01"
-          placeholder="Valor"
-          className="input-field flex-1"
-          required
-        />
+      <div className="flex gap-2 items-center">
+        <MarkValueInput name="value" unitSymbol={selectedUnit} />
         <button
           type="submit"
           disabled={pending}

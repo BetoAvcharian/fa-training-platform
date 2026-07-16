@@ -33,6 +33,7 @@ export interface SessionExercise {
   rawText: string
   isStructured: boolean
   observableId: string | null
+  unitSymbol: string | null
   sets: number | null
   reps: number | null
   weightKg: number | null

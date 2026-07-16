@@ -1,9 +1,10 @@
 import Link from 'next/link'
-import { getMyActiveMembership, getRoster } from '@/domains/athletes/queries'
+import { getMyActiveMembership, getAthletesForCoach, getRoster } from '@/domains/athletes/queries'
 import { getAssessments, getProtocols } from '@/domains/assessments/queries'
 import { getObservables } from '@/domains/catalog/queries'
 import { AssessmentForm } from './assessment-form'
 import { ProtocolForm } from './protocol-form'
+import { ProtocolChip } from './protocol-chip'
 
 export const dynamic = 'force-dynamic'
 
@@ -18,7 +19,7 @@ export default async function EvaluacionesPage() {
   const [assessments, protocols, roster, observables] = await Promise.all([
     getAssessments(membership.organizationId),
     getProtocols(membership.organizationId),
-    getRoster(membership.organizationId),
+    (membership.role === 'manager' ? getRoster(membership.organizationId) : getAthletesForCoach(membership.id)),
     getObservables(membership.organizationId),
   ])
 
@@ -44,9 +45,7 @@ export default async function EvaluacionesPage() {
           <p className="text-sm font-semibold text-navy mb-2">Protocolos</p>
           <div className="flex flex-wrap gap-2">
             {protocols.map((p) => (
-              <span key={p.id} className="text-xs bg-gray-50 rounded-full px-2 py-1 text-navy">
-                {p.name}
-              </span>
+              <ProtocolChip key={p.id} id={p.id} name={p.name} deletable={p.organizationId !== null} />
             ))}
           </div>
         </div>

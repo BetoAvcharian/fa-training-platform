@@ -12,7 +12,7 @@ export default async function ConfiguracionPage() {
   const [org, groups, roster] = await Promise.all([
     getOrganization(membership.organizationId),
     getGroups(membership.organizationId),
-    getRoster(membership.organizationId),
+    (membership.role === 'manager' ? getRoster(membership.organizationId) : getAthletesForCoach(membership.id)),
   ])
 
   const groupsWithMembers = await Promise.all(

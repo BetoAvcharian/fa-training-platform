@@ -1,4 +1,4 @@
-import { getMyActiveMembership, getRoster } from '@/domains/athletes/queries'
+import { getMyActiveMembership, getAthletesForCoach, getRoster } from '@/domains/athletes/queries'
 import { getPlans, getObjectives } from '@/domains/planning/queries'
 import { PlanForm } from './plan-form'
 import { ObjectiveForm } from './objective-form'
@@ -32,7 +32,7 @@ export default async function PlanificacionPage() {
   const [plans, objectives, roster] = await Promise.all([
     getPlans(membership.organizationId),
     getObjectives(membership.organizationId),
-    getRoster(membership.organizationId),
+    (membership.role === 'manager' ? getRoster(membership.organizationId) : getAthletesForCoach(membership.id)),
   ])
 
   const rosterById = new Map(roster.map((r) => [r.id, r]))

@@ -85,7 +85,7 @@ export async function getSessionExercises(eventId: string, client?: AppSupabaseC
   const { data, error } = await supabase
     .from('session_exercises')
     .select(
-      'id, event_id, session_block_id, order_index, raw_text, is_structured, observable_id, sets, reps, weight_kg, distance_meters, time_seconds, rest_seconds, replaces_id'
+      'id, event_id, session_block_id, order_index, raw_text, is_structured, observable_id, sets, reps, weight_kg, distance_meters, time_seconds, rest_seconds, replaces_id, observables(units(symbol))'
     )
     .eq('event_id', eventId)
     .order('order_index')
@@ -138,6 +138,7 @@ function mapSessionExercise(row: any): SessionExercise {
     rawText: row.raw_text,
     isStructured: row.is_structured,
     observableId: row.observable_id,
+    unitSymbol: row.observables?.units?.symbol ?? null,
     sets: row.sets,
     reps: row.reps,
     weightKg: row.weight_kg,

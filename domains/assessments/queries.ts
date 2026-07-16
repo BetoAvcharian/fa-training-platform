@@ -4,6 +4,7 @@ import { DomainError } from '@/types/errors'
 export interface Protocol {
   id: string
   name: string
+  organizationId: string | null
 }
 
 export interface ProtocolObservable {
@@ -33,12 +34,12 @@ export async function getProtocols(organizationId: string, client?: AppSupabaseC
   const supabase = client ?? (await createServerClient())
   const { data, error } = await supabase
     .from('protocols')
-    .select('id, name')
+    .select('id, name, organization_id')
     .or(`organization_id.is.null,organization_id.eq.${organizationId}`)
     .order('name')
 
   if (error) throw new DomainError('NOT_FOUND', error.message)
-  return data ?? []
+  return (data ?? []).map((row) => ({ id: row.id, name: row.name, organizationId: row.organization_id }))
 }
 
 export async function getProtocolObservables(protocolId: string, client?: AppSupabaseClient): Promise<ProtocolObservable[]> {
