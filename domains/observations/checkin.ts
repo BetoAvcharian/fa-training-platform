@@ -54,6 +54,19 @@ export async function submitCheckin(
 
   const insertedIds: string[] = []
   for (const entry of entries) {
+    // Un solo check-in vigente por día y por variable — si ya había uno
+    // hoy, se marca superado antes de cargar el nuevo (mismo mecanismo
+    // que usa editObservation para corregir una marca).
+    const { data: previous } = await supabase
+      .from('observations')
+      .select('id')
+      .eq('athlete_membership_id', input.athleteMembershipId)
+      .eq('observable_id', entry.observableId)
+      .eq('date', input.date)
+      .eq('source_type', 'checkin')
+      .is('superseded_by', null)
+      .maybeSingle()
+
     const { data: id, error } = await supabase.rpc('create_observation_with_context', {
       p_organization_id: input.organizationId,
       p_athlete_membership_id: input.athleteMembershipId,
@@ -66,6 +79,11 @@ export async function submitCheckin(
     if (error || !id) {
       throw new DomainError('CONFLICT', error?.message ?? 'No se pudo guardar el check-in')
     }
+
+    if (previous) {
+      await supabase.from('observations').update({ superseded_by: id }).eq('id', previous.id)
+    }
+
     insertedIds.push(id as string)
   }
 

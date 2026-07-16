@@ -52,11 +52,13 @@ export default async function MiSaludPage() {
       </section>
 
       {resueltos.length > 0 && (
-        <section className="space-y-3">
-          <h2 className="text-sm font-semibold text-navy">Resueltos</h2>
-          <div className="space-y-2">
+        <details className="rounded-2xl border border-gray-100 bg-white">
+          <summary className="cursor-pointer px-4 py-3 text-sm font-medium text-navy">
+            Mostrar resueltos ({resueltos.length})
+          </summary>
+          <div className="p-4 pt-0 space-y-2">
             {resueltos.map((e) => (
-              <div key={e.id} className="rounded-2xl border border-gray-100 bg-white p-4 opacity-60">
+              <div key={e.id} className="rounded-xl border border-gray-100 p-4 opacity-60">
                 <p className="text-xs uppercase tracking-wide text-status-neutral font-semibold">{e.type}</p>
                 <p className="font-medium text-navy">{e.title}</p>
                 <p className="text-xs text-status-neutral mt-0.5">
@@ -65,7 +67,7 @@ export default async function MiSaludPage() {
               </div>
             ))}
           </div>
-        </section>
+        </details>
       )}
 
       <section className="space-y-3">

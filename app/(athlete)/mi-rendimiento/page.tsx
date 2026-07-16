@@ -2,6 +2,7 @@ import { getMyRecords, getMyResults } from '@/domains/performance/queries'
 import { formatMark } from '@/lib/format-mark'
 import { EditableRecordRow } from '@/components/ui/editable-record-row'
 import { editResultAction, deleteResultAction } from './actions'
+import { MyPerformanceChart } from './performance-chart'
 
 export const dynamic = 'force-dynamic'
 
@@ -38,6 +39,11 @@ export default async function MiRendimientoPage() {
         <p className="text-xs uppercase tracking-wider text-gold font-medium">Rendimiento</p>
         <h1 className="font-display text-2xl font-bold text-navy">Mi rendimiento</h1>
       </div>
+
+      <section className="card p-4">
+        <h2 className="text-sm font-semibold text-navy mb-3">Mi evolución</h2>
+        <MyPerformanceChart results={results.map((r) => ({ date: r.date, observableName: r.observableName, value: r.value }))} />
+      </section>
 
       <section className="space-y-3">
         <h2 className="text-sm font-semibold text-navy">Récords oficiales</h2>
