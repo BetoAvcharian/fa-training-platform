@@ -3,7 +3,7 @@
 import { useState, useTransition } from 'react'
 import { Modal } from '@/components/ui/modal'
 import { logCycleDayAction, deleteCycleDayAction } from './actions'
-import { SYMPTOM_OPTIONS, type CycleFlow, type CycleDayLog } from '@/domains/health/cycle'
+import { SYMPTOM_OPTIONS, type CycleFlow, type CycleDayLog } from '@/domains/health/cycle-types'
 
 const FLOW_OPTIONS: Array<{ value: CycleFlow; label: string }> = [
   { value: 'manchado', label: 'Manchado' },

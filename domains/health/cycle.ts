@@ -2,27 +2,9 @@ import { createServerClient, type AppSupabaseClient } from '@/lib/supabase/serve
 import { DomainError } from '@/types/errors'
 import { getMyActiveMembership } from '@/domains/athletes/queries'
 import { getTodayISO } from '@/lib/today'
+import { SYMPTOM_OPTIONS, type CycleFlow, type CycleDayLog, type CycleStats } from './cycle-types'
 
-export type CycleFlow = 'ligero' | 'medio' | 'abundante' | 'manchado'
-
-export interface CycleDayLog {
-  id: string
-  date: string
-  flow: CycleFlow | null
-  symptoms: string[]
-  notes: string | null
-}
-
-export const SYMPTOM_OPTIONS = [
-  'cólicos',
-  'dolor de cabeza',
-  'hinchazón',
-  'cansancio',
-  'irritabilidad',
-  'antojos',
-  'acné',
-  'dolor de espalda',
-] as const
+export { SYMPTOM_OPTIONS, type CycleFlow, type CycleDayLog, type CycleStats }
 
 /** Todos los días cargados para un atleta, en un rango de fechas (para pintar el calendario). */
 export async function getCycleLogs(
@@ -61,13 +43,6 @@ async function getAllFlowDates(athleteMembershipId: string, supabase: AppSupabas
 
   if (error) throw new DomainError('NOT_FOUND', error.message)
   return (data ?? []).map((r) => r.date)
-}
-
-export interface CycleStats {
-  currentCycleDay: number | null
-  averageCycleLength: number | null
-  lastPeriodStart: string | null
-  predictedNextPeriod: string | null
 }
 
 /**
