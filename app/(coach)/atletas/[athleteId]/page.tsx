@@ -237,20 +237,34 @@ async function SaludTab({ athleteId }: { athleteId: string }) {
     getAthleteHealthEpisodes(athleteId),
     getAnthropometryHistory(athleteId),
   ])
+  const activos = episodes.filter((e) => e.status === 'activo')
+  const resueltos = episodes.filter((e) => e.status === 'resuelto')
 
   return (
     <div className="space-y-4">
       <div className="card p-4">
-        <p className="text-sm font-semibold text-navy mb-2">Episodios</p>
-        {episodes.length === 0 && (
-          <p className="text-sm text-status-neutral">Sin episodios visibles para vos en este momento.</p>
+        <p className="text-sm font-semibold text-navy mb-2">Episodios activos</p>
+        {activos.length === 0 && (
+          <p className="text-sm text-status-neutral">Sin episodios activos visibles para vos en este momento.</p>
         )}
-        {episodes.map((e) => (
+        {activos.map((e) => (
           <div key={e.id} className="text-sm text-navy py-1 border-b border-gray-50 last:border-0">
             <span className="text-xs text-gold font-medium">{HEALTH_LABELS[e.type]}</span> — {e.title}
           </div>
         ))}
       </div>
+      {resueltos.length > 0 && (
+        <details className="card">
+          <summary className="cursor-pointer px-4 py-3 text-sm font-medium text-navy">Mostrar resueltos ({resueltos.length})</summary>
+          <div className="p-4 pt-0">
+            {resueltos.map((e) => (
+              <div key={e.id} className="text-sm text-navy py-1 border-b border-gray-50 last:border-0 opacity-60">
+                <span className="text-xs text-status-neutral font-medium">{HEALTH_LABELS[e.type]}</span> — {e.title}
+              </div>
+            ))}
+          </div>
+        </details>
+      )}
       {anthropometry.length > 0 && (
         <div className="rounded-xl border border-gray-200 bg-white divide-y divide-gray-100">
           <p className="p-3 text-sm font-semibold text-navy">Antropometría y signos vitales</p>
