@@ -85,7 +85,7 @@ export default async function RegistrosPage() {
 
       <details className="rounded-xl border border-gray-200 bg-white">
         <summary className="cursor-pointer px-4 py-3 text-sm font-medium text-navy">
-          Catálogo completo ({observables.length} ítems) — avanzado
+          Catálogo de marcas ({registrableObservables.length} ítems) — avanzado
         </summary>
         <div className="p-4 pt-0 space-y-6">
           {isManager && (
@@ -95,7 +95,7 @@ export default async function RegistrosPage() {
           )}
 
           {sports.map((sport) => {
-            const items = observables.filter((o) => o.sportId === sport.id)
+            const items = registrableObservables.filter((o) => o.sportId === sport.id)
             if (items.length === 0) return null
 
             return (
