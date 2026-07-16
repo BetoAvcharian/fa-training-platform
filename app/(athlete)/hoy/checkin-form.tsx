@@ -3,9 +3,9 @@
 import { useState, useTransition } from 'react'
 import { submitCheckinAction } from './actions'
 
-export function CheckinForm({ alreadySubmitted }: { alreadySubmitted: boolean }) {
-  const [energia, setEnergia] = useState(3)
-  const [fatiga, setFatiga] = useState(3)
+export function CheckinForm({ initialEnergia, initialFatiga, alreadySubmitted }: { initialEnergia: number | null; initialFatiga: number | null; alreadySubmitted: boolean }) {
+  const [energia, setEnergia] = useState(initialEnergia ?? 3)
+  const [fatiga, setFatiga] = useState(initialFatiga ?? 3)
   const [pending, startTransition] = useTransition()
   const [saved, setSaved] = useState(alreadySubmitted)
 

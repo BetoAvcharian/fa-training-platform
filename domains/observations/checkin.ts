@@ -81,6 +81,34 @@ export async function submitCheckin(
   return { ids: insertedIds }
 }
 
+/** Valores reales del check-in de esta fecha (o null si no cargó nada) — para que el formulario recuerde lo que ya guardaste. */
+export async function getCheckinForDate(
+  athleteMembershipId: string,
+  date: string,
+  client?: AppSupabaseClient
+): Promise<{ energia: number | null; fatiga: number | null; molestia: number | null }> {
+  const supabase = client ?? (await createServerClient())
+  const { data, error } = await supabase
+    .from('observations')
+    .select('value, observables(name)')
+    .eq('athlete_membership_id', athleteMembershipId)
+    .eq('date', date)
+    .eq('source_type', 'checkin')
+    .is('superseded_by', null)
+
+  if (error) throw new DomainError('NOT_FOUND', error.message)
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const rows = (data ?? []) as any[]
+  const byName = (name: string) => rows.find((r) => r.observables?.name === name)?.value ?? null
+
+  return {
+    energia: byName('Energía'),
+    fatiga: byName('Fatiga'),
+    molestia: byName('Molestia'),
+  }
+}
+
 /** ¿Este atleta ya cargó check-in hoy (o en la fecha dada)? Base de la alerta de "sin bienestar cargado". */
 export async function hasCheckinForDate(
   athleteMembershipId: string,

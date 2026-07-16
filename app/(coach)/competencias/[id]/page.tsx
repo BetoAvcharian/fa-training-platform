@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { getMyActiveMembership, getRoster } from '@/domains/athletes/queries'
+import { getMyActiveMembership, getRoster, getAthletesForCoach } from '@/domains/athletes/queries'
 import { getCompetitionEntries } from '@/domains/competitions/queries'
 import { getObservables, getUnits } from '@/domains/catalog/queries'
 import { createServerClient } from '@/lib/supabase/server'
@@ -18,7 +18,7 @@ export default async function CompetitionDetailPage({ params }: { params: Promis
 
   const [entries, roster, observables, units] = await Promise.all([
     getCompetitionEntries(id),
-    getRoster(membership.organizationId),
+    membership.role === 'manager' ? getRoster(membership.organizationId) : getAthletesForCoach(membership.id),
     getObservables(membership.organizationId),
     getUnits(membership.organizationId),
   ])

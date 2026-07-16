@@ -2,7 +2,7 @@ import { getTodayISO } from '@/lib/today'
 import { getMyActiveMembership } from '@/domains/athletes/queries'
 import { getEventsForRange } from '@/domains/events/queries'
 import { getResolvedSessionForAthlete } from '@/domains/observations/session-view'
-import { hasCheckinForDate } from '@/domains/observations/checkin'
+import { getCheckinForDate } from '@/domains/observations/checkin'
 import { getMySessionFeedback } from '@/domains/observations/session-feedback'
 import { CheckinForm } from './checkin-form'
 import { SessionLine } from './session-line'
@@ -16,10 +16,11 @@ export default async function HoyPage() {
 
   const today = getTodayISO()
 
-  const [events, checkinDone] = await Promise.all([
+  const [events, checkin] = await Promise.all([
     getEventsForRange(membership.organizationId, today, today),
-    hasCheckinForDate(membership.id, today),
+    getCheckinForDate(membership.id, today),
   ])
+  const checkinDone = checkin.energia !== null || checkin.fatiga !== null || checkin.molestia !== null
 
   const trainingEvents = events.filter((e) => e.type === 'entrenamiento')
 
@@ -40,7 +41,7 @@ export default async function HoyPage() {
         </h1>
       </div>
 
-      <CheckinForm alreadySubmitted={checkinDone} />
+      <CheckinForm initialEnergia={checkin.energia} initialFatiga={checkin.fatiga} alreadySubmitted={checkinDone} />
 
       <div className="space-y-3">
         {sessions.length === 0 && (
