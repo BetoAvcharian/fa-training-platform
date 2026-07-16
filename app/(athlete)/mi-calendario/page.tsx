@@ -84,7 +84,7 @@ export default async function MiCalendarioPage({
         })}
 
         {sessions.length === 0 && (
-          <div className="rounded-2xl border border-gray-100 bg-panel p-5 shadow-sm text-center text-sm text-status-neutral">
+          <div className="rounded-2xl border border-outline bg-panel p-5 shadow-sm text-center text-sm text-status-neutral">
             Sin entrenamientos esta semana.
           </div>
         )}

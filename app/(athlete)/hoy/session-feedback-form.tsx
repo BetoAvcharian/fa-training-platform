@@ -48,7 +48,7 @@ export function SessionFeedbackForm({
   }
 
   return (
-    <div className="mt-3 border-t border-gray-100 pt-3 space-y-2">
+    <div className="mt-3 border-t border-outline pt-3 space-y-2">
       <p className="text-xs text-status-neutral">¿Cómo te fue con esta sesión?</p>
       <div className="flex flex-col gap-1.5">
         {STATUS_OPTIONS.map((opt) => (

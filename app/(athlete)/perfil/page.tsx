@@ -37,7 +37,7 @@ export default async function PerfilPage() {
         initials={`${profile.firstName[0] ?? ''}${profile.lastName[0] ?? ''}`}
       />
 
-      <div className="rounded-2xl border border-gray-100 bg-panel p-4 shadow-sm space-y-3">
+      <div className="rounded-2xl border border-outline bg-panel p-4 shadow-sm space-y-3">
         <div>
           <p className="text-xs text-status-neutral">Email</p>
           <p className="text-sm text-ink">{profile.email}</p>
@@ -60,11 +60,11 @@ export default async function PerfilPage() {
 
       <ProfileEditForm birthDate={profile.birthDate} gender={profile.gender} phone={profile.phone} />
 
-      <a href="/mis-objetivos" className="block rounded-2xl border border-gray-100 bg-panel p-4 shadow-sm text-sm text-ink">
+      <a href="/mis-objetivos" className="block rounded-2xl border border-outline bg-panel p-4 shadow-sm text-sm text-ink">
         Mis objetivos →
       </a>
 
-      <form action={signOutAction} className="rounded-2xl border border-gray-100 bg-panel p-2 shadow-sm">
+      <form action={signOutAction} className="rounded-2xl border border-outline bg-panel p-2 shadow-sm">
         <button type="submit" className="w-full text-left px-3 py-2.5 rounded-lg text-status-critical text-sm">
           Cerrar sesión
         </button>

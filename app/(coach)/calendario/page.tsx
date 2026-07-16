@@ -213,7 +213,7 @@ async function MonthView({
             <a
               key={i}
               href={`?week=${dayWeekStart}&mode=${mode}&view=semana`}
-              className={`min-h-[80px] rounded-lg border p-1.5 ${inMonth ? 'bg-panel border-outline' : 'bg-outline/40 border-gray-100'}`}
+              className={`min-h-[80px] rounded-lg border p-1.5 ${inMonth ? 'bg-panel border-outline' : 'bg-outline/40 border-outline'}`}
             >
               <p className={`text-xs ${inMonth ? 'text-ink' : 'text-gray-300'}`}>{day.getDate()}</p>
               <div className="space-y-0.5 mt-1">

@@ -18,7 +18,7 @@ export function SessionAccordion({
   const doneCount = lines.filter((l) => l.executed).length
 
   return (
-    <div className="rounded-2xl border border-gray-100 bg-panel shadow-sm mb-2 overflow-hidden">
+    <div className="rounded-2xl border border-outline bg-panel shadow-sm mb-2 overflow-hidden">
       <button onClick={() => setOpen(!open)} className="w-full flex items-center justify-between p-4 text-left">
         <div className="flex items-center gap-2 min-w-0">
           <span className="text-base shrink-0">🏃</span>
@@ -35,7 +35,7 @@ export function SessionAccordion({
       </button>
 
       {open && (
-        <div className="px-4 pb-4 space-y-1 border-t border-gray-50 pt-3">
+        <div className="px-4 pb-4 space-y-1 border-t border-outline pt-3">
           {lines.map((resolved) => (
             <p key={resolved.line.id} className="text-xs text-status-neutral">
               {resolved.line.rawText}

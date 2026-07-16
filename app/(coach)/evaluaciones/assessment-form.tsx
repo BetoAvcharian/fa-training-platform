@@ -85,7 +85,7 @@ export function AssessmentForm({
                   placeholder="Buscar atleta…"
                   className="input-field"
                 />
-                <div className="max-h-32 overflow-y-auto mt-1 border border-gray-100 rounded-lg">
+                <div className="max-h-32 overflow-y-auto mt-1 border border-outline rounded-lg">
                   {filteredRoster.slice(0, 30).map((r) => (
                     <button
                       type="button"
@@ -128,7 +128,7 @@ export function AssessmentForm({
 
           <div>
             <label className="text-xs text-status-neutral mb-1 block">Qué se midió</label>
-            <div className="max-h-48 overflow-y-auto space-y-1 border border-gray-100 rounded-lg p-3">
+            <div className="max-h-48 overflow-y-auto space-y-1 border border-outline rounded-lg p-3">
               {observables.map((o) => (
                 <div key={o.id} className="flex items-center gap-2">
                   <input

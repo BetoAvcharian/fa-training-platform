@@ -92,7 +92,7 @@ export default async function MisVideosCategoryPage({
       </a>
 
       {visible.length === 0 && (
-        <div className="rounded-2xl border border-gray-100 bg-panel p-6 text-center text-sm text-status-neutral">
+        <div className="rounded-2xl border border-outline bg-panel p-6 text-center text-sm text-status-neutral">
           No hay videos acá todavía.
         </div>
       )}

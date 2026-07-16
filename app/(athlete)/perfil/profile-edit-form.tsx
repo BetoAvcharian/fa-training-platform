@@ -36,7 +36,7 @@ export function ProfileEditForm({
 
   if (!editing) {
     return (
-      <div className="rounded-2xl border border-gray-100 bg-panel p-4 shadow-sm space-y-3">
+      <div className="rounded-2xl border border-outline bg-panel p-4 shadow-sm space-y-3">
         <div className="flex items-center justify-between">
           <p className="text-xs text-status-neutral uppercase tracking-wide">Datos personales</p>
           <button onClick={() => setEditing(true)} className="text-xs text-ink underline">
@@ -60,7 +60,7 @@ export function ProfileEditForm({
   }
 
   return (
-    <form action={handleSubmit} className="rounded-2xl border border-gray-100 bg-panel p-4 shadow-sm space-y-3">
+    <form action={handleSubmit} className="rounded-2xl border border-outline bg-panel p-4 shadow-sm space-y-3">
       <p className="text-xs text-status-neutral uppercase tracking-wide">Datos personales</p>
       <div>
         <label className="text-xs text-status-neutral">Fecha de nacimiento</label>

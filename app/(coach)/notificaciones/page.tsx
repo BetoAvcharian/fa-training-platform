@@ -40,7 +40,7 @@ export default async function NotificacionesPage() {
         </div>
       )}
 
-      <div className="rounded-xl border border-outline bg-panel divide-y divide-gray-100">
+      <div className="rounded-xl border border-outline bg-panel divide-y divide-outline">
         {notifications.map((n) => (
           <form
             key={n.id}

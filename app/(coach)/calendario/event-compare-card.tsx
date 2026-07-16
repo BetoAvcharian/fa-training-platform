@@ -27,7 +27,7 @@ export async function EventCompareCard({ event, roster }: { event: Event; roster
       {athleteIds.map((athleteId) => {
         const athlete = rosterById.get(athleteId)
         return (
-          <div key={athleteId} className="border-t border-gray-100 pt-1.5">
+          <div key={athleteId} className="border-t border-outline pt-1.5">
             <p className="text-[10px] text-status-neutral">
               {athlete?.person ? `${athlete.person.firstName} ${athlete.person.lastName}` : '—'}
             </p>

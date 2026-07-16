@@ -67,7 +67,7 @@ export default async function RegistrosPage() {
             Todavía no hay nada cargado acá.
           </div>
         )}
-        <div className="rounded-xl border border-outline bg-panel divide-y divide-gray-100">
+        <div className="rounded-xl border border-outline bg-panel divide-y divide-outline">
           {recent.map((r) => (
             <EditableRecordRow
               key={r.id}
@@ -103,7 +103,7 @@ export default async function RegistrosPage() {
                 <h3 className="text-xs font-semibold text-status-neutral uppercase">{sport.name}</h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   {items.map((obs) => (
-                    <div key={obs.id} className="rounded-lg border border-gray-100 p-3">
+                    <div key={obs.id} className="rounded-lg border border-outline p-3">
                       <div className="flex items-start justify-between gap-2">
                         <div>
                           <p className="font-medium text-ink text-sm">{obs.name}</p>
@@ -128,7 +128,7 @@ export default async function RegistrosPage() {
                 {observables
                   .filter((o) => !sportById.has(o.sportId))
                   .map((obs) => (
-                    <div key={obs.id} className="rounded-lg border border-gray-100 p-3">
+                    <div key={obs.id} className="rounded-lg border border-outline p-3">
                       <p className="font-medium text-ink text-sm">{obs.name}</p>
                       <p className="text-xs text-status-neutral">{unitById.get(obs.unitId)?.symbol ?? ''}</p>
                     </div>

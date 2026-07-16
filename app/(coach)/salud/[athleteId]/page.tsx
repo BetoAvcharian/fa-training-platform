@@ -52,7 +52,7 @@ export default async function AthleteSaludPage({
       </div>
 
       {episodes.length === 0 && (
-        <div className="rounded-xl border border-gray-100 bg-panel p-5 text-sm text-status-neutral">
+        <div className="rounded-xl border border-outline bg-panel p-5 text-sm text-status-neutral">
           Sin episodios visibles para vos en este momento.
         </div>
       )}

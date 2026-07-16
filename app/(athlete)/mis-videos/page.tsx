@@ -47,7 +47,7 @@ export default async function MisVideosMenuPage() {
 
       <div className="space-y-2">
         {CATEGORIES.map((c) => (
-          <Link key={c.key} href={`/mis-videos/${c.key}`} className="block rounded-2xl border border-gray-100 bg-panel p-4 shadow-sm">
+          <Link key={c.key} href={`/mis-videos/${c.key}`} className="block rounded-2xl border border-outline bg-panel p-4 shadow-sm">
             <div className="flex items-center justify-between">
               <p className="font-medium text-ink">{c.label}</p>
               <span className="text-xs text-status-neutral">{countByCategory.get(c.key) ?? 0}</span>

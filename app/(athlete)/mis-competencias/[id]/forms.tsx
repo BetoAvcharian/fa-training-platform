@@ -55,7 +55,7 @@ export function MyResultForm({ eventId, observables }: { eventId: string; observ
   }
 
   return (
-    <form action={handleSubmit} className="flex flex-wrap items-center gap-2 mt-3 pt-3 border-t border-gray-100">
+    <form action={handleSubmit} className="flex flex-wrap items-center gap-2 mt-3 pt-3 border-t border-outline">
       <select
         name="observableId"
         value={selectedObs}

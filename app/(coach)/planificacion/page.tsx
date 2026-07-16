@@ -53,7 +53,7 @@ export default async function PlanificacionPage() {
         </div>
 
         {plans.length === 0 && (
-          <div className="rounded-xl border border-gray-100 bg-panel p-4 text-sm text-status-neutral">
+          <div className="rounded-xl border border-outline bg-panel p-4 text-sm text-status-neutral">
             Todavía no hay temporadas ni ciclos cargados.
           </div>
         )}
@@ -65,7 +65,7 @@ export default async function PlanificacionPage() {
               <div key={root.id} className="card p-4">
                 <p className="text-xs uppercase tracking-wide text-gold font-semibold">{TYPE_LABELS[root.type]}</p>
                 <p className="font-medium text-ink">{root.title}</p>
-                <div className="mt-2 space-y-1 pl-3 border-l-2 border-gray-100">
+                <div className="mt-2 space-y-1 pl-3 border-l-2 border-outline">
                   {plans
                     .filter((p) => p.parentPlanId === root.id)
                     .map((child) => (
@@ -86,7 +86,7 @@ export default async function PlanificacionPage() {
         </div>
 
         {pendientes.length === 0 && (
-          <div className="rounded-xl border border-gray-100 bg-panel p-4 text-sm text-status-neutral">
+          <div className="rounded-xl border border-outline bg-panel p-4 text-sm text-status-neutral">
             Sin objetivos pendientes.
           </div>
         )}
@@ -95,7 +95,7 @@ export default async function PlanificacionPage() {
           {pendientes.map((o) => {
             const athlete = rosterById.get(o.athleteMembershipId)
             return (
-              <div key={o.id} className="rounded-xl border border-gray-100 bg-panel p-4 shadow-sm flex items-start justify-between gap-2">
+              <div key={o.id} className="rounded-xl border border-outline bg-panel p-4 shadow-sm flex items-start justify-between gap-2">
                 <div>
                   <p className="text-xs uppercase tracking-wide text-gold font-semibold">
                     {CATEGORY_LABELS[o.category]}
@@ -114,7 +114,7 @@ export default async function PlanificacionPage() {
           <div className="space-y-2 pt-2">
             <p className="text-xs text-status-neutral uppercase tracking-wide">Logrados</p>
             {logrados.map((o) => (
-              <div key={o.id} className="rounded-xl border border-gray-100 bg-panel p-4 opacity-60">
+              <div key={o.id} className="rounded-xl border border-outline bg-panel p-4 opacity-60">
                 <p className="text-sm text-ink">{o.description}</p>
               </div>
             ))}

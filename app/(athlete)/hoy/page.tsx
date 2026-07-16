@@ -45,13 +45,13 @@ export default async function HoyPage() {
 
       <div className="space-y-3">
         {sessions.length === 0 && (
-          <div className="rounded-2xl border border-gray-100 bg-panel p-5 shadow-sm text-center text-sm text-status-neutral">
+          <div className="rounded-2xl border border-outline bg-panel p-5 shadow-sm text-center text-sm text-status-neutral">
             Sin entrenamiento asignado para hoy.
           </div>
         )}
 
         {sessions.map(({ event, lines, feedback }) => (
-          <div key={event.id} className="rounded-2xl border border-gray-100 bg-panel p-5 shadow-sm">
+          <div key={event.id} className="rounded-2xl border border-outline bg-panel p-5 shadow-sm">
             <p className="text-xs uppercase tracking-wide text-gold font-semibold mb-1">Entrenamiento de hoy</p>
             <p className="font-display font-bold text-ink mb-3">{event.title}</p>
 

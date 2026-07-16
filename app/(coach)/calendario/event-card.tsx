@@ -65,7 +65,7 @@ export function EventCard({ event, lines, roster }: { event: Event; lines: Sessi
         <div className="space-y-3">
           {lines.length === 0 && <p className="text-sm text-status-neutral">Sin líneas cargadas todavía.</p>}
           {lines.map((line) => (
-            <div key={line.id} className="border-b border-gray-50 pb-2 last:border-0">
+            <div key={line.id} className="border-b border-outline pb-2 last:border-0">
               <div className="flex items-center gap-2">
                 {line.isStructured && (
                   <span className="text-[10px] px-1.5 py-0.5 rounded-full shrink-0 bg-status-positive/10 text-status-positive">
@@ -103,7 +103,7 @@ export function EventCard({ event, lines, roster }: { event: Event; lines: Sessi
             </div>
           ))}
 
-          <div className="pt-2 border-t border-gray-100">
+          <div className="pt-2 border-t border-outline">
             <p className="text-xs text-status-neutral mb-1">Agregar ejercicio</p>
             <div className="flex gap-2">
               <select
@@ -129,7 +129,7 @@ export function EventCard({ event, lines, roster }: { event: Event; lines: Sessi
             {addError && <p className="text-xs text-status-critical mt-1">{addError}</p>}
           </div>
 
-          <div className="pt-2 border-t border-gray-100">
+          <div className="pt-2 border-t border-outline">
             {duplicating ? (
               <form action={handleDuplicate} className="flex gap-2">
                 <input name="newDate" type="date" className="flex-1 input-field" required />
