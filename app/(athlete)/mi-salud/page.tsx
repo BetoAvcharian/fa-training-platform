@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import { getMyHealthEpisodes } from '@/domains/health/queries'
 import { getMyActiveMembership, getMyProfile } from '@/domains/athletes/queries'
 import { getAnthropometryObservables, getAnthropometryHistory } from '@/domains/observations/anthropometry'
@@ -36,6 +37,19 @@ export default async function MiSaludPage() {
       </div>
 
       <HealthForm gender={profile?.gender ?? null} />
+
+      {profile?.gender === 'femenino' && (
+        <Link
+          href="/mi-salud/ciclo"
+          className="flex items-center justify-between rounded-2xl border border-gray-100 bg-white p-4 shadow-sm"
+        >
+          <div>
+            <p className="font-medium text-navy text-sm">Ciclo menstrual</p>
+            <p className="text-xs text-status-neutral">Calendario, síntomas y predicción</p>
+          </div>
+          <span className="text-navy">→</span>
+        </Link>
+      )}
 
       <section className="space-y-3">
         <h2 className="text-sm font-semibold text-navy">Activos</h2>

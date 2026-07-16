@@ -6,14 +6,13 @@ import { createHealthEpisodeAction } from './actions'
 const ALL_TYPE_OPTIONS = [
   { value: 'lesion', label: 'Lesión' },
   { value: 'medicacion', label: 'Medicación' },
-  { value: 'ciclo_menstrual', label: 'Ciclo menstrual' },
 ]
 
-export function HealthForm({ gender }: { gender: string | null }) {
+export function HealthForm({ gender: _gender }: { gender: string | null }) {
   const [open, setOpen] = useState(false)
   const [pending, startTransition] = useTransition()
   const [error, setError] = useState<string | null>(null)
-  const TYPE_OPTIONS = ALL_TYPE_OPTIONS.filter((o) => o.value !== 'ciclo_menstrual' || gender === 'femenino')
+  const TYPE_OPTIONS = ALL_TYPE_OPTIONS
 
   function handleSubmit(formData: FormData) {
     startTransition(async () => {
