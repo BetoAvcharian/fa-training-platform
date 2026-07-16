@@ -53,7 +53,7 @@ export default async function PersonasPage() {
           <h2 className="text-sm font-semibold text-ink">Invitaciones pendientes</h2>
           <div className="space-y-2">
             {invitados.map((m) => (
-              <div key={m.id} className="rounded-xl border border-gray-100 bg-panel p-4 shadow-sm flex items-center justify-between">
+              <div key={m.id} className="rounded-xl border border-outline bg-panel p-4 shadow-sm flex items-center justify-between">
                 <div>
                   <p className="text-sm text-ink">{m.email}</p>
                   <p className="text-xs text-status-neutral">{ROLE_LABELS[m.role]} · esperando que acepte</p>
@@ -69,7 +69,7 @@ export default async function PersonasPage() {
         <h2 className="text-sm font-semibold text-ink">Activos</h2>
         <div className="space-y-2">
           {activos.map((m) => (
-            <div key={m.id} className="rounded-xl border border-gray-100 bg-panel p-4 shadow-sm flex items-center justify-between gap-2">
+            <div key={m.id} className="rounded-xl border border-outline bg-panel p-4 shadow-sm flex items-center justify-between gap-2">
               <div>
                 {m.role === 'athlete' ? (
                   <Link href={`/atletas/${m.id}`} className="text-sm font-medium text-ink underline">
@@ -96,7 +96,7 @@ export default async function PersonasPage() {
           <h2 className="text-sm font-semibold text-ink">Inactivos</h2>
           <div className="space-y-2">
             {inactivos.map((m) => (
-              <div key={m.id} className="rounded-xl border border-gray-100 bg-panel p-4 opacity-60">
+              <div key={m.id} className="rounded-xl border border-outline bg-panel p-4 opacity-60">
                 <p className="text-sm text-ink">{m.name ?? m.email ?? '—'}</p>
                 <p className="text-xs text-status-neutral">{ROLE_LABELS[m.role]}</p>
               </div>

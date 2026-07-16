@@ -38,7 +38,7 @@ export function HealthForm({ gender: _gender }: { gender: string | null }) {
   }
 
   return (
-    <form action={handleSubmit} className="rounded-2xl border border-gray-100 bg-panel p-4 shadow-sm space-y-3">
+    <form action={handleSubmit} className="rounded-2xl border border-outline bg-panel p-4 shadow-sm space-y-3">
       <select name="type" className="input-field" required>
         {TYPE_OPTIONS.map((opt) => (
           <option key={opt.value} value={opt.value}>

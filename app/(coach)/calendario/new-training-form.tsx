@@ -110,7 +110,7 @@ export function NewTrainingForm({
                   placeholder="Buscar atleta…"
                   className="input-field"
                 />
-                <div className="max-h-40 overflow-y-auto mt-1 border border-gray-100 rounded-lg">
+                <div className="max-h-40 overflow-y-auto mt-1 border border-outline rounded-lg">
                   {filteredRoster.slice(0, 30).map((r) => (
                     <button
                       type="button"
@@ -141,7 +141,7 @@ export function NewTrainingForm({
             </div>
           )}
 
-          <div className="pt-3 border-t border-gray-100">
+          <div className="pt-3 border-t border-outline">
             <label className="text-xs text-status-neutral mb-1 block">Ejercicios (opcional — podés agregar más después también)</label>
             <div className="space-y-2">
               {lines.map((line, i) => (

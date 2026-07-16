@@ -17,7 +17,7 @@ export function CheckinForm({ initialEnergia, initialFatiga, alreadySubmitted }:
   }
 
   return (
-    <div className="rounded-2xl border border-gray-100 bg-panel p-5 shadow-sm">
+    <div className="rounded-2xl border border-outline bg-panel p-5 shadow-sm">
       <p className="text-sm font-medium text-ink mb-3">¿Cómo llegás hoy?</p>
 
       <form action={handleSubmit} className="space-y-4">

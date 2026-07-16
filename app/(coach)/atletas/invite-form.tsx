@@ -38,7 +38,7 @@ export function InviteForm({ coaches }: { coaches: CoachOption[] }) {
   }
 
   return (
-    <form action={handleSubmit} className="rounded-xl border border-gray-100 bg-panel p-4 shadow-sm space-y-3 max-w-sm">
+    <form action={handleSubmit} className="rounded-xl border border-outline bg-panel p-4 shadow-sm space-y-3 max-w-sm">
       <input
         name="email"
         type="email"

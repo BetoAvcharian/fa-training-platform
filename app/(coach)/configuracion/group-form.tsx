@@ -32,7 +32,7 @@ export function GroupForm() {
   }
 
   return (
-    <form action={handleSubmit} className="rounded-xl border border-gray-100 bg-panel p-4 shadow-sm space-y-3 max-w-sm">
+    <form action={handleSubmit} className="rounded-xl border border-outline bg-panel p-4 shadow-sm space-y-3 max-w-sm">
       <input
         name="name"
         placeholder="Nombre del grupo (ej: Sub-18 fondo)"

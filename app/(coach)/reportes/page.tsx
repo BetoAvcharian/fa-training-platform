@@ -109,7 +109,7 @@ export default async function ReportesPage({
       <div className="rounded-xl border border-outline bg-panel overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
-            <tr className="border-b border-gray-100 text-left text-xs text-status-neutral">
+            <tr className="border-b border-outline text-left text-xs text-status-neutral">
               <th className="p-2">Fecha</th>
               <th className="p-2">Atleta</th>
               <th className="p-2">Prueba</th>
@@ -119,7 +119,7 @@ export default async function ReportesPage({
           </thead>
           <tbody>
             {rows.slice(0, 100).map((r, i) => (
-              <tr key={i} className="border-b border-gray-50">
+              <tr key={i} className="border-b border-outline">
                 <td className="p-2 text-xs text-status-neutral">{formatDate(r.date)}</td>
                 <td className="p-2 text-ink">{r.athleteName}</td>
                 <td className="p-2 text-ink">{r.observableName}</td>

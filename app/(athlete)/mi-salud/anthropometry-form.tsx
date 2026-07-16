@@ -41,7 +41,7 @@ export function AnthropometryForm({ observables }: { observables: Observable[] }
   }
 
   return (
-    <form action={handleSubmit} className="rounded-2xl border border-gray-100 bg-panel p-4 shadow-sm space-y-3">
+    <form action={handleSubmit} className="rounded-2xl border border-outline bg-panel p-4 shadow-sm space-y-3">
       <select name="observableId" value={observableId} onChange={(e) => setObservableId(e.target.value)} className="input-field" required>
         {observables.map((o) => (
           <option key={o.id} value={o.id}>

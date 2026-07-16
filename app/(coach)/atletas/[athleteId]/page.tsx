@@ -129,7 +129,7 @@ async function ResumenTab({ athleteId, organizationId }: { athleteId: string; or
         <p className="text-sm font-semibold text-ink mb-2">Últimos entrenamientos</p>
         {events.length === 0 && <p className="text-sm text-status-neutral">Sin actividad todavía.</p>}
         {events.map((e) => (
-          <p key={e.id} className="text-sm text-ink py-1 border-b border-gray-50 last:border-0">
+          <p key={e.id} className="text-sm text-ink py-1 border-b border-outline last:border-0">
             {e.date ? formatDate(e.date) : ''} — {e.title}
           </p>
         ))}
@@ -142,7 +142,7 @@ async function ResumenTab({ athleteId, organizationId }: { athleteId: string; or
         {records
           .filter((r) => r.recordType === 'oficial')
           .map((r) => (
-            <p key={r.id} className="text-sm text-ink py-1 border-b border-gray-50 last:border-0">
+            <p key={r.id} className="text-sm text-ink py-1 border-b border-outline last:border-0">
               {r.observableName}: <span className="font-medium">{formatMark(r.value, r.unitSymbol)}</span>
             </p>
           ))}
@@ -166,7 +166,7 @@ async function ResumenTab({ athleteId, organizationId }: { athleteId: string; or
 async function EntrenamientosTab({ athleteId }: { athleteId: string }) {
   const events = await getEventsForAthlete(athleteId, 30)
   return (
-    <div className="rounded-xl border border-outline bg-panel divide-y divide-gray-100">
+    <div className="rounded-xl border border-outline bg-panel divide-y divide-outline">
       {events.length === 0 && <p className="p-4 text-sm text-status-neutral">Sin historial todavía.</p>}
       {events.map((e) => (
         <div key={e.id} className="p-3 flex items-center justify-between text-sm">
@@ -194,14 +194,14 @@ async function ResultadosTab({ athleteId, organizationId }: { athleteId: string;
         {records.length === 0 && <p className="text-sm text-status-neutral">Sin récords todavía.</p>}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
           {records.map((r) => (
-            <div key={r.id} className="text-sm text-ink border border-gray-100 rounded-lg p-2">
+            <div key={r.id} className="text-sm text-ink border border-outline rounded-lg p-2">
               {r.observableName}: <span className="font-medium">{formatMark(r.value, r.unitSymbol)}</span>
               <span className="text-xs text-status-neutral"> ({r.recordType})</span>
             </div>
           ))}
         </div>
       </div>
-      <div className="rounded-xl border border-outline bg-panel divide-y divide-gray-100">
+      <div className="rounded-xl border border-outline bg-panel divide-y divide-outline">
         <p className="p-3 text-sm font-semibold text-ink">Todos los resultados</p>
         {results.length === 0 && <p className="p-4 text-sm text-status-neutral">Sin resultados todavía.</p>}
         {results.map((r) => (
@@ -275,7 +275,7 @@ async function SaludTab({ athleteId, gender }: { athleteId: string; gender: stri
           <p className="text-sm text-status-neutral">Sin episodios activos visibles para vos en este momento.</p>
         )}
         {activos.map((e) => (
-          <div key={e.id} className="text-sm text-ink py-1 border-b border-gray-50 last:border-0">
+          <div key={e.id} className="text-sm text-ink py-1 border-b border-outline last:border-0">
             <span className="text-xs text-gold font-medium">{HEALTH_LABELS[e.type]}</span> — {e.title}
           </div>
         ))}
@@ -285,7 +285,7 @@ async function SaludTab({ athleteId, gender }: { athleteId: string; gender: stri
           <summary className="cursor-pointer px-4 py-3 text-sm font-medium text-ink">Mostrar resueltos ({resueltos.length})</summary>
           <div className="p-4 pt-0">
             {resueltos.map((e) => (
-              <div key={e.id} className="text-sm text-ink py-1 border-b border-gray-50 last:border-0 opacity-60">
+              <div key={e.id} className="text-sm text-ink py-1 border-b border-outline last:border-0 opacity-60">
                 <span className="text-xs text-status-neutral font-medium">{HEALTH_LABELS[e.type]}</span> — {e.title}
               </div>
             ))}
@@ -293,7 +293,7 @@ async function SaludTab({ athleteId, gender }: { athleteId: string; gender: stri
         </details>
       )}
       {anthropometry.length > 0 && (
-        <div className="rounded-xl border border-outline bg-panel divide-y divide-gray-100">
+        <div className="rounded-xl border border-outline bg-panel divide-y divide-outline">
           <p className="p-3 text-sm font-semibold text-ink">Antropometría y signos vitales</p>
           {anthropometry.map((h) => (
             <div key={h.id} className="p-3 flex items-center justify-between text-sm">

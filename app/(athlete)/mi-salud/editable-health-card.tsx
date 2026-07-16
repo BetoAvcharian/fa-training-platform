@@ -41,7 +41,7 @@ export function EditableHealthCard({ episode }: { episode: Episode }) {
 
   if (editing) {
     return (
-      <form action={handleSubmit} className="rounded-2xl border border-gray-100 bg-panel p-4 shadow-sm space-y-2">
+      <form action={handleSubmit} className="rounded-2xl border border-outline bg-panel p-4 shadow-sm space-y-2">
         <input type="hidden" name="id" value={episode.id} />
         <p className="text-xs uppercase tracking-wide text-gold font-semibold">{TYPE_LABELS[episode.type]}</p>
         <input name="title" defaultValue={episode.title} className="input-field" required />
@@ -61,7 +61,7 @@ export function EditableHealthCard({ episode }: { episode: Episode }) {
   }
 
   return (
-    <div className="rounded-2xl border border-gray-100 bg-panel p-4 shadow-sm">
+    <div className="rounded-2xl border border-outline bg-panel p-4 shadow-sm">
       <div className="flex items-start justify-between gap-2">
         <div>
           <p className="text-xs uppercase tracking-wide text-gold font-semibold">{TYPE_LABELS[episode.type]}</p>

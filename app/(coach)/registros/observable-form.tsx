@@ -37,7 +37,7 @@ export function ObservableForm({ sports, units }: { sports: Option[]; units: Opt
   }
 
   return (
-    <form action={handleSubmit} className="rounded-xl border border-gray-100 bg-panel p-4 shadow-sm space-y-3 max-w-sm">
+    <form action={handleSubmit} className="rounded-xl border border-outline bg-panel p-4 shadow-sm space-y-3 max-w-sm">
       <input name="name" placeholder="Nombre (ej: Sentadilla búlgara)" className="input-field" required />
       <select name="sportId" className="input-field" required>
         <option value="">Deporte</option>

@@ -35,7 +35,7 @@ export default async function MisNotificacionesPage() {
       </div>
 
       {notifications.length === 0 && (
-        <div className="rounded-2xl border border-gray-100 bg-panel p-5 shadow-sm text-center text-sm text-status-neutral">
+        <div className="rounded-2xl border border-outline bg-panel p-5 shadow-sm text-center text-sm text-status-neutral">
           Sin notificaciones todavía.
         </div>
       )}
@@ -51,7 +51,7 @@ export default async function MisNotificacionesPage() {
           >
             <button
               type="submit"
-              className={`w-full text-left rounded-2xl border border-gray-100 bg-panel p-4 shadow-sm flex items-start gap-3 ${!n.readAt ? 'bg-gold/5' : ''}`}
+              className={`w-full text-left rounded-2xl border border-outline bg-panel p-4 shadow-sm flex items-start gap-3 ${!n.readAt ? 'bg-gold/5' : ''}`}
             >
               <span className="text-lg shrink-0">{TYPE_ICONS[n.type] ?? '🔔'}</span>
               <div className="flex-1 min-w-0">

@@ -35,14 +35,14 @@ export default async function MisObjetivosPage() {
       <MyObjectiveForm />
 
       {pendientes.length === 0 && (
-        <div className="rounded-2xl border border-gray-100 bg-panel p-4 text-sm text-status-neutral">
+        <div className="rounded-2xl border border-outline bg-panel p-4 text-sm text-status-neutral">
           Sin objetivos cargados todavía.
         </div>
       )}
 
       <div className="space-y-2">
         {pendientes.map((o) => (
-          <div key={o.id} className="rounded-2xl border border-gray-100 bg-panel p-4 shadow-sm flex items-start justify-between gap-2">
+          <div key={o.id} className="rounded-2xl border border-outline bg-panel p-4 shadow-sm flex items-start justify-between gap-2">
             <div>
               <p className="text-xs uppercase tracking-wide text-gold font-semibold">{CATEGORY_LABELS[o.category]}</p>
               <p className="text-sm text-ink mt-0.5">{o.description}</p>
@@ -57,7 +57,7 @@ export default async function MisObjetivosPage() {
         <div className="space-y-2">
           <p className="text-xs text-status-neutral uppercase tracking-wide">Logrados</p>
           {logrados.map((o) => (
-            <div key={o.id} className="rounded-2xl border border-gray-100 bg-panel p-4 opacity-60">
+            <div key={o.id} className="rounded-2xl border border-outline bg-panel p-4 opacity-60">
               <p className="text-sm text-ink">{o.description}</p>
             </div>
           ))}

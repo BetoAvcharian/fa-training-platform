@@ -25,7 +25,7 @@ export default async function RendimientoRosterPage() {
       </div>
 
       {roster.length === 0 && (
-        <div className="rounded-xl border border-gray-100 bg-panel p-5 text-sm text-status-neutral">
+        <div className="rounded-xl border border-outline bg-panel p-5 text-sm text-status-neutral">
           Todavía no hay atletas en tu equipo.
         </div>
       )}
@@ -35,7 +35,7 @@ export default async function RendimientoRosterPage() {
           <Link
             key={entry.id}
             href={`/rendimiento/${entry.id}`}
-            className="rounded-xl border border-gray-100 bg-panel p-4 shadow-sm hover:border-gold/40 transition-colors"
+            className="rounded-xl border border-outline bg-panel p-4 shadow-sm hover:border-gold/40 transition-colors"
           >
             <p className="font-medium text-ink">
               {entry.person ? `${entry.person.firstName} ${entry.person.lastName}` : '—'}

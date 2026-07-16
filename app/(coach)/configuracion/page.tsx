@@ -43,14 +43,14 @@ export default async function ConfiguracionPage() {
         </div>
 
         {groups.length === 0 && (
-          <div className="rounded-xl border border-gray-100 bg-panel p-4 text-sm text-status-neutral">
+          <div className="rounded-xl border border-outline bg-panel p-4 text-sm text-status-neutral">
             Todavía no armaste ningún grupo.
           </div>
         )}
 
         <div className="space-y-2">
           {groupsWithMembers.map(({ group: g, members }) => (
-            <div key={g.id} className="rounded-xl border border-gray-100 bg-panel p-4 shadow-sm space-y-2">
+            <div key={g.id} className="rounded-xl border border-outline bg-panel p-4 shadow-sm space-y-2">
               <p className="font-medium text-ink text-sm">{g.name}</p>
               <GroupMembersEditor groupId={g.id} members={members} roster={roster} />
             </div>

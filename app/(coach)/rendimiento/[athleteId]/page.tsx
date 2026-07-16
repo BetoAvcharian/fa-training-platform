@@ -62,13 +62,13 @@ export default async function AthleteRendimientoPage({
       <section className="space-y-3">
         <h2 className="text-sm font-semibold text-ink">Récords oficiales</h2>
         {oficiales.length === 0 && (
-          <div className="rounded-xl border border-gray-100 bg-panel p-4 text-sm text-status-neutral">
+          <div className="rounded-xl border border-outline bg-panel p-4 text-sm text-status-neutral">
             Sin récords oficiales todavía.
           </div>
         )}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
           {oficiales.map((r) => (
-            <div key={r.id} className="rounded-xl border border-gray-100 bg-panel p-4 shadow-sm flex items-center justify-between">
+            <div key={r.id} className="rounded-xl border border-outline bg-panel p-4 shadow-sm flex items-center justify-between">
               <div>
                 <p className="font-medium text-ink text-sm">{r.observableName}</p>
                 <p className="text-xs text-status-neutral">{formatDate(r.achievedDate)}</p>
@@ -84,11 +84,11 @@ export default async function AthleteRendimientoPage({
       <section className="space-y-3">
         <h2 className="text-sm font-semibold text-ink">Todos los resultados</h2>
         {results.length === 0 && (
-          <div className="rounded-xl border border-gray-100 bg-panel p-4 text-sm text-status-neutral">
+          <div className="rounded-xl border border-outline bg-panel p-4 text-sm text-status-neutral">
             Sin resultados cargados todavía.
           </div>
         )}
-        <div className="rounded-xl border border-gray-100 bg-panel shadow-sm divide-y divide-gray-50">
+        <div className="rounded-xl border border-outline bg-panel shadow-sm divide-y divide-outline">
           {results.map((row) => (
             <EditableRecordRow
               key={row.id}

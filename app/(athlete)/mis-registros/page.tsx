@@ -46,7 +46,7 @@ export default async function MisRegistrosPage() {
 
       <div>
         <p className="text-xs text-status-neutral uppercase tracking-wide mb-2">Últimos registros</p>
-        <div className="rounded-2xl border border-gray-100 bg-panel shadow-sm divide-y divide-gray-50">
+        <div className="rounded-2xl border border-outline bg-panel shadow-sm divide-y divide-outline">
           {recent.length === 0 && <p className="p-4 text-sm text-status-neutral">Todavía no cargaste nada.</p>}
           {recent.map((r) => (
             <EditableRecordRow

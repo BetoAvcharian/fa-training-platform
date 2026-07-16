@@ -122,7 +122,7 @@ export default async function ResumenPage() {
             </Link>
           </div>
           {upcoming.length === 0 && <p className="text-sm text-status-neutral">Sin eventos próximos.</p>}
-          <div className="divide-y divide-gray-100">
+          <div className="divide-y divide-outline">
             {upcoming.map((e) => (
               <div key={e.id} className="py-3 flex items-center justify-between gap-2">
                 <div>

@@ -42,7 +42,7 @@ export default async function AssessmentDetailPage({ params }: { params: Promise
         <div className="rounded-xl border border-outline bg-panel p-4 text-sm text-ink">{row.notes}</div>
       )}
 
-      <div className="rounded-xl border border-outline bg-panel divide-y divide-gray-100">
+      <div className="rounded-xl border border-outline bg-panel divide-y divide-outline">
         <p className="p-3 text-sm font-semibold text-ink">Resultados</p>
         {results.length === 0 && <p className="p-4 text-sm text-status-neutral">Sin resultados cargados.</p>}
         {results.map((r) => (

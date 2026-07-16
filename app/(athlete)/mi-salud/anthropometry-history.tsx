@@ -31,7 +31,7 @@ export function AnthropometryHistory({ history }: { history: Entry[] }) {
 
   if (history.length === 0) {
     return (
-      <div className="rounded-2xl border border-gray-100 bg-panel p-4 text-sm text-status-neutral">
+      <div className="rounded-2xl border border-outline bg-panel p-4 text-sm text-status-neutral">
         Todavía no cargaste nada.
       </div>
     )
@@ -54,7 +54,7 @@ export function AnthropometryHistory({ history }: { history: Entry[] }) {
           ))}
         </div>
       )}
-      <div className="rounded-2xl border border-gray-100 bg-panel shadow-sm divide-y divide-gray-50">
+      <div className="rounded-2xl border border-outline bg-panel shadow-sm divide-y divide-outline">
         {visible.length === 0 && <p className="p-4 text-sm text-status-neutral">Nada para mostrar con este filtro.</p>}
         {visible.map((h) => (
           <div key={h.id} className="p-4 flex items-center justify-between">
