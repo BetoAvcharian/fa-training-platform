@@ -18,9 +18,17 @@ export function EventCard({ event, lines, roster }: { event: Event; lines: Sessi
   const [exceptionFor, setExceptionFor] = useState<string | null>(null)
   const [exceptionError, setExceptionError] = useState<string | null>(null)
 
+  const [addError, setAddError] = useState<string | null>(null)
+  const [addKey, setAddKey] = useState(0)
+
   function handleAdd(formData: FormData) {
     startTransition(async () => {
-      await addSessionLineAction(event.id, sport, formData)
+      const result = await addSessionLineAction(event.id, sport, formData)
+      if (result?.error) setAddError(result.error)
+      else {
+        setAddError(null)
+        setAddKey((k) => k + 1) // fuerza a remontar el input y así se vacía
+      }
     })
   }
 
@@ -110,15 +118,17 @@ export function EventCard({ event, lines, roster }: { event: Event; lines: Sessi
               </select>
               <form action={handleAdd} className="flex-1 flex gap-2">
                 <input
+                  key={addKey}
                   name="rawText"
                   placeholder={sport === 'Atletismo' ? "4x400m 1:15 r2'" : 'Sentadilla 4x8x120kg'}
                   className="flex-1 min-w-0 input-field"
                 />
                 <button type="submit" disabled={pending} className="btn-primary px-4 text-sm">
-                  + Agregar
+                  {pending ? '...' : '+ Agregar'}
                 </button>
               </form>
             </div>
+            {addError && <p className="text-xs text-status-critical mt-1">{addError}</p>}
           </div>
 
           <div className="pt-2 border-t border-gray-100">

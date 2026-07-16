@@ -92,20 +92,19 @@ export async function createExceptionAction(
 
 export async function addSessionLineAction(eventId: string, sport: 'Fuerza' | 'Atletismo', formData: FormData) {
   const membership = await getMyActiveMembership()
-  if (!membership) return
+  if (!membership) return { error: 'No autenticado' }
 
   const rawText = String(formData.get('rawText') ?? '')
-  if (!rawText.trim()) return
+  if (!rawText.trim()) return { error: 'Escribí algo primero' }
 
   try {
     await addSessionLineDomain({ eventId, sportName: sport, rawText })
-  } catch {
-    // se guarda igual sin estructurar por diseño (SmartLine nunca bloquea
-    // la carga) — un error acá sería otra cosa (permisos, conexión); no
-    // rompemos la pantalla por eso, simplemente no se agrega la línea.
+  } catch (e) {
+    return { error: e instanceof DomainError ? e.message : 'No se pudo guardar la línea' }
   }
 
   revalidatePath('/calendario')
+  return { error: null }
 }
 
 /**
