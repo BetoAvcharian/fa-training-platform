@@ -26,7 +26,7 @@ export function CopyWeekForm({ weekStart }: { weekStart: string }) {
 
   if (!open) {
     return (
-      <button onClick={() => setOpen(true)} className="px-3 py-1.5 rounded-md border border-gray-300 text-xs text-ink">
+      <button onClick={() => setOpen(true)} className="px-3 py-1.5 rounded-md border border-outline text-xs text-ink">
         Copiar semana a…
       </button>
     )
@@ -34,7 +34,7 @@ export function CopyWeekForm({ weekStart }: { weekStart: string }) {
 
   return (
     <form action={handleSubmit} className="flex items-center gap-2">
-      <input name="targetWeekStart" type="date" required className="rounded-md border border-gray-300 px-2 py-1 text-xs" />
+      <input name="targetWeekStart" type="date" required className="rounded-md border border-outline bg-panel text-ink px-2 py-1 text-xs" />
       <button type="submit" disabled={pending} className="bg-navy text-white rounded-md px-3 py-1.5 text-xs disabled:opacity-50">
         {pending ? 'Copiando…' : 'Copiar'}
       </button>

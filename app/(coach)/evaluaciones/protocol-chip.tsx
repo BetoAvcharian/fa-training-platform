@@ -8,7 +8,7 @@ export function ProtocolChip({ id, name, deletable }: { id: string; name: string
   const [confirming, setConfirming] = useState(false)
 
   return (
-    <span className="text-xs bg-gray-50 rounded-full px-2 py-1 text-ink flex items-center gap-1.5">
+    <span className="text-xs bg-outline/40 rounded-full px-2 py-1 text-ink flex items-center gap-1.5">
       {name}
       {deletable &&
         (confirming ? (

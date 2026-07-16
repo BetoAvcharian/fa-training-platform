@@ -69,7 +69,7 @@ export function SessionFeedbackForm({
           onChange={(e) => setNotes(e.target.value)}
           placeholder="Contanos qué pasó (opcional)"
           rows={2}
-          className="w-full rounded-lg border border-outline px-3 py-2 text-xs"
+          className="w-full rounded-lg border border-outline bg-panel text-ink px-3 py-2 text-xs"
         />
       )}
       {error && <p className="text-xs text-status-critical">{error}</p>}

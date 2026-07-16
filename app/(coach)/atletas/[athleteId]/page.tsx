@@ -153,7 +153,7 @@ async function ResumenTab({ athleteId, organizationId }: { athleteId: string; or
         <div className="flex flex-wrap gap-2">
           {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
           {(checkins as any[]).map((c, i) => (
-            <span key={i} className="text-xs bg-gray-50 rounded-full px-2 py-1 text-ink">
+            <span key={i} className="text-xs bg-outline/40 rounded-full px-2 py-1 text-ink">
               {formatDate(c.date)} · {c.observables?.name}: <span className="font-medium">{c.value}</span>
             </span>
           ))}

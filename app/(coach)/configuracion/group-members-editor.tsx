@@ -53,7 +53,7 @@ export function GroupMembersEditor({
             startTransition(() => addAthleteToGroupAction(formData))
             e.target.value = ''
           }}
-          className="w-full text-xs rounded-lg border border-outline px-2 py-1.5 mt-1"
+          className="w-full text-xs rounded-lg border border-outline bg-panel text-ink px-2 py-1.5 mt-1"
         >
           <option value="">+ Agregar atleta al grupo</option>
           {available.map((a) => (

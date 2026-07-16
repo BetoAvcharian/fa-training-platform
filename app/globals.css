@@ -3,6 +3,7 @@
 @tailwind utilities;
 
 :root {
+  color-scheme: light;
   --color-ink: 11 30 63; /* navy — texto principal en modo claro */
   --color-surface: 247 244 238; /* cream — fondo de página en modo claro */
   --color-panel: 255 255 255; /* blanco — tarjetas/inputs en modo claro */
@@ -10,6 +11,7 @@
 }
 
 .dark {
+  color-scheme: dark;
   --color-ink: 237 233 224; /* cream tenue — texto principal en modo oscuro */
   --color-surface: 13 20 38; /* navy muy oscuro — fondo de página */
   --color-panel: 20 31 56; /* navy oscuro — tarjetas/inputs */
