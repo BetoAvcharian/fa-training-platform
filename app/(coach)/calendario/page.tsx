@@ -1,4 +1,4 @@
-import { getMyActiveMembership, getRoster, getGroups } from '@/domains/athletes/queries'
+import { getMyActiveMembership, getAthletesForCoach, getRoster, getGroups } from '@/domains/athletes/queries'
 import { getEventsForRange, getSessionExercises } from '@/domains/events/queries'
 import { getTodayDate } from '@/lib/today'
 import { EventCard } from './event-card'
@@ -56,7 +56,7 @@ export default async function CalendarioPage({
 
   const [events, roster, groups] = await Promise.all([
     getEventsForRange(membership.organizationId, weekStartStr, weekEndStr),
-    getRoster(membership.organizationId),
+    (membership.role === 'manager' ? getRoster(membership.organizationId) : getAthletesForCoach(membership.id)),
     getGroups(membership.organizationId),
   ])
 

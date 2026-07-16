@@ -1,7 +1,7 @@
 'use server'
 
 import { revalidatePath } from 'next/cache'
-import { createProtocol, createAssessment } from '@/domains/assessments/mutations'
+import { createProtocol, createAssessment, deleteProtocol } from '@/domains/assessments/mutations'
 import { getMyActiveMembership } from '@/domains/athletes/queries'
 import { DomainError } from '@/types/errors'
 
@@ -56,6 +56,20 @@ export async function createAssessmentAction(formData: FormData) {
     })
   } catch (e) {
     return { error: e instanceof DomainError ? e.message : 'No se pudo guardar' }
+  }
+
+  revalidatePath('/evaluaciones')
+  return { error: null }
+}
+
+export async function deleteProtocolAction(protocolId: string) {
+  const membership = await getMyActiveMembership()
+  if (!membership) return { error: 'No autenticado' }
+
+  try {
+    await deleteProtocol({ protocolId, organizationId: membership.organizationId })
+  } catch (e) {
+    return { error: e instanceof DomainError ? e.message : 'No se pudo eliminar' }
   }
 
   revalidatePath('/evaluaciones')

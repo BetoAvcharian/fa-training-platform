@@ -2,6 +2,8 @@
 
 import { useState, useTransition } from 'react'
 import { completeSessionLineAction } from './actions'
+import { MarkValueInput } from '@/components/ui/mark-value-input'
+import { formatMark } from '@/lib/format-mark'
 import type { SessionExercise } from '@/domains/events/types'
 
 interface Props {
@@ -28,7 +30,7 @@ export function SessionLine({ line, executed }: Props) {
           <p className="text-[11px] text-status-attention mt-0.5">Sin estructurar — tocá para completar igual</p>
         )}
         {executed && (
-          <p className="text-[11px] text-status-positive mt-0.5">✓ Completado — real: {executed.value}</p>
+          <p className="text-[11px] text-status-positive mt-0.5">✓ Completado — real: {formatMark(executed.value, line.unitSymbol)}</p>
         )}
       </div>
 
@@ -40,13 +42,7 @@ export function SessionLine({ line, executed }: Props) {
             </button>
           ) : (
             <form action={handleComplete} className="flex items-center gap-1.5">
-              <input
-                name="actualValue"
-                type="number"
-                step="0.01"
-                placeholder="real (opcional)"
-                className="w-20 rounded border border-gray-300 px-1.5 py-1 text-xs"
-              />
+              <MarkValueInput name="actualValue" unitSymbol={line.unitSymbol} />
               <button type="submit" disabled={pending} className="text-xs bg-navy text-white rounded px-2 py-1 disabled:opacity-50">
                 {pending ? '...' : 'OK'}
               </button>

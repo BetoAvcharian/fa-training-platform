@@ -104,3 +104,27 @@ export async function createAssessment(
 
   return { id: assessment.id }
 }
+
+export async function deleteProtocol(
+  input: { protocolId: string; organizationId: string },
+  client?: AppSupabaseClient
+): Promise<void> {
+  const supabase = client ?? (await createServerClient())
+  const actor = await requireRole(input.organizationId, ['manager', 'coach'], supabase)
+
+  const { error } = await supabase
+    .from('protocols')
+    .delete()
+    .eq('id', input.protocolId)
+    .eq('organization_id', input.organizationId)
+
+  if (error) throw new DomainError('CONFLICT', error.message)
+
+  await logAudit({
+    organizationId: input.organizationId,
+    actorMembershipId: actor.id,
+    action: 'protocol.delete',
+    entityType: 'protocol',
+    entityId: input.protocolId,
+  })
+}

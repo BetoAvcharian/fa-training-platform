@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { getMyActiveMembership, getRoster } from '@/domains/athletes/queries'
+import { getMyActiveMembership, getAthletesForCoach, getRoster } from '@/domains/athletes/queries'
 import { getVideos } from '@/domains/videos/queries'
 import { getAthletesForVideo } from '@/domains/videos/tags'
 import { VideoCard } from '../video-card'
@@ -39,7 +39,7 @@ export default async function VideoCategoryPage({
 
   const [videos, roster] = await Promise.all([
     getVideos(membership.organizationId),
-    getRoster(membership.organizationId),
+    (membership.role === 'manager' ? getRoster(membership.organizationId) : getAthletesForCoach(membership.id)),
   ])
   const canManage = membership.role === 'manager' || membership.role === 'coach'
 

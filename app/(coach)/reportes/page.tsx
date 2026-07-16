@@ -1,4 +1,4 @@
-import { getMyActiveMembership, getRoster, getGroups } from '@/domains/athletes/queries'
+import { getMyActiveMembership, getAthletesForCoach, getRoster, getGroups } from '@/domains/athletes/queries'
 import { getReportData } from '@/domains/reports/queries'
 import { formatMark } from '@/lib/format-mark'
 
@@ -26,7 +26,7 @@ export default async function ReportesPage({
   if (!membership) return null
 
   const [roster, groups] = await Promise.all([
-    getRoster(membership.organizationId),
+    (membership.role === 'manager' ? getRoster(membership.organizationId) : getAthletesForCoach(membership.id)),
     getGroups(membership.organizationId),
   ])
 

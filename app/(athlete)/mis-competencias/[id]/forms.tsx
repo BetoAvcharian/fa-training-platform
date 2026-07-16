@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from 'react'
 import { selfEnrollAction, selfUnenrollAction, recordMyResultAction } from '../actions'
+import { MarkValueInput } from '@/components/ui/mark-value-input'
 
 export function SelfEnrollButton({ eventId, enrolled }: { eventId: string; enrolled: boolean }) {
   const [pending, startTransition] = useTransition()
@@ -69,10 +70,7 @@ export function MyResultForm({ eventId, observables }: { eventId: string; observ
           </option>
         ))}
       </select>
-      <div className="flex items-center gap-1">
-        <input name="value" type="number" step="0.01" placeholder="Valor" className="input-field w-24" required />
-        {selectedUnit && <span className="text-xs text-status-neutral">{selectedUnit}</span>}
-      </div>
+      <MarkValueInput name="value" unitSymbol={selectedUnit} />
       <input name="windMs" type="number" step="0.1" placeholder="Viento" className="input-field w-24" />
       <button type="submit" disabled={pending} className="btn-primary px-4 py-2 text-sm">
         {pending ? 'Guardando…' : ok ? 'Guardado ✓' : 'Cargar mi resultado'}

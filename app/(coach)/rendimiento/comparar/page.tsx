@@ -1,4 +1,4 @@
-import { getMyActiveMembership, getRoster, getGroups, getGroupMembers } from '@/domains/athletes/queries'
+import { getMyActiveMembership, getAthletesForCoach, getRoster, getGroups, getGroupMembers } from '@/domains/athletes/queries'
 import { getObservables } from '@/domains/catalog/queries'
 import { compareAthletes, computeGroupAverage } from '@/domains/performance/queries'
 import { CompareChart } from '../compare-chart'
@@ -31,7 +31,7 @@ export default async function CompararPage({
   if (!membership) return null
 
   const [roster, groups, observables] = await Promise.all([
-    getRoster(membership.organizationId),
+    (membership.role === 'manager' ? getRoster(membership.organizationId) : getAthletesForCoach(membership.id)),
     getGroups(membership.organizationId),
     getObservables(membership.organizationId),
   ])

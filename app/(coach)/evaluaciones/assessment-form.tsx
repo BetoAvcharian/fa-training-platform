@@ -3,6 +3,7 @@
 import { useState, useTransition, useMemo } from 'react'
 import { createAssessmentAction } from './actions'
 import { Modal } from '@/components/ui/modal'
+import { MarkValueInput } from '@/components/ui/mark-value-input'
 
 interface RosterOption {
   id: string
@@ -146,7 +147,7 @@ export function AssessmentForm({
                   {selected.has(o.id) && (
                     <>
                       <input type="hidden" name="observableId" value={o.id} />
-                      <input name="value" type="number" step="0.01" placeholder="Valor" className="w-20 rounded-md border border-gray-200 px-2 py-1 text-xs" />
+                      <MarkValueInput name="value" unitSymbol={o.unitSymbol} />
                     </>
                   )}
                 </div>

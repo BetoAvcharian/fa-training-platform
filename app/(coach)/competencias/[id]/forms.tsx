@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from 'react'
 import { enrollAthleteAction, unenrollAthleteAction, recordResultAction } from '../actions'
+import { MarkValueInput } from '@/components/ui/mark-value-input'
 
 interface RosterOption {
   id: string
@@ -111,10 +112,7 @@ export function ResultForm({
           </option>
         ))}
       </select>
-      <div className="flex items-center gap-1">
-        <input name="value" type="number" step="0.01" placeholder="Valor" className="w-20 rounded-md border border-gray-200 px-2 py-1 text-xs" required />
-        {selectedUnit && <span className="text-[10px] text-status-neutral">{selectedUnit}</span>}
-      </div>
+      <MarkValueInput name="value" unitSymbol={selectedUnit} />
       <input name="windMs" type="number" step="0.1" placeholder="Viento m/s" className="w-24 rounded-md border border-gray-200 px-2 py-1 text-xs" />
       <button type="submit" disabled={pending} className="bg-navy text-white rounded-md px-2 py-1 text-xs disabled:opacity-50">
         Guardar

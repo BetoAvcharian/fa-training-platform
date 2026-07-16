@@ -23,6 +23,7 @@ export type AuditAction =
   | 'session_feedback.create'
   | 'assessment.create'
   | 'protocol.create'
+  | 'protocol.delete'
 
 export interface AuditLogInput {
   organizationId: string
