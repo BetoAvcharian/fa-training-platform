@@ -3,6 +3,8 @@ import { getMyActiveMembership } from '@/domains/athletes/queries'
 import { getAthleteRecords, getAthleteResults } from '@/domains/performance/queries'
 import { createServerClient } from '@/lib/supabase/server'
 import { formatMark } from '@/lib/format-mark'
+import { EditableRecordRow } from '@/components/ui/editable-record-row'
+import { editResultAction, deleteResultAction } from './actions'
 
 export const dynamic = 'force-dynamic'
 
@@ -88,17 +90,16 @@ export default async function AthleteRendimientoPage({
         )}
         <div className="rounded-xl border border-gray-100 bg-white shadow-sm divide-y divide-gray-50">
           {results.map((row) => (
-            <div key={row.id} className="p-4 flex items-center justify-between">
-              <div>
-                <p className="font-medium text-navy text-sm">{row.observableName}</p>
-                <p className="text-xs text-status-neutral">
-                  {formatDate(row.date)} · {SOURCE_LABELS[row.sourceType] ?? row.sourceType}
-                </p>
-              </div>
-              <p className="font-semibold text-navy">
-                {formatMark(row.value, row.unitSymbol)}
-              </p>
-            </div>
+            <EditableRecordRow
+              key={row.id}
+              id={row.id}
+              title={row.observableName}
+              subtitle={`${formatDate(row.date)} · ${SOURCE_LABELS[row.sourceType] ?? row.sourceType}`}
+              value={row.value}
+              unitSymbol={row.unitSymbol}
+              onEdit={editResultAction}
+              onDelete={deleteResultAction}
+            />
           ))}
         </div>
       </section>
