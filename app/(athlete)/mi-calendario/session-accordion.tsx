@@ -18,11 +18,11 @@ export function SessionAccordion({
   const doneCount = lines.filter((l) => l.executed).length
 
   return (
-    <div className="rounded-2xl border border-gray-100 bg-white shadow-sm mb-2 overflow-hidden">
+    <div className="rounded-2xl border border-gray-100 bg-panel shadow-sm mb-2 overflow-hidden">
       <button onClick={() => setOpen(!open)} className="w-full flex items-center justify-between p-4 text-left">
         <div className="flex items-center gap-2 min-w-0">
           <span className="text-base shrink-0">🏃</span>
-          <p className="font-medium text-navy text-sm truncate">{title}</p>
+          <p className="font-medium text-ink text-sm truncate">{title}</p>
         </div>
         <div className="flex items-center gap-2 shrink-0">
           {lines.length > 0 && (

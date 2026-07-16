@@ -36,31 +36,31 @@ export function ProfileEditForm({
 
   if (!editing) {
     return (
-      <div className="rounded-2xl border border-gray-100 bg-white p-4 shadow-sm space-y-3">
+      <div className="rounded-2xl border border-gray-100 bg-panel p-4 shadow-sm space-y-3">
         <div className="flex items-center justify-between">
           <p className="text-xs text-status-neutral uppercase tracking-wide">Datos personales</p>
-          <button onClick={() => setEditing(true)} className="text-xs text-navy underline">
+          <button onClick={() => setEditing(true)} className="text-xs text-ink underline">
             Editar
           </button>
         </div>
         <div>
           <p className="text-xs text-status-neutral">Fecha de nacimiento</p>
-          <p className="text-sm text-navy">{birthDate ?? '—'}</p>
+          <p className="text-sm text-ink">{birthDate ?? '—'}</p>
         </div>
         <div>
           <p className="text-xs text-status-neutral">Género</p>
-          <p className="text-sm text-navy">{gender ? GENDER_LABELS[gender] ?? gender : '—'}</p>
+          <p className="text-sm text-ink">{gender ? GENDER_LABELS[gender] ?? gender : '—'}</p>
         </div>
         <div>
           <p className="text-xs text-status-neutral">Teléfono</p>
-          <p className="text-sm text-navy">{phone ?? '—'}</p>
+          <p className="text-sm text-ink">{phone ?? '—'}</p>
         </div>
       </div>
     )
   }
 
   return (
-    <form action={handleSubmit} className="rounded-2xl border border-gray-100 bg-white p-4 shadow-sm space-y-3">
+    <form action={handleSubmit} className="rounded-2xl border border-gray-100 bg-panel p-4 shadow-sm space-y-3">
       <p className="text-xs text-status-neutral uppercase tracking-wide">Datos personales</p>
       <div>
         <label className="text-xs text-status-neutral">Fecha de nacimiento</label>

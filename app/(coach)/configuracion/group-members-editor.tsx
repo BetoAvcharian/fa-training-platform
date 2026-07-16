@@ -25,7 +25,7 @@ export function GroupMembersEditor({
     <div className="space-y-2">
       {members.map((m) => (
         <div key={m.id} className="flex items-center justify-between text-xs">
-          <span className="text-navy">{m.person ? `${m.person.firstName} ${m.person.lastName}` : '—'}</span>
+          <span className="text-ink">{m.person ? `${m.person.firstName} ${m.person.lastName}` : '—'}</span>
           <button
             disabled={pending}
             onClick={() => {
@@ -53,7 +53,7 @@ export function GroupMembersEditor({
             startTransition(() => addAthleteToGroupAction(formData))
             e.target.value = ''
           }}
-          className="w-full text-xs rounded-lg border border-gray-200 px-2 py-1.5 mt-1"
+          className="w-full text-xs rounded-lg border border-outline px-2 py-1.5 mt-1"
         >
           <option value="">+ Agregar atleta al grupo</option>
           {available.map((a) => (

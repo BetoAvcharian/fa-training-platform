@@ -8,10 +8,10 @@ export default async function LoginPage({
   const params = await searchParams
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-cream px-4">
-      <form action={loginAction} className="w-full max-w-sm bg-white rounded-2xl shadow-sm p-8 space-y-4">
+    <div className="min-h-screen flex items-center justify-center bg-surface px-4">
+      <form action={loginAction} className="w-full max-w-sm bg-panel rounded-2xl shadow-sm p-8 space-y-4">
         <div className="text-center mb-2">
-          <h1 className="font-display text-2xl font-bold text-navy">ENTRENAME</h1>
+          <h1 className="font-display text-2xl font-bold text-ink">ENTRENAME</h1>
           <p className="text-sm text-status-neutral mt-1">Rendimiento para atletismo</p>
         </div>
 
@@ -45,7 +45,7 @@ export default async function LoginPage({
         </button>
 
         <p className="text-center text-xs text-status-neutral">
-          ¿No tenés cuenta? <a href="/signup" className="text-navy underline">Creá una</a>
+          ¿No tenés cuenta? <a href="/signup" className="text-ink underline">Creá una</a>
         </p>
       </form>
     </div>

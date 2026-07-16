@@ -12,7 +12,7 @@ export function CopyJoinCode({ code }: { code: string }) {
         setCopied(true)
         setTimeout(() => setCopied(false), 1500)
       }}
-      className="font-display text-2xl font-bold text-navy tracking-widest"
+      className="font-display text-2xl font-bold text-ink tracking-widest"
       title="Copiar"
     >
       {code} {copied && <span className="text-xs text-status-positive align-middle">copiado</span>}

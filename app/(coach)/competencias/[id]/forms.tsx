@@ -90,7 +90,7 @@ export function ResultForm({
 
   if (!open) {
     return (
-      <button onClick={() => setOpen(true)} className="text-xs text-navy underline">
+      <button onClick={() => setOpen(true)} className="text-xs text-ink underline">
         + Resultado
       </button>
     )
@@ -102,7 +102,7 @@ export function ResultForm({
         name="observableId"
         value={selectedObs}
         onChange={(e) => setSelectedObs(e.target.value)}
-        className="rounded-md border border-gray-200 px-2 py-1 text-xs"
+        className="rounded-md border border-outline px-2 py-1 text-xs"
         required
       >
         <option value="">Prueba</option>
@@ -113,7 +113,7 @@ export function ResultForm({
         ))}
       </select>
       <MarkValueInput name="value" unitSymbol={selectedUnit} />
-      <input name="windMs" type="number" step="0.1" placeholder="Viento m/s" className="w-24 rounded-md border border-gray-200 px-2 py-1 text-xs" />
+      <input name="windMs" type="number" step="0.1" placeholder="Viento m/s" className="w-24 rounded-md border border-outline px-2 py-1 text-xs" />
       <button type="submit" disabled={pending} className="bg-navy text-white rounded-md px-2 py-1 text-xs disabled:opacity-50">
         Guardar
       </button>

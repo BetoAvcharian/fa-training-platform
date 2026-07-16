@@ -30,10 +30,7 @@ export default async function MiSaludPage() {
     <div className="space-y-6">
       <div>
         <p className="text-xs uppercase tracking-wider text-gold font-medium">Salud</p>
-        <h1 className="font-display text-2xl font-bold text-navy">Mi salud</h1>
-        <p className="text-xs text-status-neutral mt-1">
-          Solo vos y tu entrenador pueden ver esto.
-        </p>
+        <h1 className="font-display text-2xl font-bold text-ink">Mi salud</h1>
       </div>
 
       <HealthForm gender={profile?.gender ?? null} />
@@ -41,20 +38,20 @@ export default async function MiSaludPage() {
       {profile?.gender === 'femenino' && (
         <Link
           href="/mi-salud/ciclo"
-          className="flex items-center justify-between rounded-2xl border border-gray-100 bg-white p-4 shadow-sm"
+          className="flex items-center justify-between rounded-2xl border border-gray-100 bg-panel p-4 shadow-sm"
         >
           <div>
-            <p className="font-medium text-navy text-sm">Ciclo menstrual</p>
+            <p className="font-medium text-ink text-sm">Ciclo menstrual</p>
             <p className="text-xs text-status-neutral">Calendario, síntomas y predicción</p>
           </div>
-          <span className="text-navy">→</span>
+          <span className="text-ink">→</span>
         </Link>
       )}
 
       <section className="space-y-3">
-        <h2 className="text-sm font-semibold text-navy">Activos</h2>
+        <h2 className="text-sm font-semibold text-ink">Activos</h2>
         {activos.length === 0 && (
-          <div className="rounded-2xl border border-gray-100 bg-white p-4 text-sm text-status-neutral">
+          <div className="rounded-2xl border border-gray-100 bg-panel p-4 text-sm text-status-neutral">
             Nada activo por ahora.
           </div>
         )}
@@ -66,15 +63,15 @@ export default async function MiSaludPage() {
       </section>
 
       {resueltos.length > 0 && (
-        <details className="rounded-2xl border border-gray-100 bg-white">
-          <summary className="cursor-pointer px-4 py-3 text-sm font-medium text-navy">
+        <details className="rounded-2xl border border-gray-100 bg-panel">
+          <summary className="cursor-pointer px-4 py-3 text-sm font-medium text-ink">
             Mostrar resueltos ({resueltos.length})
           </summary>
           <div className="p-4 pt-0 space-y-2">
             {resueltos.map((e) => (
               <div key={e.id} className="rounded-xl border border-gray-100 p-4 opacity-60">
                 <p className="text-xs uppercase tracking-wide text-status-neutral font-semibold">{e.type}</p>
-                <p className="font-medium text-navy">{e.title}</p>
+                <p className="font-medium text-ink">{e.title}</p>
                 <p className="text-xs text-status-neutral mt-0.5">
                   {formatDate(e.startDate)} — {e.endDate ? formatDate(e.endDate) : ''}
                 </p>
@@ -85,7 +82,7 @@ export default async function MiSaludPage() {
       )}
 
       <section className="space-y-3">
-        <h2 className="text-sm font-semibold text-navy">Antropometría y signos vitales</h2>
+        <h2 className="text-sm font-semibold text-ink">Antropometría y signos vitales</h2>
         <AnthropometryForm observables={observables} />
         <AnthropometryHistory history={history} />
       </section>

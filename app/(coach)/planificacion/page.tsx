@@ -43,17 +43,17 @@ export default async function PlanificacionPage() {
     <div className="space-y-8">
       <div>
         <p className="text-xs uppercase tracking-wider text-gold font-medium">Planificación</p>
-        <h1 className="font-display text-2xl font-bold text-navy">Temporadas y objetivos</h1>
+        <h1 className="font-display text-2xl font-bold text-ink">Temporadas y objetivos</h1>
       </div>
 
       <section className="space-y-3">
         <div className="flex items-center justify-between">
-          <h2 className="text-sm font-semibold text-navy">Árbol de planes</h2>
+          <h2 className="text-sm font-semibold text-ink">Árbol de planes</h2>
           <PlanForm plans={plans.map((p) => ({ id: p.id, title: p.title, type: p.type }))} />
         </div>
 
         {plans.length === 0 && (
-          <div className="rounded-xl border border-gray-100 bg-white p-4 text-sm text-status-neutral">
+          <div className="rounded-xl border border-gray-100 bg-panel p-4 text-sm text-status-neutral">
             Todavía no hay temporadas ni ciclos cargados.
           </div>
         )}
@@ -64,12 +64,12 @@ export default async function PlanificacionPage() {
             .map((root) => (
               <div key={root.id} className="card p-4">
                 <p className="text-xs uppercase tracking-wide text-gold font-semibold">{TYPE_LABELS[root.type]}</p>
-                <p className="font-medium text-navy">{root.title}</p>
+                <p className="font-medium text-ink">{root.title}</p>
                 <div className="mt-2 space-y-1 pl-3 border-l-2 border-gray-100">
                   {plans
                     .filter((p) => p.parentPlanId === root.id)
                     .map((child) => (
-                      <p key={child.id} className="text-sm text-navy">
+                      <p key={child.id} className="text-sm text-ink">
                         <span className="text-xs text-status-neutral">{TYPE_LABELS[child.type]}</span> {child.title}
                       </p>
                     ))}
@@ -81,12 +81,12 @@ export default async function PlanificacionPage() {
 
       <section className="space-y-3">
         <div className="flex items-center justify-between">
-          <h2 className="text-sm font-semibold text-navy">Objetivos</h2>
+          <h2 className="text-sm font-semibold text-ink">Objetivos</h2>
           <ObjectiveForm roster={roster} />
         </div>
 
         {pendientes.length === 0 && (
-          <div className="rounded-xl border border-gray-100 bg-white p-4 text-sm text-status-neutral">
+          <div className="rounded-xl border border-gray-100 bg-panel p-4 text-sm text-status-neutral">
             Sin objetivos pendientes.
           </div>
         )}
@@ -95,13 +95,13 @@ export default async function PlanificacionPage() {
           {pendientes.map((o) => {
             const athlete = rosterById.get(o.athleteMembershipId)
             return (
-              <div key={o.id} className="rounded-xl border border-gray-100 bg-white p-4 shadow-sm flex items-start justify-between gap-2">
+              <div key={o.id} className="rounded-xl border border-gray-100 bg-panel p-4 shadow-sm flex items-start justify-between gap-2">
                 <div>
                   <p className="text-xs uppercase tracking-wide text-gold font-semibold">
                     {CATEGORY_LABELS[o.category]}
                     {athlete?.person ? ` · ${athlete.person.firstName} ${athlete.person.lastName}` : ''}
                   </p>
-                  <p className="text-sm text-navy mt-0.5">{o.description}</p>
+                  <p className="text-sm text-ink mt-0.5">{o.description}</p>
                   {o.targetDate && <p className="text-xs text-status-neutral mt-0.5">Meta: {formatDate(o.targetDate)}</p>}
                 </div>
                 <AchieveButton id={o.id} />
@@ -114,8 +114,8 @@ export default async function PlanificacionPage() {
           <div className="space-y-2 pt-2">
             <p className="text-xs text-status-neutral uppercase tracking-wide">Logrados</p>
             {logrados.map((o) => (
-              <div key={o.id} className="rounded-xl border border-gray-100 bg-white p-4 opacity-60">
-                <p className="text-sm text-navy">{o.description}</p>
+              <div key={o.id} className="rounded-xl border border-gray-100 bg-panel p-4 opacity-60">
+                <p className="text-sm text-ink">{o.description}</p>
               </div>
             ))}
           </div>

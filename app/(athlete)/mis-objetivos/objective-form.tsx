@@ -27,7 +27,7 @@ export function MyObjectiveForm() {
 
   if (!open) {
     return (
-      <button onClick={() => setOpen(true)} className="w-full rounded-2xl border border-dashed border-gray-200 bg-white p-4 text-sm font-medium text-navy">
+      <button onClick={() => setOpen(true)} className="w-full rounded-2xl border border-dashed border-outline bg-panel p-4 text-sm font-medium text-ink">
         + Cargar objetivo
       </button>
     )

@@ -20,8 +20,8 @@ export async function EventCompareCard({ event, roster }: { event: Event; roster
   const rosterById = new Map(roster.map((r) => [r.id, r]))
 
   return (
-    <div className="bg-white border border-gray-200 rounded-lg p-2.5 text-xs space-y-2">
-      <p className="font-medium text-navy truncate">{event.title}</p>
+    <div className="bg-panel border border-outline rounded-lg p-2.5 text-xs space-y-2">
+      <p className="font-medium text-ink truncate">{event.title}</p>
       {athleteIds.length === 0 && <p className="text-[10px] text-status-neutral">Sin asignar</p>}
 
       {athleteIds.map((athleteId) => {
@@ -39,7 +39,7 @@ export async function EventCompareCard({ event, roster }: { event: Event; roster
               )
               return (
                 <div key={line.id} className="flex items-center justify-between gap-2">
-                  <span className="text-navy truncate">{line.rawText}</span>
+                  <span className="text-ink truncate">{line.rawText}</span>
                   <span
                     className={executed ? 'text-status-positive font-medium' : 'text-status-neutral'}
                   >

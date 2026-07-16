@@ -26,7 +26,7 @@ export function CopyWeekForm({ weekStart }: { weekStart: string }) {
 
   if (!open) {
     return (
-      <button onClick={() => setOpen(true)} className="px-3 py-1.5 rounded-md border border-gray-300 text-xs text-navy">
+      <button onClick={() => setOpen(true)} className="px-3 py-1.5 rounded-md border border-gray-300 text-xs text-ink">
         Copiar semana a…
       </button>
     )

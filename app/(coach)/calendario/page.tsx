@@ -71,28 +71,28 @@ export default async function CalendarioPage({
       <div className="flex items-center justify-between mb-6 flex-wrap gap-3">
         <div>
           <p className="text-xs uppercase tracking-wider text-gold font-medium">Calendario</p>
-          <h1 className="font-display text-2xl font-bold text-navy">{mode === 'ver' ? 'Ver' : 'Planificar'}</h1>
+          <h1 className="font-display text-2xl font-bold text-ink">{mode === 'ver' ? 'Ver' : 'Planificar'}</h1>
         </div>
         <div className="flex items-center gap-3 flex-wrap">
-          <div className="flex rounded-lg border border-gray-200 overflow-hidden text-xs">
+          <div className="flex rounded-lg border border-outline overflow-hidden text-xs">
             <a
               href={`?week=${weekStartStr}&mode=planificar`}
-              className={`px-3 py-1.5 ${mode === 'planificar' ? 'bg-navy text-white' : 'bg-white text-navy'}`}
+              className={`px-3 py-1.5 ${mode === 'planificar' ? 'bg-navy text-white' : 'bg-panel text-ink'}`}
             >
               Planificar
             </a>
             <a
               href={`?week=${weekStartStr}&mode=ver`}
-              className={`px-3 py-1.5 ${mode === 'ver' ? 'bg-navy text-white' : 'bg-white text-navy'}`}
+              className={`px-3 py-1.5 ${mode === 'ver' ? 'bg-navy text-white' : 'bg-panel text-ink'}`}
             >
               Ver
             </a>
           </div>
-          <div className="flex rounded-lg border border-gray-200 overflow-hidden text-xs">
+          <div className="flex rounded-lg border border-outline overflow-hidden text-xs">
             <a href={`?week=${weekStartStr}&mode=${mode}&view=semana`} className="px-3 py-1.5 bg-navy text-white">
               Semana
             </a>
-            <a href={`?week=${weekStartStr}&mode=${mode}&view=mes`} className="px-3 py-1.5 bg-white text-navy">
+            <a href={`?week=${weekStartStr}&mode=${mode}&view=mes`} className="px-3 py-1.5 bg-panel text-ink">
               Mes
             </a>
           </div>
@@ -176,13 +176,13 @@ async function MonthView({
       <div className="flex items-center justify-between mb-6 flex-wrap gap-3">
         <div>
           <p className="text-xs uppercase tracking-wider text-gold font-medium">Calendario</p>
-          <h1 className="font-display text-2xl font-bold text-navy">
+          <h1 className="font-display text-2xl font-bold text-ink">
             {MONTH_NAMES[month]} {year}
           </h1>
         </div>
         <div className="flex items-center gap-3 flex-wrap">
-          <div className="flex rounded-lg border border-gray-200 overflow-hidden text-xs">
-            <a href={`?view=semana&mode=${mode}`} className="px-3 py-1.5 bg-white text-navy">
+          <div className="flex rounded-lg border border-outline overflow-hidden text-xs">
+            <a href={`?view=semana&mode=${mode}`} className="px-3 py-1.5 bg-panel text-ink">
               Semana
             </a>
             <a href={`?month=${monthStr}&mode=${mode}&view=mes`} className="px-3 py-1.5 bg-navy text-white">
@@ -213,12 +213,12 @@ async function MonthView({
             <a
               key={i}
               href={`?week=${dayWeekStart}&mode=${mode}&view=semana`}
-              className={`min-h-[80px] rounded-lg border p-1.5 ${inMonth ? 'bg-white border-gray-200' : 'bg-gray-50 border-gray-100'}`}
+              className={`min-h-[80px] rounded-lg border p-1.5 ${inMonth ? 'bg-panel border-outline' : 'bg-gray-50 border-gray-100'}`}
             >
-              <p className={`text-xs ${inMonth ? 'text-navy' : 'text-gray-300'}`}>{day.getDate()}</p>
+              <p className={`text-xs ${inMonth ? 'text-ink' : 'text-gray-300'}`}>{day.getDate()}</p>
               <div className="space-y-0.5 mt-1">
                 {dayEvents.slice(0, 3).map((e) => (
-                  <p key={e.id} className="text-[9px] bg-navy/5 text-navy rounded px-1 py-0.5 truncate">
+                  <p key={e.id} className="text-[9px] bg-navy/5 text-ink rounded px-1 py-0.5 truncate">
                     {e.title}
                   </p>
                 ))}

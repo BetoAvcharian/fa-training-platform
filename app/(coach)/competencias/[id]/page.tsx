@@ -34,10 +34,10 @@ export default async function CompetitionDetailPage({ params }: { params: Promis
   return (
     <div className="space-y-6">
       <div>
-        <Link href="/competencias" className="text-xs text-status-neutral hover:text-navy">
+        <Link href="/competencias" className="text-xs text-status-neutral hover:text-ink">
           ← Volver a competencias
         </Link>
-        <h1 className="font-display text-2xl font-bold text-navy mt-2">{event?.title ?? 'Competencia'}</h1>
+        <h1 className="font-display text-2xl font-bold text-ink mt-2">{event?.title ?? 'Competencia'}</h1>
         {event?.date && (
           <p className="text-xs text-status-neutral">
             {new Date(event.date + 'T00:00:00').toLocaleDateString('es-AR', { day: 'numeric', month: 'long', year: 'numeric' })}
@@ -47,7 +47,7 @@ export default async function CompetitionDetailPage({ params }: { params: Promis
           <p className="text-xs text-status-neutral">
             📍{' '}
             {event.location_map_url ? (
-              <a href={event.location_map_url} target="_blank" rel="noreferrer" className="underline text-navy">
+              <a href={event.location_map_url} target="_blank" rel="noreferrer" className="underline text-ink">
                 {event.location}
               </a>
             ) : (
@@ -57,20 +57,20 @@ export default async function CompetitionDetailPage({ params }: { params: Promis
         )}
       </div>
 
-      <div className="rounded-xl border border-gray-200 bg-white p-4 max-w-sm">
+      <div className="rounded-xl border border-outline bg-panel p-4 max-w-sm">
         <EnrollForm eventId={id} roster={availableRoster} />
       </div>
 
       <div className="space-y-2">
         {entries.length === 0 && (
-          <div className="rounded-xl border border-gray-200 bg-white p-4 text-sm text-status-neutral">
+          <div className="rounded-xl border border-outline bg-panel p-4 text-sm text-status-neutral">
             Sin atletas inscriptos todavía.
           </div>
         )}
         {entries.map((entry) => (
           <div key={entry.athleteMembershipId} className="card p-4">
             <div className="flex items-start justify-between gap-2">
-              <p className="font-medium text-navy text-sm">{entry.athleteName}</p>
+              <p className="font-medium text-ink text-sm">{entry.athleteName}</p>
               <UnenrollButton eventId={id} athleteMembershipId={entry.athleteMembershipId} />
             </div>
 
@@ -78,7 +78,7 @@ export default async function CompetitionDetailPage({ params }: { params: Promis
               <div className="mt-2 space-y-1">
                 {entry.results.map((r) => (
                   <p key={r.id} className="text-xs text-status-neutral">
-                    {r.observableName}: <span className="font-medium text-navy">{formatMark(r.value, r.unitSymbol)}</span>
+                    {r.observableName}: <span className="font-medium text-ink">{formatMark(r.value, r.unitSymbol)}</span>
                     {r.windMs !== null && <span> (viento {r.windMs > 0 ? '+' : ''}{r.windMs} m/s)</span>}
                   </p>
                 ))}

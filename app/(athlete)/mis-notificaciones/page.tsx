@@ -23,11 +23,11 @@ export default async function MisNotificacionesPage() {
       <div className="flex items-start justify-between gap-3">
         <div>
           <p className="text-xs uppercase tracking-wider text-gold font-medium">Notificaciones</p>
-          <h1 className="font-display text-2xl font-bold text-navy">Notificaciones</h1>
+          <h1 className="font-display text-2xl font-bold text-ink">Notificaciones</h1>
         </div>
         {unread.length > 0 && (
           <form action={markAllNotificationsReadAction}>
-            <button type="submit" className="text-xs text-navy underline">
+            <button type="submit" className="text-xs text-ink underline">
               Marcar todas
             </button>
           </form>
@@ -35,7 +35,7 @@ export default async function MisNotificacionesPage() {
       </div>
 
       {notifications.length === 0 && (
-        <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm text-center text-sm text-status-neutral">
+        <div className="rounded-2xl border border-gray-100 bg-panel p-5 shadow-sm text-center text-sm text-status-neutral">
           Sin notificaciones todavía.
         </div>
       )}
@@ -51,11 +51,11 @@ export default async function MisNotificacionesPage() {
           >
             <button
               type="submit"
-              className={`w-full text-left rounded-2xl border border-gray-100 bg-white p-4 shadow-sm flex items-start gap-3 ${!n.readAt ? 'bg-gold/5' : ''}`}
+              className={`w-full text-left rounded-2xl border border-gray-100 bg-panel p-4 shadow-sm flex items-start gap-3 ${!n.readAt ? 'bg-gold/5' : ''}`}
             >
               <span className="text-lg shrink-0">{TYPE_ICONS[n.type] ?? '🔔'}</span>
               <div className="flex-1 min-w-0">
-                <p className={`text-sm ${!n.readAt ? 'font-semibold text-navy' : 'text-navy'}`}>{n.title}</p>
+                <p className={`text-sm ${!n.readAt ? 'font-semibold text-ink' : 'text-ink'}`}>{n.title}</p>
                 {n.body && <p className="text-xs text-status-neutral">{n.body}</p>}
                 <p className="text-[10px] text-status-neutral mt-0.5">{formatDate(n.createdAt)}</p>
               </div>

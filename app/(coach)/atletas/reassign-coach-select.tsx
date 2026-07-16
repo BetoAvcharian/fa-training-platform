@@ -29,7 +29,7 @@ export function ReassignCoachSelect({
         formData.set('newCoachMembershipId', e.target.value)
         startTransition(() => reassignCoachAction(formData))
       }}
-      className="text-xs rounded-lg border border-gray-200 px-2 py-1"
+      className="text-xs rounded-lg border border-outline px-2 py-1"
     >
       <option value="" disabled>
         Sin entrenador

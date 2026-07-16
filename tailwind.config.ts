@@ -6,6 +6,7 @@ import type { Config } from 'tailwindcss'
  * son identidad de marca, no estados.
  */
 const config: Config = {
+  darkMode: 'class',
   content: ['./app/**/*.{ts,tsx}', './components/**/*.{ts,tsx}'],
   theme: {
     extend: {
@@ -13,6 +14,10 @@ const config: Config = {
         navy: '#0B1E3F',
         gold: '#C6A55C',
         cream: '#F7F4EE',
+        ink: 'rgb(var(--color-ink) / <alpha-value>)',
+        surface: 'rgb(var(--color-surface) / <alpha-value>)',
+        panel: 'rgb(var(--color-panel) / <alpha-value>)',
+        outline: 'rgb(var(--color-outline) / <alpha-value>)',
         status: {
           positive: '#2E7D32',
           attention: '#B45309',

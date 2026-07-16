@@ -16,7 +16,7 @@ export default async function SaludRosterPage() {
     <div className="space-y-6">
       <div>
         <p className="text-xs uppercase tracking-wider text-gold font-medium">Salud</p>
-        <h1 className="font-display text-2xl font-bold text-navy">Elegí un atleta</h1>
+        <h1 className="font-display text-2xl font-bold text-ink">Elegí un atleta</h1>
         <p className="text-xs text-status-neutral mt-1">
           Solo vas a ver algo acá si sos el entrenador directo del atleta.
         </p>
@@ -27,9 +27,9 @@ export default async function SaludRosterPage() {
           <Link
             key={entry.id}
             href={`/salud/${entry.id}`}
-            className="rounded-xl border border-gray-100 bg-white p-4 shadow-sm hover:border-gold/40 transition-colors"
+            className="rounded-xl border border-gray-100 bg-panel p-4 shadow-sm hover:border-gold/40 transition-colors"
           >
-            <p className="font-medium text-navy">
+            <p className="font-medium text-ink">
               {entry.person ? `${entry.person.firstName} ${entry.person.lastName}` : '—'}
             </p>
           </Link>

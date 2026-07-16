@@ -28,7 +28,7 @@ export default async function EvaluacionesPage() {
       <div className="flex items-start justify-between gap-3 flex-wrap">
         <div>
           <p className="text-xs uppercase tracking-wider text-gold font-medium">Evaluaciones</p>
-          <h1 className="font-display text-2xl font-bold text-navy">Evaluaciones formales</h1>
+          <h1 className="font-display text-2xl font-bold text-ink">Evaluaciones formales</h1>
         </div>
         <div className="flex items-center gap-3">
           <ProtocolForm observables={observables.map((o) => ({ id: o.id, name: o.name }))} />
@@ -42,7 +42,7 @@ export default async function EvaluacionesPage() {
 
       {protocols.length > 0 && (
         <div className="card p-4">
-          <p className="text-sm font-semibold text-navy mb-2">Protocolos</p>
+          <p className="text-sm font-semibold text-ink mb-2">Protocolos</p>
           <div className="flex flex-wrap gap-2">
             {protocols.map((p) => (
               <ProtocolChip key={p.id} id={p.id} name={p.name} deletable={p.organizationId !== null} />
@@ -53,14 +53,14 @@ export default async function EvaluacionesPage() {
 
       <div className="space-y-2">
         {assessments.length === 0 && (
-          <div className="rounded-xl border border-gray-200 bg-white p-6 text-center text-sm text-status-neutral">
+          <div className="rounded-xl border border-outline bg-panel p-6 text-center text-sm text-status-neutral">
             Sin evaluaciones cargadas todavía.
           </div>
         )}
         {assessments.map((a) => (
-          <Link key={a.id} href={`/evaluaciones/${a.id}`} className="block rounded-xl border border-gray-200 bg-white p-4 hover:border-gold/40">
+          <Link key={a.id} href={`/evaluaciones/${a.id}`} className="block rounded-xl border border-outline bg-panel p-4 hover:border-gold/40">
             <div className="flex items-center justify-between">
-              <p className="font-medium text-navy">{a.title}</p>
+              <p className="font-medium text-ink">{a.title}</p>
               <span className="text-xs text-status-neutral">{formatDate(a.date)}</span>
             </div>
             <p className="text-xs text-status-neutral">{a.athleteName}{a.protocolName ? ` · ${a.protocolName}` : ''}</p>

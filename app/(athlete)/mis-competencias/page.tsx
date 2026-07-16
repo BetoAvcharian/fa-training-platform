@@ -24,18 +24,18 @@ export default async function CompetenciasPage() {
     <div className="space-y-6">
       <div>
         <p className="text-xs uppercase tracking-wider text-gold font-medium">Competencias</p>
-        <h1 className="font-display text-2xl font-bold text-navy">Competencias</h1>
+        <h1 className="font-display text-2xl font-bold text-ink">Competencias</h1>
       </div>
 
       <CompetitionForm />
 
       <section className="space-y-2">
-        <h2 className="text-sm font-semibold text-navy">Próximas</h2>
+        <h2 className="text-sm font-semibold text-ink">Próximas</h2>
         {upcoming.length === 0 && <p className="text-sm text-status-neutral">Ninguna cargada.</p>}
         <div className="space-y-2">
           {upcoming.map((c) => (
             <Link key={c.id} href={`/mis-competencias/${c.id}`} className="block card p-4">
-              <p className="font-medium text-navy">{c.title}</p>
+              <p className="font-medium text-ink">{c.title}</p>
               <p className="text-xs text-status-neutral">
                 {formatDate(c.date)}
                 {c.location ? ` · ${c.location}` : ''}
@@ -47,11 +47,11 @@ export default async function CompetenciasPage() {
 
       {past.length > 0 && (
         <section className="space-y-2">
-          <h2 className="text-sm font-semibold text-navy">Pasadas</h2>
+          <h2 className="text-sm font-semibold text-ink">Pasadas</h2>
           <div className="space-y-2">
             {past.map((c) => (
               <Link key={c.id} href={`/mis-competencias/${c.id}`} className="block card p-4 opacity-70">
-                <p className="font-medium text-navy">{c.title}</p>
+                <p className="font-medium text-ink">{c.title}</p>
                 <p className="text-xs text-status-neutral">{formatDate(c.date)}</p>
               </Link>
             ))}

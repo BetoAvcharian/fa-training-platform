@@ -52,28 +52,28 @@ export default async function AthleteRendimientoPage({
   return (
     <div className="space-y-6">
       <div>
-        <Link href="/rendimiento" className="text-xs text-status-neutral hover:text-navy">
+        <Link href="/rendimiento" className="text-xs text-status-neutral hover:text-ink">
           ← Volver a atletas
         </Link>
         <p className="text-xs uppercase tracking-wider text-gold font-medium mt-2">Rendimiento</p>
-        <h1 className="font-display text-2xl font-bold text-navy">{athleteName}</h1>
+        <h1 className="font-display text-2xl font-bold text-ink">{athleteName}</h1>
       </div>
 
       <section className="space-y-3">
-        <h2 className="text-sm font-semibold text-navy">Récords oficiales</h2>
+        <h2 className="text-sm font-semibold text-ink">Récords oficiales</h2>
         {oficiales.length === 0 && (
-          <div className="rounded-xl border border-gray-100 bg-white p-4 text-sm text-status-neutral">
+          <div className="rounded-xl border border-gray-100 bg-panel p-4 text-sm text-status-neutral">
             Sin récords oficiales todavía.
           </div>
         )}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
           {oficiales.map((r) => (
-            <div key={r.id} className="rounded-xl border border-gray-100 bg-white p-4 shadow-sm flex items-center justify-between">
+            <div key={r.id} className="rounded-xl border border-gray-100 bg-panel p-4 shadow-sm flex items-center justify-between">
               <div>
-                <p className="font-medium text-navy text-sm">{r.observableName}</p>
+                <p className="font-medium text-ink text-sm">{r.observableName}</p>
                 <p className="text-xs text-status-neutral">{formatDate(r.achievedDate)}</p>
               </div>
-              <p className="font-display font-bold text-navy">
+              <p className="font-display font-bold text-ink">
                 {formatMark(r.value, r.unitSymbol)}
               </p>
             </div>
@@ -82,13 +82,13 @@ export default async function AthleteRendimientoPage({
       </section>
 
       <section className="space-y-3">
-        <h2 className="text-sm font-semibold text-navy">Todos los resultados</h2>
+        <h2 className="text-sm font-semibold text-ink">Todos los resultados</h2>
         {results.length === 0 && (
-          <div className="rounded-xl border border-gray-100 bg-white p-4 text-sm text-status-neutral">
+          <div className="rounded-xl border border-gray-100 bg-panel p-4 text-sm text-status-neutral">
             Sin resultados cargados todavía.
           </div>
         )}
-        <div className="rounded-xl border border-gray-100 bg-white shadow-sm divide-y divide-gray-50">
+        <div className="rounded-xl border border-gray-100 bg-panel shadow-sm divide-y divide-gray-50">
           {results.map((row) => (
             <EditableRecordRow
               key={row.id}

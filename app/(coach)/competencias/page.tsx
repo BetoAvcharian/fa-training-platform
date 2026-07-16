@@ -25,18 +25,18 @@ export default async function CompetenciasPage() {
       <div className="flex items-start justify-between gap-3 flex-wrap">
         <div>
           <p className="text-xs uppercase tracking-wider text-gold font-medium">Competencias</p>
-          <h1 className="font-display text-2xl font-bold text-navy">Competencias</h1>
+          <h1 className="font-display text-2xl font-bold text-ink">Competencias</h1>
         </div>
         <CompetitionForm />
       </div>
 
       <section className="space-y-2">
-        <h2 className="text-sm font-semibold text-navy">Próximas</h2>
+        <h2 className="text-sm font-semibold text-ink">Próximas</h2>
         {upcoming.length === 0 && <p className="text-sm text-status-neutral">Ninguna cargada.</p>}
         <div className="space-y-2">
           {upcoming.map((c) => (
-            <Link key={c.id} href={`/competencias/${c.id}`} className="block rounded-xl border border-gray-200 bg-white p-4 hover:border-gold/40">
-              <p className="font-medium text-navy">{c.title}</p>
+            <Link key={c.id} href={`/competencias/${c.id}`} className="block rounded-xl border border-outline bg-panel p-4 hover:border-gold/40">
+              <p className="font-medium text-ink">{c.title}</p>
               <p className="text-xs text-status-neutral">{formatDate(c.date)}{c.location ? ` · ${c.location}` : ''}</p>
             </Link>
           ))}
@@ -45,11 +45,11 @@ export default async function CompetenciasPage() {
 
       {past.length > 0 && (
         <section className="space-y-2">
-          <h2 className="text-sm font-semibold text-navy">Pasadas</h2>
+          <h2 className="text-sm font-semibold text-ink">Pasadas</h2>
           <div className="space-y-2">
             {past.map((c) => (
-              <Link key={c.id} href={`/competencias/${c.id}`} className="block rounded-xl border border-gray-200 bg-white p-4 opacity-70 hover:opacity-100">
-                <p className="font-medium text-navy">{c.title}</p>
+              <Link key={c.id} href={`/competencias/${c.id}`} className="block rounded-xl border border-outline bg-panel p-4 opacity-70 hover:opacity-100">
+                <p className="font-medium text-ink">{c.title}</p>
                 <p className="text-xs text-status-neutral">{formatDate(c.date)}{c.location ? ` · ${c.location}` : ''}</p>
               </Link>
             ))}

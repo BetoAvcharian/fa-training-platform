@@ -4,6 +4,7 @@ import { getUnreadCount } from '@/domains/notifications/queries'
 import { redirect } from 'next/navigation'
 import { createServerClient } from '@/lib/supabase/server'
 import { Logo } from '@/components/logo'
+import { ThemeToggle } from '@/components/ui/theme-toggle'
 import { SideDrawer } from './side-drawer'
 
 // Rediseño (feedback del usuario: la barra de 6 ítems abajo se veía
@@ -39,14 +40,15 @@ export default async function AthleteLayout({ children }: { children: React.Reac
   const unreadCount = await getUnreadCount()
 
   return (
-    <div className="min-h-screen bg-cream pb-24">
+    <div className="min-h-screen bg-surface pb-24">
       <header className="px-5 pt-5 pb-3 flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Logo className="w-7 h-7" />
-          <p className="font-display font-bold text-navy tracking-wide">ENTRENAME</p>
+          <p className="font-display font-bold text-ink tracking-wide">ENTRENAME</p>
         </div>
         <div className="flex items-center gap-3">
-          <Link href="/mis-notificaciones" className="relative text-navy">
+          <ThemeToggle />
+          <Link href="/mis-notificaciones" className="relative text-ink">
             🔔
             {unreadCount > 0 && (
               <span className="absolute -top-1 -right-1 bg-gold text-navy text-[9px] font-bold rounded-full w-4 h-4 flex items-center justify-center">
@@ -70,7 +72,7 @@ export default async function AthleteLayout({ children }: { children: React.Reac
           <Link
             key={item.href}
             href={item.href}
-            className="flex flex-col items-center justify-center w-16 h-12 rounded-full text-white/90 hover:bg-white/10 transition-colors"
+            className="flex flex-col items-center justify-center w-16 h-12 rounded-full text-white/90 hover:bg-panel/10 transition-colors"
           >
             <span className="text-base leading-none">{item.icon}</span>
             <span className="text-[9px] mt-0.5">{item.label}</span>

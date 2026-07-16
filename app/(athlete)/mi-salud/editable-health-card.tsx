@@ -41,7 +41,7 @@ export function EditableHealthCard({ episode }: { episode: Episode }) {
 
   if (editing) {
     return (
-      <form action={handleSubmit} className="rounded-2xl border border-gray-100 bg-white p-4 shadow-sm space-y-2">
+      <form action={handleSubmit} className="rounded-2xl border border-gray-100 bg-panel p-4 shadow-sm space-y-2">
         <input type="hidden" name="id" value={episode.id} />
         <p className="text-xs uppercase tracking-wide text-gold font-semibold">{TYPE_LABELS[episode.type]}</p>
         <input name="title" defaultValue={episode.title} className="input-field" required />
@@ -61,16 +61,16 @@ export function EditableHealthCard({ episode }: { episode: Episode }) {
   }
 
   return (
-    <div className="rounded-2xl border border-gray-100 bg-white p-4 shadow-sm">
+    <div className="rounded-2xl border border-gray-100 bg-panel p-4 shadow-sm">
       <div className="flex items-start justify-between gap-2">
         <div>
           <p className="text-xs uppercase tracking-wide text-gold font-semibold">{TYPE_LABELS[episode.type]}</p>
-          <p className="font-medium text-navy">{episode.title}</p>
+          <p className="font-medium text-ink">{episode.title}</p>
           <p className="text-xs text-status-neutral mt-0.5">Desde {formatDate(episode.startDate)}</p>
-          {episode.notes && <p className="text-sm text-navy mt-2">{episode.notes}</p>}
+          {episode.notes && <p className="text-sm text-ink mt-2">{episode.notes}</p>}
         </div>
         <div className="flex flex-col items-end gap-1 shrink-0">
-          <button onClick={() => setEditing(true)} className="text-xs text-navy underline">
+          <button onClick={() => setEditing(true)} className="text-xs text-ink underline">
             Editar
           </button>
           <ResolveButton id={episode.id} />

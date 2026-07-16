@@ -29,7 +29,7 @@ export function ObservableForm({ sports, units }: { sports: Option[]; units: Opt
     return (
       <button
         onClick={() => setOpen(true)}
-        className="rounded-lg border border-dashed border-gray-200 bg-white px-4 py-2 text-sm font-medium text-navy"
+        className="rounded-lg border border-dashed border-outline bg-panel px-4 py-2 text-sm font-medium text-ink"
       >
         + Nuevo ejercicio/prueba
       </button>
@@ -37,7 +37,7 @@ export function ObservableForm({ sports, units }: { sports: Option[]; units: Opt
   }
 
   return (
-    <form action={handleSubmit} className="rounded-xl border border-gray-100 bg-white p-4 shadow-sm space-y-3 max-w-sm">
+    <form action={handleSubmit} className="rounded-xl border border-gray-100 bg-panel p-4 shadow-sm space-y-3 max-w-sm">
       <input name="name" placeholder="Nombre (ej: Sentadilla búlgara)" className="input-field" required />
       <select name="sportId" className="input-field" required>
         <option value="">Deporte</option>
@@ -55,7 +55,7 @@ export function ObservableForm({ sports, units }: { sports: Option[]; units: Opt
           </option>
         ))}
       </select>
-      <label className="flex items-center gap-2 text-sm text-navy">
+      <label className="flex items-center gap-2 text-sm text-ink">
         <input type="checkbox" name="isPerformance" />
         Puede generar récord
       </label>

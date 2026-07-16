@@ -27,7 +27,7 @@ export default async function PerfilPage() {
     <div className="space-y-6">
       <div>
         <p className="text-xs uppercase tracking-wider text-gold font-medium">Perfil</p>
-        <h1 className="font-display text-2xl font-bold text-navy">
+        <h1 className="font-display text-2xl font-bold text-ink">
           {profile.firstName} {profile.lastName}
         </h1>
       </div>
@@ -37,34 +37,34 @@ export default async function PerfilPage() {
         initials={`${profile.firstName[0] ?? ''}${profile.lastName[0] ?? ''}`}
       />
 
-      <div className="rounded-2xl border border-gray-100 bg-white p-4 shadow-sm space-y-3">
+      <div className="rounded-2xl border border-gray-100 bg-panel p-4 shadow-sm space-y-3">
         <div>
           <p className="text-xs text-status-neutral">Email</p>
-          <p className="text-sm text-navy">{profile.email}</p>
+          <p className="text-sm text-ink">{profile.email}</p>
         </div>
         <div>
           <p className="text-xs text-status-neutral">Rol</p>
-          <p className="text-sm text-navy">{ROLE_LABELS[profile.role] ?? profile.role}</p>
+          <p className="text-sm text-ink">{ROLE_LABELS[profile.role] ?? profile.role}</p>
         </div>
         <div>
           <p className="text-xs text-status-neutral">Organización</p>
-          <p className="text-sm text-navy">{profile.organizationName}</p>
+          <p className="text-sm text-ink">{profile.organizationName}</p>
         </div>
         {profile.coachName && (
           <div>
             <p className="text-xs text-status-neutral">Entrenador</p>
-            <p className="text-sm text-navy">{profile.coachName}</p>
+            <p className="text-sm text-ink">{profile.coachName}</p>
           </div>
         )}
       </div>
 
       <ProfileEditForm birthDate={profile.birthDate} gender={profile.gender} phone={profile.phone} />
 
-      <a href="/mis-objetivos" className="block rounded-2xl border border-gray-100 bg-white p-4 shadow-sm text-sm text-navy">
+      <a href="/mis-objetivos" className="block rounded-2xl border border-gray-100 bg-panel p-4 shadow-sm text-sm text-ink">
         Mis objetivos →
       </a>
 
-      <form action={signOutAction} className="rounded-2xl border border-gray-100 bg-white p-2 shadow-sm">
+      <form action={signOutAction} className="rounded-2xl border border-gray-100 bg-panel p-2 shadow-sm">
         <button type="submit" className="w-full text-left px-3 py-2.5 rounded-lg text-status-critical text-sm">
           Cerrar sesión
         </button>

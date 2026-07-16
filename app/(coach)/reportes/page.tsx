@@ -47,13 +47,13 @@ export default async function ReportesPage({
     <div className="space-y-6">
       <div>
         <p className="text-xs uppercase tracking-wider text-gold font-medium">Reportes</p>
-        <h1 className="font-display text-2xl font-bold text-navy">Reportes y exportación</h1>
+        <h1 className="font-display text-2xl font-bold text-ink">Reportes y exportación</h1>
       </div>
 
-      <form className="rounded-xl border border-gray-200 bg-white p-4 grid grid-cols-2 sm:grid-cols-3 gap-2 items-end">
+      <form className="rounded-xl border border-outline bg-panel p-4 grid grid-cols-2 sm:grid-cols-3 gap-2 items-end">
         <div>
           <label className="text-xs text-status-neutral block mb-1">Atleta</label>
-          <select name="atleta" defaultValue={params.atleta ?? ''} className="w-full rounded-lg border border-gray-200 px-2 py-1.5 text-sm">
+          <select name="atleta" defaultValue={params.atleta ?? ''} className="w-full rounded-lg border border-outline px-2 py-1.5 text-sm">
             <option value="">Todos</option>
             {roster.map((r) => (
               <option key={r.id} value={r.id}>
@@ -65,7 +65,7 @@ export default async function ReportesPage({
         {groups.length > 0 && (
           <div>
             <label className="text-xs text-status-neutral block mb-1">Grupo</label>
-            <select name="grupo" defaultValue={params.grupo ?? ''} className="w-full rounded-lg border border-gray-200 px-2 py-1.5 text-sm">
+            <select name="grupo" defaultValue={params.grupo ?? ''} className="w-full rounded-lg border border-outline px-2 py-1.5 text-sm">
               <option value="">Todos</option>
               {groups.map((g) => (
                 <option key={g.id} value={g.id}>
@@ -77,7 +77,7 @@ export default async function ReportesPage({
         )}
         <div>
           <label className="text-xs text-status-neutral block mb-1">Origen</label>
-          <select name="origen" defaultValue={params.origen ?? ''} className="w-full rounded-lg border border-gray-200 px-2 py-1.5 text-sm">
+          <select name="origen" defaultValue={params.origen ?? ''} className="w-full rounded-lg border border-outline px-2 py-1.5 text-sm">
             <option value="">Todos</option>
             {Object.entries(SOURCE_LABELS).map(([value, label]) => (
               <option key={value} value={value}>
@@ -88,11 +88,11 @@ export default async function ReportesPage({
         </div>
         <div>
           <label className="text-xs text-status-neutral block mb-1">Desde</label>
-          <input type="date" name="desde" defaultValue={params.desde ?? ''} className="w-full rounded-lg border border-gray-200 px-2 py-1.5 text-sm" />
+          <input type="date" name="desde" defaultValue={params.desde ?? ''} className="w-full rounded-lg border border-outline px-2 py-1.5 text-sm" />
         </div>
         <div>
           <label className="text-xs text-status-neutral block mb-1">Hasta</label>
-          <input type="date" name="hasta" defaultValue={params.hasta ?? ''} className="w-full rounded-lg border border-gray-200 px-2 py-1.5 text-sm" />
+          <input type="date" name="hasta" defaultValue={params.hasta ?? ''} className="w-full rounded-lg border border-outline px-2 py-1.5 text-sm" />
         </div>
         <button type="submit" className="btn-primary px-4 py-1.5 text-sm h-fit">
           Filtrar
@@ -106,7 +106,7 @@ export default async function ReportesPage({
         </a>
       </div>
 
-      <div className="rounded-xl border border-gray-200 bg-white overflow-x-auto">
+      <div className="rounded-xl border border-outline bg-panel overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-gray-100 text-left text-xs text-status-neutral">
@@ -121,9 +121,9 @@ export default async function ReportesPage({
             {rows.slice(0, 100).map((r, i) => (
               <tr key={i} className="border-b border-gray-50">
                 <td className="p-2 text-xs text-status-neutral">{formatDate(r.date)}</td>
-                <td className="p-2 text-navy">{r.athleteName}</td>
-                <td className="p-2 text-navy">{r.observableName}</td>
-                <td className="p-2 font-medium text-navy">
+                <td className="p-2 text-ink">{r.athleteName}</td>
+                <td className="p-2 text-ink">{r.observableName}</td>
+                <td className="p-2 font-medium text-ink">
                   {formatMark(r.value, r.unitSymbol)}
                 </td>
                 <td className="p-2 text-xs text-status-neutral">{SOURCE_LABELS[r.sourceType] ?? r.sourceType}</td>

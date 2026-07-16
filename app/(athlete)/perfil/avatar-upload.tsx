@@ -55,7 +55,7 @@ export function AvatarUpload({ initialUrl, initials }: { initialUrl: string | nu
           // eslint-disable-next-line @next/next/no-img-element
           <img src={url} alt="Foto de perfil" className="w-full h-full object-cover" />
         ) : (
-          <span className="text-navy font-display font-bold text-lg">{initials}</span>
+          <span className="text-ink font-display font-bold text-lg">{initials}</span>
         )}
       </div>
       <label className="btn-secondary px-3 py-1.5 text-xs cursor-pointer">

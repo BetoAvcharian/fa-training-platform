@@ -29,7 +29,7 @@ export default async function MisVideosCategoryPage({
   if (!CATEGORY_LABELS[category]) {
     return (
       <div className="space-y-4">
-        <Link href="/mis-videos" className="text-xs text-status-neutral hover:text-navy">
+        <Link href="/mis-videos" className="text-xs text-status-neutral hover:text-ink">
           ← Volver
         </Link>
         <p className="text-sm text-status-neutral">Categoría no encontrada.</p>
@@ -58,13 +58,13 @@ export default async function MisVideosCategoryPage({
   return (
     <div className="space-y-4">
       <div>
-        <Link href="/mis-videos" className="text-xs text-status-neutral hover:text-navy">
+        <Link href="/mis-videos" className="text-xs text-status-neutral hover:text-ink">
           ← Volver a categorías
         </Link>
-        <h1 className="font-display text-2xl font-bold text-navy mt-1">{CATEGORY_LABELS[category]}</h1>
+        <h1 className="font-display text-2xl font-bold text-ink mt-1">{CATEGORY_LABELS[category]}</h1>
       </div>
 
-      <Link href="/mis-videos" className="text-xs text-navy underline">
+      <Link href="/mis-videos" className="text-xs text-ink underline">
         + Subir video
       </Link>
 
@@ -74,7 +74,7 @@ export default async function MisVideosCategoryPage({
           name="q"
           defaultValue={sParams.q ?? ''}
           placeholder="Buscar por título o descripción…"
-          className="flex-1 rounded-lg border border-gray-200 px-3 py-1.5 text-sm"
+          className="flex-1 rounded-lg border border-outline px-3 py-1.5 text-sm"
         />
         {sParams.mios === '1' && <input type="hidden" name="mios" value="1" />}
         <button type="submit" className="btn-primary px-4 py-1.5 text-sm">
@@ -85,14 +85,14 @@ export default async function MisVideosCategoryPage({
       <a
         href={`?mios=${sParams.mios === '1' ? '' : '1'}`}
         className={`inline-block rounded-full px-4 py-1.5 text-xs font-medium ${
-          sParams.mios === '1' ? 'bg-navy text-white' : 'bg-white border border-gray-200 text-navy'
+          sParams.mios === '1' ? 'bg-navy text-white' : 'bg-panel border border-outline text-ink'
         }`}
       >
         {sParams.mios === '1' ? '✓ Solo donde estoy etiquetado' : 'Solo donde estoy etiquetado'}
       </a>
 
       {visible.length === 0 && (
-        <div className="rounded-2xl border border-gray-100 bg-white p-6 text-center text-sm text-status-neutral">
+        <div className="rounded-2xl border border-gray-100 bg-panel p-6 text-center text-sm text-status-neutral">
           No hay videos acá todavía.
         </div>
       )}

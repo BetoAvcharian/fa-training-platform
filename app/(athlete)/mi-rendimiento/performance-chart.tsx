@@ -45,7 +45,7 @@ export function MyPerformanceChart({ results }: { results: ResultPoint[] }) {
             key={name}
             onClick={() => toggle(name)}
             className={`text-xs rounded-full px-3 py-1 border ${
-              selected.has(name) ? 'bg-navy text-white border-navy' : 'bg-white text-status-neutral border-gray-200'
+              selected.has(name) ? 'bg-navy text-white border-navy' : 'bg-panel text-status-neutral border-outline'
             }`}
           >
             {name}

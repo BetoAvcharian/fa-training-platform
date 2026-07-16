@@ -2,9 +2,23 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --color-ink: 11 30 63; /* navy — texto principal en modo claro */
+  --color-surface: 247 244 238; /* cream — fondo de página en modo claro */
+  --color-panel: 255 255 255; /* blanco — tarjetas/inputs en modo claro */
+  --color-outline: 229 231 235; /* gray-200 */
+}
+
+.dark {
+  --color-ink: 237 233 224; /* cream tenue — texto principal en modo oscuro */
+  --color-surface: 13 20 38; /* navy muy oscuro — fondo de página */
+  --color-panel: 20 31 56; /* navy oscuro — tarjetas/inputs */
+  --color-outline: 40 54 87; /* navy medio, para bordes sutiles */
+}
+
 body {
-  background-color: #f7f4ee;
-  color: #0b1e3f;
+  @apply bg-surface text-ink;
+  transition: background-color 200ms ease, color 200ms ease;
 }
 
 /* Sistema de componentes compartidos — Fase de diseño. Reemplaza los
@@ -24,7 +38,7 @@ body {
   input:focus-visible,
   select:focus-visible,
   textarea:focus-visible {
-    @apply outline-none ring-2 ring-gold/50 ring-offset-1 ring-offset-cream;
+    @apply outline-none ring-2 ring-gold/50 ring-offset-1 ring-offset-surface;
   }
 
   .btn-primary {
@@ -36,7 +50,7 @@ body {
   }
 
   .btn-secondary {
-    @apply bg-white text-navy border border-gray-200 rounded-lg font-medium
+    @apply bg-panel text-ink border border-outline rounded-lg font-medium
       hover:border-gold/50 hover:bg-gold/5
       active:scale-[0.98]
       disabled:opacity-50 disabled:pointer-events-none
@@ -50,13 +64,13 @@ body {
   }
 
   .input-field {
-    @apply w-full rounded-lg border border-gray-200 px-3 py-2 text-sm bg-white
+    @apply w-full rounded-lg border border-outline px-3 py-2 text-sm bg-panel text-ink
       focus:border-gold/60 focus:ring-2 focus:ring-gold/20 outline-none
       transition-all duration-150;
   }
 
   .card {
-    @apply rounded-xl border border-gray-200 bg-white shadow-sm;
+    @apply rounded-xl border border-outline bg-panel shadow-sm;
   }
 
   .card-hover {

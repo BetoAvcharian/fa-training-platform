@@ -81,10 +81,10 @@ export default async function CompararPage({
     <div className="space-y-6">
       <div>
         <p className="text-xs uppercase tracking-wider text-gold font-medium">Rendimiento</p>
-        <h1 className="font-display text-2xl font-bold text-navy">Comparar atletas / grupo</h1>
+        <h1 className="font-display text-2xl font-bold text-ink">Comparar atletas / grupo</h1>
       </div>
 
-      <form action={compareAction} className="rounded-xl border border-gray-200 bg-white p-4 space-y-3 max-w-lg">
+      <form action={compareAction} className="rounded-xl border border-outline bg-panel p-4 space-y-3 max-w-lg">
         <select name="observableId" defaultValue={params.observableId ?? ''} required className="input-field">
           <option value="">Prueba/ejercicio</option>
           {performanceObservables.map((o) => (
@@ -134,7 +134,7 @@ export default async function CompararPage({
           </div>
         </div>
 
-        <label className="flex items-center gap-2 text-xs text-navy">
+        <label className="flex items-center gap-2 text-xs text-ink">
           <input type="checkbox" name="soloOficiales" value="1" defaultChecked={params.oficiales === '1'} />
           Solo resultados oficiales
         </label>

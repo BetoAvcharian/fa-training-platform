@@ -36,7 +36,7 @@ export function ObjectiveForm({ roster }: { roster: RosterOption[] }) {
     return (
       <button
         onClick={() => setOpen(true)}
-        className="rounded-lg border border-dashed border-gray-200 bg-white px-4 py-2 text-sm font-medium text-navy"
+        className="rounded-lg border border-dashed border-outline bg-panel px-4 py-2 text-sm font-medium text-ink"
       >
         + Nuevo objetivo
       </button>
@@ -44,7 +44,7 @@ export function ObjectiveForm({ roster }: { roster: RosterOption[] }) {
   }
 
   return (
-    <form action={handleSubmit} className="rounded-xl border border-gray-100 bg-white p-4 shadow-sm space-y-3 max-w-md">
+    <form action={handleSubmit} className="rounded-xl border border-gray-100 bg-panel p-4 shadow-sm space-y-3 max-w-md">
       <select name="athleteMembershipId" className="input-field" required>
         <option value="">Elegí un atleta</option>
         {roster.map((r) => (
