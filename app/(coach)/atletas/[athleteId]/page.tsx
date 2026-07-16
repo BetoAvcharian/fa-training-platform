@@ -3,6 +3,7 @@ import { createServerClient } from '@/lib/supabase/server'
 import { getEventsForAthlete } from '@/domains/events/queries'
 import { getAthleteRecords, getAthleteResults } from '@/domains/performance/queries'
 import { getAthleteHealthEpisodes } from '@/domains/health/queries'
+import { getCycleStats } from '@/domains/health/cycle'
 import { getAnthropometryHistory } from '@/domains/observations/anthropometry'
 import { getVideosForAthlete } from '@/domains/videos/tags'
 import { getMyActiveMembership } from '@/domains/athletes/queries'
@@ -101,7 +102,7 @@ export default async function AthleteProfilePage({
       {tab === 'entrenamientos' && <EntrenamientosTab athleteId={athleteId} />}
       {tab === 'resultados' && <ResultadosTab athleteId={athleteId} organizationId={membership.organizationId} />}
       {tab === 'videos' && <VideosTab athleteId={athleteId} />}
-      {tab === 'salud' && <SaludTab athleteId={athleteId} />}
+      {tab === 'salud' && <SaludTab athleteId={athleteId} gender={athleteRow?.people?.gender ?? null} />}
     </div>
   )
 }
@@ -232,16 +233,42 @@ async function VideosTab({ athleteId }: { athleteId: string }) {
   )
 }
 
-async function SaludTab({ athleteId }: { athleteId: string }) {
-  const [episodes, anthropometry] = await Promise.all([
+async function SaludTab({ athleteId, gender }: { athleteId: string; gender: string | null }) {
+  const [episodes, anthropometry, cycleStats] = await Promise.all([
     getAthleteHealthEpisodes(athleteId),
     getAnthropometryHistory(athleteId),
+    gender === 'femenino' ? getCycleStats(athleteId) : Promise.resolve(null),
   ])
   const activos = episodes.filter((e) => e.status === 'activo')
   const resueltos = episodes.filter((e) => e.status === 'resuelto')
 
   return (
     <div className="space-y-4">
+      {cycleStats && (
+        <div className="card p-4">
+          <p className="text-sm font-semibold text-navy mb-2">Ciclo menstrual</p>
+          {cycleStats.currentCycleDay === null ? (
+            <p className="text-sm text-status-neutral">Todavía no cargó datos de ciclo.</p>
+          ) : (
+            <div className="flex gap-4 text-sm">
+              <p>
+                <span className="text-navy font-medium">Día {cycleStats.currentCycleDay}</span>{' '}
+                <span className="text-status-neutral">del ciclo</span>
+              </p>
+              {cycleStats.averageCycleLength && (
+                <p className="text-status-neutral">Promedio: {cycleStats.averageCycleLength} días</p>
+              )}
+              {cycleStats.predictedNextPeriod && (
+                <p className="text-status-neutral">
+                  Próximo:{' '}
+                  {new Date(cycleStats.predictedNextPeriod + 'T00:00:00').toLocaleDateString('es-AR', { day: 'numeric', month: 'short' })}
+                </p>
+              )}
+            </div>
+          )}
+        </div>
+      )}
+
       <div className="card p-4">
         <p className="text-sm font-semibold text-navy mb-2">Episodios activos</p>
         {activos.length === 0 && (
