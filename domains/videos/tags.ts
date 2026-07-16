@@ -7,20 +7,32 @@ export interface TaggedAthlete {
   name: string
 }
 
-export async function getAthletesForVideo(videoId: string, client?: AppSupabaseClient): Promise<TaggedAthlete[]> {
+/**
+ * `viewerCoachMembershipId`: si se pasa, oculta cualquier atleta
+ * etiquetado que no sea del equipo de ese coach — un coach nunca debe
+ * ver el nombre de un atleta ajeno, ni siquiera en un video que sí le
+ * es visible por tener también a uno de los suyos etiquetado.
+ */
+export async function getAthletesForVideo(
+  videoId: string,
+  viewerCoachMembershipId?: string,
+  client?: AppSupabaseClient
+): Promise<TaggedAthlete[]> {
   const supabase = client ?? (await createServerClient())
   const { data, error } = await supabase
     .from('video_athlete_tags')
-    .select('athlete_membership_id, memberships(people(first_name, last_name))')
+    .select('athlete_membership_id, memberships(coach_membership_id, people(first_name, last_name))')
     .eq('video_id', videoId)
 
   if (error) throw new DomainError('NOT_FOUND', error.message)
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  return (data ?? []).map((row: any) => ({
-    id: row.athlete_membership_id,
-    name: row.memberships?.people ? `${row.memberships.people.first_name} ${row.memberships.people.last_name}` : '—',
-  }))
+  return (data ?? [])
+    .filter((row: any) => !viewerCoachMembershipId || row.memberships?.coach_membership_id === viewerCoachMembershipId)
+    .map((row: any) => ({
+      id: row.athlete_membership_id,
+      name: row.memberships?.people ? `${row.memberships.people.first_name} ${row.memberships.people.last_name}` : '—',
+    }))
 }
 
 export async function tagAthletesOnVideo(

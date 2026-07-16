@@ -10,6 +10,7 @@ export interface Video {
   category: VideoCategory
   url: string
   createdAt: string
+  createdByMembershipId: string
 }
 
 export interface CreateVideoInput {

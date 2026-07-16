@@ -1,6 +1,6 @@
 import Link from 'next/link'
-import { getMyActiveMembership, getRoster } from '@/domains/athletes/queries'
-import { getVideos } from '@/domains/videos/queries'
+import { getMyActiveMembership, getRoster, getMyCoachMembershipId, getAthletesForCoach } from '@/domains/athletes/queries'
+import { getVideosForAthlete } from '@/domains/videos/queries'
 import { getAthletesForVideo } from '@/domains/videos/tags'
 import { VideoCard } from '@/app/(coach)/videos/video-card'
 
@@ -19,7 +19,7 @@ export default async function MisVideosCategoryPage({
   searchParams,
 }: {
   params: Promise<{ category: string }>
-  searchParams: Promise<{ mios?: string }>
+  searchParams: Promise<{ mios?: string; q?: string }>
 }) {
   const { category } = await params
   const sParams = await searchParams
@@ -37,12 +37,17 @@ export default async function MisVideosCategoryPage({
     )
   }
 
-  const videos = await getVideos(membership.organizationId)
-  const roster = await getRoster(membership.organizationId)
-  const filtered = category === 'todos' ? videos : videos.filter((v) => v.category === category)
+  const coachMembershipId = await getMyCoachMembershipId()
+  const videos = await getVideosForAthlete(membership.id, coachMembershipId, membership.organizationId)
+  const roster = coachMembershipId ? await getAthletesForCoach(coachMembershipId) : await getRoster(membership.organizationId)
+  let filtered = category === 'todos' ? videos : videos.filter((v) => v.category === category)
+  if (sParams.q) {
+    const q = sParams.q.toLowerCase()
+    filtered = filtered.filter((v) => v.title.toLowerCase().includes(q) || v.description?.toLowerCase().includes(q))
+  }
 
   const videosWithTags = await Promise.all(
-    filtered.map(async (v) => ({ video: v, tags: await getAthletesForVideo(v.id) }))
+    filtered.map(async (v) => ({ video: v, tags: await getAthletesForVideo(v.id, coachMembershipId ?? undefined) }))
   )
 
   const visible =
@@ -62,6 +67,20 @@ export default async function MisVideosCategoryPage({
       <Link href="/mis-videos" className="text-xs text-navy underline">
         + Subir video
       </Link>
+
+      <form className="flex gap-2">
+        <input
+          type="text"
+          name="q"
+          defaultValue={sParams.q ?? ''}
+          placeholder="Buscar por título o descripción…"
+          className="flex-1 rounded-lg border border-gray-200 px-3 py-1.5 text-sm"
+        />
+        {sParams.mios === '1' && <input type="hidden" name="mios" value="1" />}
+        <button type="submit" className="btn-primary px-4 py-1.5 text-sm">
+          Buscar
+        </button>
+      </form>
 
       <a
         href={`?mios=${sParams.mios === '1' ? '' : '1'}`}

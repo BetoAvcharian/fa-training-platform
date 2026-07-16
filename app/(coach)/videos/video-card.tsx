@@ -38,9 +38,9 @@ export function VideoCard({
 
   return (
     <div className="rounded-xl border border-gray-200 bg-white overflow-hidden">
-      <div className="aspect-video bg-navy/5">
+      <div className="h-36 bg-navy/5">
         {sourceType === 'upload' ? (
-          <video src={url} controls className="w-full h-full" />
+          <video src={url} controls className="w-full h-full object-cover" />
         ) : embedUrl ? (
           <iframe src={embedUrl} className="w-full h-full" allowFullScreen />
         ) : (

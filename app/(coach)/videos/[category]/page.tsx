@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { getMyActiveMembership, getAthletesForCoach, getRoster } from '@/domains/athletes/queries'
-import { getVideos } from '@/domains/videos/queries'
+import { getVideos, getVideosForCoach } from '@/domains/videos/queries'
 import { getAthletesForVideo } from '@/domains/videos/tags'
 import { VideoCard } from '../video-card'
 
@@ -19,7 +19,7 @@ export default async function VideoCategoryPage({
   searchParams,
 }: {
   params: Promise<{ category: string }>
-  searchParams: Promise<{ atleta?: string; desde?: string; hasta?: string; etiquetados?: string }>
+  searchParams: Promise<{ q?: string; atleta?: string; desde?: string; hasta?: string; etiquetados?: string }>
 }) {
   const { category } = await params
   const sParams = await searchParams
@@ -37,18 +37,24 @@ export default async function VideoCategoryPage({
     )
   }
 
+  const isManager = membership.role === 'manager'
   const [videos, roster] = await Promise.all([
-    getVideos(membership.organizationId),
-    (membership.role === 'manager' ? getRoster(membership.organizationId) : getAthletesForCoach(membership.id)),
+    isManager ? getVideos(membership.organizationId) : getVideosForCoach(membership.id, membership.organizationId),
+    (isManager ? getRoster(membership.organizationId) : getAthletesForCoach(membership.id)),
   ])
   const canManage = membership.role === 'manager' || membership.role === 'coach'
 
   let filtered = category === 'todos' ? videos : videos.filter((v) => v.category === category)
+  if (sParams.q) {
+    const q = sParams.q.toLowerCase()
+    filtered = filtered.filter((v) => v.title.toLowerCase().includes(q) || v.description?.toLowerCase().includes(q))
+  }
   if (sParams.desde) filtered = filtered.filter((v) => v.createdAt.slice(0, 10) >= sParams.desde!)
   if (sParams.hasta) filtered = filtered.filter((v) => v.createdAt.slice(0, 10) <= sParams.hasta!)
 
+  const viewerCoachId = isManager ? undefined : membership.id
   const videosWithTags = await Promise.all(
-    filtered.map(async (v) => ({ video: v, tags: await getAthletesForVideo(v.id) }))
+    filtered.map(async (v) => ({ video: v, tags: await getAthletesForVideo(v.id, viewerCoachId) }))
   )
 
   let visible = sParams.atleta
@@ -79,6 +85,16 @@ export default async function VideoCategoryPage({
       </div>
 
       <form className="flex flex-wrap gap-2 items-end">
+        <div className="flex-1 min-w-[160px]">
+          <label className="text-xs text-status-neutral block mb-1">Buscar</label>
+          <input
+            type="text"
+            name="q"
+            defaultValue={sParams.q ?? ''}
+            placeholder="Título o descripción…"
+            className="w-full rounded-lg border border-gray-200 px-3 py-1.5 text-sm"
+          />
+        </div>
         <div>
           <label className="text-xs text-status-neutral block mb-1">Atleta</label>
           <select name="atleta" defaultValue={sParams.atleta ?? ''} className="rounded-lg border border-gray-200 px-3 py-1.5 text-sm">

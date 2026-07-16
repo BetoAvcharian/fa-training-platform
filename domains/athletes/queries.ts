@@ -221,3 +221,13 @@ export async function getPublicCoachDirectory(): Promise<CoachDirectoryEntry[]> 
     organizationName: row.organizations?.name ?? '—',
   }))
 }
+
+/** El coach directo del atleta actual (o null si no tiene asignado). Para escenarios donde solo hace falta ese dato — como filtrar videos por equipo — sin traer todo getMyProfile. */
+export async function getMyCoachMembershipId(client?: AppSupabaseClient): Promise<string | null> {
+  const supabase = client ?? (await createServerClient())
+  const membership = await getMyActiveMembership(supabase)
+  if (!membership) return null
+
+  const { data } = await supabase.from('memberships').select('coach_membership_id').eq('id', membership.id).maybeSingle()
+  return data?.coach_membership_id ?? null
+}
