@@ -297,7 +297,10 @@ async function SaludTab({ athleteId, gender }: { athleteId: string; gender: stri
           <p className="p-3 text-sm font-semibold text-ink">Antropometría y signos vitales</p>
           {anthropometry.map((h) => (
             <div key={h.id} className="p-3 flex items-center justify-between text-sm">
-              <p className="text-ink">{h.observableName}</p>
+              <div>
+                <p className="text-ink">{h.observableName}</p>
+                <p className="text-xs text-status-neutral">{formatDate(h.date)}</p>
+              </div>
               <p className="font-medium text-ink">{formatMark(h.value, h.unitSymbol)}</p>
             </div>
           ))}
