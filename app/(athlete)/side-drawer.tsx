@@ -1,7 +1,8 @@
 'use client'
 
 import Link from 'next/link'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { createPortal } from 'react-dom'
 
 interface NavItem {
   href: string
@@ -12,6 +13,45 @@ interface NavItem {
 
 export function SideDrawer({ items }: { items: NavItem[] }) {
   const [open, setOpen] = useState(false)
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  const drawer = (
+    <div className="fixed inset-0 z-[100]">
+      <div className="absolute inset-0 bg-navy/70 backdrop-blur-sm" onClick={() => setOpen(false)} />
+      <div className="absolute right-0 top-0 bottom-0 w-64 bg-surface shadow-xl p-5 flex flex-col animate-[slideIn_0.2s_ease-out]">
+        <div className="flex items-center justify-between mb-6">
+          <p className="font-display font-bold text-ink text-lg">ENTRENAME</p>
+          <button onClick={() => setOpen(false)} className="text-ink text-xl leading-none">
+            ×
+          </button>
+        </div>
+        <nav className="flex flex-col gap-1">
+          {items.map((item) =>
+            item.ready ? (
+              <Link
+                key={item.href}
+                href={item.href}
+                onClick={() => setOpen(false)}
+                className="flex items-center gap-3 px-3 py-3 rounded-xl text-ink hover:bg-panel transition-colors"
+              >
+                <span className="text-lg">{item.icon}</span>
+                <span className="text-sm font-medium">{item.label}</span>
+              </Link>
+            ) : (
+              <span key={item.href} className="flex items-center gap-3 px-3 py-3 rounded-xl text-status-neutral">
+                <span className="text-lg opacity-50">{item.icon}</span>
+                <span className="text-sm">{item.label}</span>
+              </span>
+            )
+          )}
+        </nav>
+      </div>
+    </div>
+  )
 
   return (
     <>
@@ -23,39 +63,7 @@ export function SideDrawer({ items }: { items: NavItem[] }) {
         <span className="text-lg leading-none">☰</span>
       </button>
 
-      {open && (
-        <div className="fixed inset-0 z-50">
-          <div className="absolute inset-0 bg-navy/70 backdrop-blur-sm" onClick={() => setOpen(false)} />
-          <div className="absolute right-0 top-0 bottom-0 w-64 bg-surface shadow-xl p-5 flex flex-col animate-[slideIn_0.2s_ease-out]">
-            <div className="flex items-center justify-between mb-6">
-              <p className="font-display font-bold text-ink text-lg">ENTRENAME</p>
-              <button onClick={() => setOpen(false)} className="text-ink text-xl leading-none">
-                ×
-              </button>
-            </div>
-            <nav className="flex flex-col gap-1">
-              {items.map((item) =>
-                item.ready ? (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    onClick={() => setOpen(false)}
-                    className="flex items-center gap-3 px-3 py-3 rounded-xl text-ink hover:bg-panel transition-colors"
-                  >
-                    <span className="text-lg">{item.icon}</span>
-                    <span className="text-sm font-medium">{item.label}</span>
-                  </Link>
-                ) : (
-                  <span key={item.href} className="flex items-center gap-3 px-3 py-3 rounded-xl text-status-neutral">
-                    <span className="text-lg opacity-50">{item.icon}</span>
-                    <span className="text-sm">{item.label}</span>
-                  </span>
-                )
-              )}
-            </nav>
-          </div>
-        </div>
-      )}
+      {open && mounted && createPortal(drawer, document.body)}
     </>
   )
 }
