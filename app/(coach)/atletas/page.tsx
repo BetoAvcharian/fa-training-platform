@@ -1,8 +1,7 @@
-import Link from 'next/link'
 import { getMyActiveMembership, getAllMembers } from '@/domains/athletes/queries'
 import { InviteForm } from './invite-form'
 import { DeactivateButton } from './deactivate-button'
-import { ReassignCoachSelect } from './reassign-coach-select'
+import { PersonasList } from './personas-list'
 
 export const dynamic = 'force-dynamic'
 
@@ -66,42 +65,14 @@ export default async function PersonasPage() {
       )}
 
       <section className="space-y-3">
-        <h2 className="text-sm font-semibold text-ink">Activos</h2>
-        <div className="space-y-2">
-          {activos.map((m) => (
-            <div key={m.id} className="rounded-xl border border-outline bg-panel p-4 shadow-sm flex items-center justify-between gap-2">
-              <div>
-                {m.role === 'athlete' ? (
-                  <Link href={`/atletas/${m.id}`} className="text-sm font-medium text-ink underline">
-                    {m.name ?? m.email ?? '—'}
-                  </Link>
-                ) : (
-                  <p className="text-sm font-medium text-ink">{m.name ?? m.email ?? '—'}</p>
-                )}
-                <p className="text-xs text-status-neutral">{ROLE_LABELS[m.role]}</p>
-              </div>
-              <div className="flex items-center gap-2">
-                {isManager && m.role === 'athlete' && (
-                  <ReassignCoachSelect athleteMembershipId={m.id} currentCoachId={m.coachMembershipId} coaches={coaches} />
-                )}
-                {isManager && m.role !== 'manager' && <DeactivateButton id={m.id} />}
-              </div>
-            </div>
-          ))}
-        </div>
+        <h2 className="text-sm font-semibold text-ink">Activos ({activos.length})</h2>
+        <PersonasList members={activos} coaches={coaches} isManager={isManager} />
       </section>
 
       {inactivos.length > 0 && (
         <section className="space-y-3">
           <h2 className="text-sm font-semibold text-ink">Inactivos</h2>
-          <div className="space-y-2">
-            {inactivos.map((m) => (
-              <div key={m.id} className="rounded-xl border border-outline bg-panel p-4 opacity-60">
-                <p className="text-sm text-ink">{m.name ?? m.email ?? '—'}</p>
-                <p className="text-xs text-status-neutral">{ROLE_LABELS[m.role]}</p>
-              </div>
-            ))}
-          </div>
+          <PersonasList members={inactivos} coaches={coaches} isManager={false} />
         </section>
       )}
     </div>

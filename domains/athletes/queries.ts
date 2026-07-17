@@ -63,14 +63,16 @@ export async function getAllMembers(organizationId: string, client?: AppSupabase
   if (error) throw new DomainError('NOT_FOUND', error.message)
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  return (data ?? []).map((row: any) => ({
-    id: row.id,
-    role: row.role as string,
-    status: row.status as string,
-    coachMembershipId: row.coach_membership_id as string | null,
-    email: row.person?.email ?? row.invited_email ?? null,
-    name: row.person ? `${row.person.first_name} ${row.person.last_name}` : null,
-  }))
+  return (data ?? [])
+    .map((row: any) => ({
+      id: row.id,
+      role: row.role as string,
+      status: row.status as string,
+      coachMembershipId: row.coach_membership_id as string | null,
+      email: row.person?.email ?? row.invited_email ?? null,
+      name: row.person ? `${row.person.first_name} ${row.person.last_name}` : null,
+    }))
+    .sort((a, b) => (a.name ?? a.email ?? '').localeCompare(b.name ?? b.email ?? '', 'es'))
 }
 
 
@@ -115,18 +117,25 @@ export async function getAthletesForCoach(
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function mapRoster(rows: any[]): RosterEntry[] {
-  return rows.map((row) => ({
-    id: row.id,
-    role: row.role,
-    status: row.status,
-    person: row.person
-      ? {
-          firstName: row.person.first_name,
-          lastName: row.person.last_name,
-          email: row.person.email,
-        }
-      : null,
-  }))
+  return rows
+    .map((row) => ({
+      id: row.id,
+      role: row.role,
+      status: row.status,
+      person: row.person
+        ? {
+            firstName: row.person.first_name,
+            lastName: row.person.last_name,
+            email: row.person.email,
+          }
+        : null,
+    }))
+    .sort((a, b) =>
+      (a.person ? `${a.person.firstName} ${a.person.lastName}` : '').localeCompare(
+        b.person ? `${b.person.firstName} ${b.person.lastName}` : '',
+        'es'
+      )
+    )
 }
 
 /** Perfil completo del usuario autenticado — para la pantalla Perfil del atleta. */
