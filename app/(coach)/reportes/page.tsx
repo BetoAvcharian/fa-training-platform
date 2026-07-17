@@ -1,6 +1,7 @@
 import { getMyActiveMembership, getAthletesForCoach, getRoster, getGroups } from '@/domains/athletes/queries'
 import { getReportData } from '@/domains/reports/queries'
 import { formatMark } from '@/lib/format-mark'
+import { AthleteSearchPicker } from '@/components/ui/athlete-search-picker'
 
 export const dynamic = 'force-dynamic'
 
@@ -53,14 +54,7 @@ export default async function ReportesPage({
       <form className="rounded-xl border border-outline bg-panel p-4 grid grid-cols-2 sm:grid-cols-3 gap-2 items-end">
         <div>
           <label className="text-xs text-status-neutral block mb-1">Atleta</label>
-          <select name="atleta" defaultValue={params.atleta ?? ''} className="w-full rounded-lg border border-outline bg-panel text-ink px-2 py-1.5 text-sm">
-            <option value="">Todos</option>
-            {roster.map((r) => (
-              <option key={r.id} value={r.id}>
-                {r.person ? `${r.person.firstName} ${r.person.lastName}` : '—'}
-              </option>
-            ))}
-          </select>
+          <AthleteSearchPicker name="atleta" roster={roster} defaultValue={params.atleta} emptyLabel="Todos" />
         </div>
         {groups.length > 0 && (
           <div>

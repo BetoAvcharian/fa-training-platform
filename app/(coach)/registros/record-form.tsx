@@ -3,6 +3,7 @@
 import { useState, useTransition } from 'react'
 import { recordObservationAction } from './actions'
 import { MarkValueInput } from '@/components/ui/mark-value-input'
+import { AthleteSearchPicker } from '@/components/ui/athlete-search-picker'
 
 interface RosterOption {
   id: string
@@ -40,14 +41,7 @@ export function RecordForm({ roster, observables }: { roster: RosterOption[]; ob
   return (
     <form action={handleSubmit} className="rounded-xl border border-outline bg-panel p-4 space-y-3">
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-        <select name="athleteMembershipId" className="input-field" required>
-          <option value="">Atleta</option>
-          {roster.map((r) => (
-            <option key={r.id} value={r.id}>
-              {r.person ? `${r.person.firstName} ${r.person.lastName}` : '—'}
-            </option>
-          ))}
-        </select>
+        <AthleteSearchPicker name="athleteMembershipId" roster={roster} required />
         <select name="observableId" value={observableId} onChange={(e) => setObservableId(e.target.value)} className="input-field" required>
           <option value="">Qué registrar</option>
           {observables.map((o) => (
