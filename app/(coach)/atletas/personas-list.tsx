@@ -55,7 +55,7 @@ export function PersonasList({
 
   return (
     <div className="space-y-3">
-      {members.length > 5 && (
+      {members.length > 0 && (
         <input
           value={query}
           onChange={(e) => setQuery(e.target.value)}
