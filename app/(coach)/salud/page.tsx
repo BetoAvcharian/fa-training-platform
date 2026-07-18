@@ -1,5 +1,5 @@
-import Link from 'next/link'
 import { getMyActiveMembership, getRoster, getAthletesForCoach } from '@/domains/athletes/queries'
+import { RosterPicker } from '@/components/ui/roster-picker'
 
 export const dynamic = 'force-dynamic'
 
@@ -22,19 +22,7 @@ export default async function SaludRosterPage() {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        {roster.map((entry) => (
-          <Link
-            key={entry.id}
-            href={`/salud/${entry.id}`}
-            className="rounded-xl border border-outline bg-panel p-4 shadow-sm hover:border-gold/40 transition-colors"
-          >
-            <p className="font-medium text-ink">
-              {entry.person ? `${entry.person.firstName} ${entry.person.lastName}` : '—'}
-            </p>
-          </Link>
-        ))}
-      </div>
+      <RosterPicker roster={roster} basePath="/salud" />
     </div>
   )
 }
