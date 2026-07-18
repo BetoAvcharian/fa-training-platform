@@ -164,7 +164,8 @@ async function ResumenTab({ athleteId, organizationId }: { athleteId: string; or
 }
 
 async function EntrenamientosTab({ athleteId }: { athleteId: string }) {
-  const events = await getEventsForAthlete(athleteId, 30)
+  const allEvents = await getEventsForAthlete(athleteId, 30)
+  const events = allEvents.filter((e) => e.type === 'entrenamiento')
   return (
     <div className="rounded-xl border border-outline bg-panel divide-y divide-outline">
       {events.length === 0 && <p className="p-4 text-sm text-status-neutral">Sin historial todavía.</p>}

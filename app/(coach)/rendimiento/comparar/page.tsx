@@ -2,6 +2,7 @@ import { getMyActiveMembership, getAthletesForCoach, getRoster, getGroups, getGr
 import { getObservables } from '@/domains/catalog/queries'
 import { compareAthletes, computeGroupAverage } from '@/domains/performance/queries'
 import { CompareChart } from '../compare-chart'
+import { FullscreenChart } from '@/components/ui/fullscreen-chart'
 import { compareAction } from './actions'
 
 export const dynamic = 'force-dynamic'
@@ -17,7 +18,7 @@ export default async function CompararPage({
   searchParams,
 }: {
   searchParams: Promise<{
-    observableId?: string
+    observableIds?: string
     groupId?: string
     athletes?: string
     desde?: string
@@ -45,36 +46,41 @@ export default async function CompararPage({
   }
 
   const origenesSeleccionados = params.origenes ? params.origenes.split(',').filter(Boolean) : []
-  const showResult = params.observableId && athleteIds.length >= 2
+  const selectedObservableIds = params.observableIds ? params.observableIds.split(',').filter(Boolean) : []
+  const showResult = selectedObservableIds.length > 0 && athleteIds.length >= 2
 
-  let chartData: Array<{ date: string; [key: string]: string | number }> = []
-  let athleteNames: string[] = []
+  const charts: Array<{ observableName: string; chartData: Array<{ date: string; [key: string]: string | number }>; athleteNames: string[] }> = []
 
   if (showResult) {
-    const series = await compareAthletes({
-      organizationId: membership.organizationId,
-      athleteMembershipIds: athleteIds,
-      observableId: params.observableId!,
-      from: params.desde || undefined,
-      to: params.hasta || undefined,
-      officialOnly: params.oficiales === '1',
-      sourceTypes: origenesSeleccionados.length > 0 ? origenesSeleccionados : undefined,
-    })
-    athleteNames = series.map((s) => s.athleteName)
-    const average = computeGroupAverage(series)
-    const averageByDate = new Map(average.map((a) => [a.date, a.average]))
+    for (const observableId of selectedObservableIds) {
+      const observable = performanceObservables.find((o) => o.id === observableId)
+      const series = await compareAthletes({
+        organizationId: membership.organizationId,
+        athleteMembershipIds: athleteIds,
+        observableId,
+        from: params.desde || undefined,
+        to: params.hasta || undefined,
+        officialOnly: params.oficiales === '1',
+        sourceTypes: origenesSeleccionados.length > 0 ? origenesSeleccionados : undefined,
+      })
+      const athleteNames = series.map((s) => s.athleteName)
+      const average = computeGroupAverage(series)
+      const averageByDate = new Map(average.map((a) => [a.date, a.average]))
 
-    const allDates = Array.from(new Set(series.flatMap((s) => s.points.map((p) => p.date)))).sort()
-    chartData = allDates.map((date) => {
-      const row: { date: string; [key: string]: string | number } = { date }
-      for (const s of series) {
-        const point = s.points.find((p) => p.date === date)
-        if (point) row[s.athleteName] = point.value
-      }
-      const avg = averageByDate.get(date)
-      if (avg !== undefined) row['Promedio'] = Math.round(avg * 100) / 100
-      return row
-    })
+      const allDates = Array.from(new Set(series.flatMap((s) => s.points.map((p) => p.date)))).sort()
+      const chartData = allDates.map((date) => {
+        const row: { date: string; [key: string]: string | number } = { date }
+        for (const s of series) {
+          const point = s.points.find((p) => p.date === date)
+          if (point) row[s.athleteName] = point.value
+        }
+        const avg = averageByDate.get(date)
+        if (avg !== undefined) row['Promedio'] = Math.round(avg * 100) / 100
+        return row
+      })
+
+      charts.push({ observableName: observable?.name ?? '—', chartData, athleteNames })
+    }
   }
 
   return (
@@ -85,14 +91,17 @@ export default async function CompararPage({
       </div>
 
       <form action={compareAction} className="rounded-xl border border-outline bg-panel p-4 space-y-3 max-w-lg">
-        <select name="observableId" defaultValue={params.observableId ?? ''} required className="input-field">
-          <option value="">Prueba/ejercicio</option>
-          {performanceObservables.map((o) => (
-            <option key={o.id} value={o.id}>
-              {o.name}
-            </option>
-          ))}
-        </select>
+        <div>
+          <p className="text-xs text-status-neutral mb-1">Prueba/ejercicio (podés elegir más de una)</p>
+          <div className="flex flex-wrap gap-2 max-h-32 overflow-y-auto">
+            {performanceObservables.map((o) => (
+              <label key={o.id} className="flex items-center gap-1 text-xs bg-outline/40 rounded-full px-2 py-1">
+                <input type="checkbox" name="observableIds" value={o.id} defaultChecked={selectedObservableIds.includes(o.id)} />
+                {o.name}
+              </label>
+            ))}
+          </div>
+        </div>
 
         {groups.length > 0 && (
           <select name="groupId" defaultValue={params.groupId ?? ''} className="input-field">
@@ -145,12 +154,24 @@ export default async function CompararPage({
       </form>
 
       {showResult && (
-        <div className="card p-4">
-          {chartData.length === 0 ? (
-            <p className="text-sm text-status-neutral">Sin datos todavía para esta combinación.</p>
-          ) : (
-            <CompareChart data={chartData} athleteNames={athleteNames} />
+        <div className="space-y-4">
+          {charts.length === 0 && (
+            <div className="card p-4">
+              <p className="text-sm text-status-neutral">Sin datos todavía para esta combinación.</p>
+            </div>
           )}
+          {charts.map((c) => (
+            <div key={c.observableName} className="card p-4">
+              <p className="text-sm font-semibold text-ink mb-2">{c.observableName}</p>
+              {c.chartData.length === 0 ? (
+                <p className="text-sm text-status-neutral">Sin datos todavía para esta prueba.</p>
+              ) : (
+                <FullscreenChart title={c.observableName}>
+                  <CompareChart data={c.chartData} athleteNames={c.athleteNames} />
+                </FullscreenChart>
+              )}
+            </div>
+          ))}
         </div>
       )}
     </div>

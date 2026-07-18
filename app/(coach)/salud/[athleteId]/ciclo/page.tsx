@@ -3,6 +3,7 @@ import { createServerClient } from '@/lib/supabase/server'
 import { getCycleLogs, getCycleStats } from '@/domains/health/cycle'
 import { getTodayISO } from '@/lib/today'
 import { CycleCalendarReadOnly } from '@/components/ui/cycle-calendar-readonly'
+import { CycleWheel } from '@/components/ui/cycle-wheel'
 
 export const dynamic = 'force-dynamic'
 
@@ -60,6 +61,23 @@ export default async function CoachCiclioPage({
   ])
   const logsByDate = new Map(logs.map((l) => [l.date, l]))
 
+  let flowDays = new Set<number>()
+  if (stats.lastPeriodStart) {
+    const cycleLen = stats.averageCycleLength ?? 28
+    const cycleLogs = await getCycleLogs(
+      athleteId,
+      stats.lastPeriodStart,
+      new Date(new Date(stats.lastPeriodStart + 'T00:00:00').getTime() + cycleLen * 86400000).toISOString().slice(0, 10),
+      supabase
+    )
+    const startDate = new Date(stats.lastPeriodStart + 'T00:00:00')
+    flowDays = new Set(
+      cycleLogs
+        .filter((l) => l.flow)
+        .map((l) => Math.round((new Date(l.date + 'T00:00:00').getTime() - startDate.getTime()) / 86400000) + 1)
+    )
+  }
+
   const prevMonth = new Date(year, month - 1, 1)
   const nextMonth = new Date(year, month + 1, 1)
   const monthLabel = base.toLocaleDateString('es-AR', { month: 'long', year: 'numeric' })
@@ -72,6 +90,10 @@ export default async function CoachCiclioPage({
         </Link>
         <p className="text-xs uppercase tracking-wider text-gold font-medium mt-2">Salud</p>
         <h1 className="font-display text-2xl font-bold text-ink">Ciclo menstrual — {athleteName}</h1>
+      </div>
+
+      <div className="card p-4">
+        <CycleWheel cycleLength={stats.averageCycleLength ?? 28} currentDay={stats.currentCycleDay} flowDays={flowDays} />
       </div>
 
       <div className="grid grid-cols-2 gap-3">
