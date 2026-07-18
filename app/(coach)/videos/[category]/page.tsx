@@ -3,6 +3,7 @@ import { getMyActiveMembership, getAthletesForCoach, getRoster } from '@/domains
 import { getVideos, getVideosForCoach } from '@/domains/videos/queries'
 import { getAthletesForVideo } from '@/domains/videos/tags'
 import { VideoCard } from '../video-card'
+import { AthleteSearchPicker } from '@/components/ui/athlete-search-picker'
 
 export const dynamic = 'force-dynamic'
 
@@ -97,14 +98,7 @@ export default async function VideoCategoryPage({
         </div>
         <div>
           <label className="text-xs text-status-neutral block mb-1">Atleta</label>
-          <select name="atleta" defaultValue={sParams.atleta ?? ''} className="rounded-lg border border-outline bg-panel text-ink px-3 py-1.5 text-sm">
-            <option value="">Todos</option>
-            {roster.map((r) => (
-              <option key={r.id} value={r.id}>
-                {r.person ? `${r.person.firstName} ${r.person.lastName}` : '—'}
-              </option>
-            ))}
-          </select>
+          <AthleteSearchPicker name="atleta" roster={roster} defaultValue={sParams.atleta} emptyLabel="Todos" />
         </div>
         <div>
           <label className="text-xs text-status-neutral block mb-1">Desde</label>
