@@ -104,3 +104,31 @@ export async function markObjectiveAchieved(
     entityId: id,
   })
 }
+
+/**
+ * Mueve/estira un plan (típicamente un mesociclo) desde la vista
+ * Anual arrastrando sus bordes — actualiza las mismas fechas que ve
+ * la vista de lista, no hay tabla paralela.
+ */
+export async function updatePlanDates(
+  input: { id: string; organizationId: string; startDate: string; endDate: string },
+  client?: AppSupabaseClient
+): Promise<void> {
+  const supabase = client ?? (await createServerClient())
+  const membership = await getMyActiveMembership(supabase)
+  if (!membership) throw new DomainError('PERMISSION', 'No autenticado')
+
+  const { error } = await supabase
+    .from('plans')
+    .update({ start_date: input.startDate, end_date: input.endDate })
+    .eq('id', input.id)
+  if (error) throw new DomainError('CONFLICT', error.message)
+
+  await logAudit({
+    organizationId: input.organizationId,
+    actorMembershipId: membership.id,
+    action: 'plan.update',
+    entityType: 'plan',
+    entityId: input.id,
+  })
+}

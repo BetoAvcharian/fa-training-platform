@@ -1,7 +1,7 @@
 'use server'
 
 import { revalidatePath } from 'next/cache'
-import { createPlan, createObjective, markObjectiveAchieved } from '@/domains/planning/mutations'
+import { createPlan, createObjective, markObjectiveAchieved, updatePlanDates } from '@/domains/planning/mutations'
 import { getMyActiveMembership, getRoster } from '@/domains/athletes/queries'
 import { DomainError } from '@/types/errors'
 
@@ -74,4 +74,18 @@ export async function getRosterForForm() {
   const membership = await getMyActiveMembership()
   if (!membership) return []
   return getRoster(membership.organizationId)
+}
+
+export async function updatePlanDatesAction(id: string, startDate: string, endDate: string) {
+  const membership = await getMyActiveMembership()
+  if (!membership) return { error: 'No autenticado' }
+
+  try {
+    await updatePlanDates({ id, organizationId: membership.organizationId, startDate, endDate })
+  } catch (e) {
+    return { error: e instanceof DomainError ? e.message : 'No se pudo guardar' }
+  }
+
+  revalidatePath('/planificacion')
+  return { error: null }
 }
