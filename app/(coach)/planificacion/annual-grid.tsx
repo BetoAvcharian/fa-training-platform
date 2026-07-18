@@ -2,7 +2,12 @@
 
 import { useState, useRef, useTransition } from 'react'
 import { updatePlanDatesAction } from './actions'
+import { Modal } from '@/components/ui/modal'
 
+interface ObjectiveInfo {
+  category: string
+  description: string
+}
 interface PlanBar {
   id: string
   type: 'macrociclo' | 'mesociclo'
@@ -10,7 +15,7 @@ interface PlanBar {
   startDate: string
   endDate: string
   parentPlanId: string | null
-  objectiveText: string | null
+  objectives: ObjectiveInfo[]
 }
 interface CompetitionMarker {
   id: string
@@ -20,6 +25,7 @@ interface CompetitionMarker {
 
 const WEEK_WIDTH = 34
 const MONTH_LABELS = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic']
+const CATEGORY_LABELS: Record<string, string> = { deportivo: 'Deportivo', salud: 'Salud', fisico: 'Físico', personal: 'Personal' }
 
 function mondayOf(date: Date) {
   const d = new Date(date)
@@ -28,9 +34,11 @@ function mondayOf(date: Date) {
   d.setHours(0, 0, 0, 0)
   return d
 }
-
 function toISO(d: Date) {
   return d.toISOString().slice(0, 10)
+}
+function formatDate(iso: string) {
+  return new Date(iso + 'T00:00:00').toLocaleDateString('es-AR', { day: 'numeric', month: 'short', year: 'numeric' })
 }
 
 export function AnnualGrid({
@@ -44,6 +52,9 @@ export function AnnualGrid({
   mesociclos: PlanBar[]
   competitions: CompetitionMarker[]
 }) {
+  const [detail, setDetail] = useState<PlanBar | null>(null)
+  const [compDetail, setCompDetail] = useState<CompetitionMarker | null>(null)
+
   const yearStart = mondayOf(new Date(year, 0, 1))
   const weeks = 53
   const totalWidth = weeks * WEEK_WIDTH
@@ -61,7 +72,7 @@ export function AnnualGrid({
       <div style={{ width: totalWidth, minWidth: totalWidth }} className="relative">
         {/* Meses */}
         <div className="flex text-[10px] text-status-neutral border-b border-outline pb-1 sticky top-0 bg-panel z-10">
-          {MONTH_LABELS.map((m, i) => (
+          {MONTH_LABELS.map((m) => (
             <div key={m} style={{ width: WEEK_WIDTH * 4.33 }} className="shrink-0">
               {m}
             </div>
@@ -74,19 +85,20 @@ export function AnnualGrid({
             const s = Math.max(0, weekIndexOf(p.startDate))
             const e = Math.min(weeks, weekIndexOf(p.endDate) + 1)
             return (
-              <div
+              <button
+                type="button"
                 key={p.id}
-                className="absolute h-7 rounded-lg bg-navy/10 border border-navy/30 flex items-center px-2 text-[10px] font-medium text-ink truncate"
+                onClick={() => setDetail(p)}
+                className="absolute h-7 rounded-lg bg-navy/10 border border-navy/30 flex items-center px-2 text-[10px] font-medium text-ink truncate text-left"
                 style={{ left: s * WEEK_WIDTH, width: Math.max((e - s) * WEEK_WIDTH, 20) }}
-                title={p.title}
               >
                 {p.title}
-              </div>
+              </button>
             )
           })}
         </div>
 
-        {/* Mesociclos — arrastrables */}
+        {/* Mesociclos — arrastrables + tocables */}
         <div className="relative mt-2" style={{ height: Math.max(mesociclos.length, 1) * 34 }}>
           {mesociclos.map((p, row) => (
             <MesocicloBar
@@ -96,6 +108,7 @@ export function AnnualGrid({
               weekIndexOf={weekIndexOf}
               dateOfWeekIndex={dateOfWeekIndex}
               maxWeeks={weeks}
+              onOpenDetail={() => setDetail(p)}
             />
           ))}
         </div>
@@ -115,18 +128,51 @@ export function AnnualGrid({
             const idx = weekIndexOf(c.date)
             if (idx < 0 || idx >= weeks) return null
             return (
-              <div
+              <button
+                type="button"
                 key={c.id}
+                onClick={() => setCompDetail(c)}
                 className="absolute flex flex-col items-center"
                 style={{ left: idx * WEEK_WIDTH + WEEK_WIDTH / 2 - 6 }}
-                title={`${c.title} — ${c.date}`}
               >
                 <span className="text-sm">🏁</span>
-              </div>
+              </button>
             )
           })}
         </div>
       </div>
+
+      {detail && (
+        <Modal open onClose={() => setDetail(null)} title={detail.title}>
+          <div className="space-y-3">
+            <p className="text-xs text-status-neutral">
+              {detail.type === 'macrociclo' ? 'Macrociclo' : 'Mesociclo'} · {formatDate(detail.startDate)} — {formatDate(detail.endDate)}
+            </p>
+            {detail.objectives.length === 0 ? (
+              <p className="text-sm text-status-neutral">Sin objetivos cargados para este bloque.</p>
+            ) : (
+              <div className="space-y-2">
+                {detail.objectives.map((o, i) => (
+                  <div key={i} className="rounded-lg border border-outline bg-surface p-2.5">
+                    <p className="text-[10px] uppercase tracking-wide text-gold font-semibold">{CATEGORY_LABELS[o.category] ?? o.category}</p>
+                    <p className="text-sm text-ink mt-0.5">{o.description}</p>
+                  </div>
+                ))}
+              </div>
+            )}
+            <p className="text-[11px] text-status-neutral">
+              Para editar el título, las fechas o agregar objetivos, hacelo desde la vista Lista — se refleja acá solo.
+            </p>
+          </div>
+        </Modal>
+      )}
+
+      {compDetail && (
+        <Modal open onClose={() => setCompDetail(null)} title={compDetail.title}>
+          <p className="text-sm text-ink">{formatDate(compDetail.date)}</p>
+          <p className="text-[11px] text-status-neutral mt-2">Se edita desde Calendario o Competencias.</p>
+        </Modal>
+      )}
     </div>
   )
 }
@@ -137,25 +183,28 @@ function MesocicloBar({
   weekIndexOf,
   dateOfWeekIndex,
   maxWeeks,
+  onOpenDetail,
 }: {
   plan: PlanBar
   row: number
   weekIndexOf: (d: string) => number
   dateOfWeekIndex: (i: number) => string
   maxWeeks: number
+  onOpenDetail: () => void
 }) {
   const [pending, startTransition] = useTransition()
   const [localStart, setLocalStart] = useState(weekIndexOf(plan.startDate))
   const [localEnd, setLocalEnd] = useState(weekIndexOf(plan.endDate) + 1)
-  const dragRef = useRef<{ edge: 'left' | 'right'; startX: number; origStart: number; origEnd: number } | null>(null)
+  const dragRef = useRef<{ edge: 'left' | 'right'; startX: number; origStart: number; origEnd: number; moved: boolean } | null>(null)
 
   function onPointerDown(edge: 'left' | 'right', e: React.PointerEvent) {
     e.currentTarget.setPointerCapture(e.pointerId)
-    dragRef.current = { edge, startX: e.clientX, origStart: localStart, origEnd: localEnd }
+    dragRef.current = { edge, startX: e.clientX, origStart: localStart, origEnd: localEnd, moved: false }
   }
   function onPointerMove(e: React.PointerEvent) {
     if (!dragRef.current) return
     const deltaWeeks = Math.round((e.clientX - dragRef.current.startX) / WEEK_WIDTH)
+    if (deltaWeeks !== 0) dragRef.current.moved = true
     if (dragRef.current.edge === 'left') {
       const next = Math.min(Math.max(dragRef.current.origStart + deltaWeeks, 0), localEnd - 1)
       setLocalStart(next)
@@ -166,7 +215,9 @@ function MesocicloBar({
   }
   function onPointerUp() {
     if (!dragRef.current) return
+    const moved = dragRef.current.moved
     dragRef.current = null
+    if (!moved) return
     const newStart = dateOfWeekIndex(localStart)
     const newEnd = dateOfWeekIndex(localEnd - 1)
     startTransition(async () => {
@@ -185,10 +236,10 @@ function MesocicloBar({
         onPointerUp={onPointerUp}
         className="w-2 h-full cursor-ew-resize shrink-0 -ml-1.5 opacity-0 group-hover:opacity-100 bg-gold rounded-l"
       />
-      <span className="truncate flex-1 px-1">
+      <button type="button" onClick={onOpenDetail} className="truncate flex-1 px-1 text-left">
         {plan.title}
-        {plan.objectiveText && <span className="text-navy/70"> — {plan.objectiveText}</span>}
-      </span>
+        {plan.objectives[0] && <span className="text-navy/70"> — {plan.objectives[0].description}</span>}
+      </button>
       <div
         onPointerDown={(e) => onPointerDown('right', e)}
         onPointerMove={onPointerMove}

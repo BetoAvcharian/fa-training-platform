@@ -56,7 +56,13 @@ export default async function PlanificacionPage({
     const yearFrom = `${year}-01-01`
     const yearTo = `${year}-12-31`
 
-    const objectivesByPlan = new Map(objectives.map((o) => [o.planId, o]))
+    const objectivesByPlanArr = new Map<string, typeof objectives>()
+    for (const o of objectives) {
+      if (!o.planId) continue
+      const list = objectivesByPlanArr.get(o.planId) ?? []
+      list.push(o)
+      objectivesByPlanArr.set(o.planId, list)
+    }
 
     const macrociclos = plans
       .filter((p) => p.type === 'macrociclo' && p.startDate && p.endDate)
@@ -67,7 +73,7 @@ export default async function PlanificacionPage({
         startDate: p.startDate!,
         endDate: p.endDate!,
         parentPlanId: p.parentPlanId,
-        objectiveText: null,
+        objectives: (objectivesByPlanArr.get(p.id) ?? []).map((o) => ({ category: o.category, description: o.description ?? '' })),
       }))
 
     const mesociclos = plans
@@ -80,7 +86,7 @@ export default async function PlanificacionPage({
         startDate: p.startDate!,
         endDate: p.endDate!,
         parentPlanId: p.parentPlanId,
-        objectiveText: objectivesByPlan.get(p.id)?.description ?? null,
+        objectives: (objectivesByPlanArr.get(p.id) ?? []).map((o) => ({ category: o.category, description: o.description ?? '' })),
       }))
 
     const yearEvents = await getEventsForRange(membership.organizationId, yearFrom, yearTo)

@@ -49,7 +49,7 @@ export function FullscreenChart({ title, children }: { title?: string; children:
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="absolute top-0 right-0 z-10 text-xs text-status-neutral hover:text-ink flex items-center gap-1 px-2 py-1"
+        className="absolute top-0 right-0 z-20 text-xs text-status-neutral hover:text-ink flex items-center gap-1 px-2 py-1 bg-panel rounded"
       >
         ⛶ Pantalla completa
       </button>
