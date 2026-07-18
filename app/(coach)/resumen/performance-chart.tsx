@@ -21,7 +21,7 @@ export function PerformanceChart({ data }: { data: Point[] }) {
   return (
     <ResponsiveContainer width="100%" height={220}>
       <LineChart data={chartData} margin={{ top: 8, right: 8, left: -20, bottom: 0 }}>
-        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#F1F5F9" />
+        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#94A3B833" />
         <XAxis dataKey="date" fontSize={11} stroke="#94A3B8" />
         <YAxis fontSize={11} stroke="#94A3B8" domain={[0, 100]} />
         <Tooltip />
