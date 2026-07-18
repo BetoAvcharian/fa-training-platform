@@ -1,5 +1,6 @@
 import { getMyActiveMembership, getAthletesForCoach, getRoster, getGroups } from '@/domains/athletes/queries'
-import { getEventsForRange, getSessionExercises } from '@/domains/events/queries'
+import { getEventsForRange, getSessionExercises, getEventAssignments } from '@/domains/events/queries'
+import { getFeedbackForEvent } from '@/domains/observations/session-feedback'
 import { getDaySchedule } from '@/domains/dashboard/day-schedule'
 import { TrainingDayList } from '@/components/ui/training-day-list'
 import { getTodayDate, getTodayISO } from '@/lib/today'
@@ -69,7 +70,12 @@ export default async function CalendarioPage({
   const eventsWithLines = await Promise.all(
     events
       .filter((e) => e.type === 'entrenamiento')
-      .map(async (event) => ({ event, lines: await getSessionExercises(event.id) }))
+      .map(async (event) => {
+        const [lines, assignments] = await Promise.all([getSessionExercises(event.id), getEventAssignments(event.id)])
+        const athleteIds = assignments.filter((a) => a.assigneeType === 'person').map((a) => a.assigneeId)
+        const feedback = await getFeedbackForEvent(event.id, athleteIds)
+        return { event, lines, feedback }
+      })
   )
 
   return (
@@ -95,7 +101,7 @@ export default async function CalendarioPage({
             </a>
           </div>
           <div className="flex rounded-lg border border-outline overflow-hidden text-xs">
-            <a href={`?week=${weekStartStr}&mode=${mode}&view=dia`} className="px-3 py-1.5 bg-panel text-ink">
+            <a href={`?mode=${mode}&view=dia`} className="px-3 py-1.5 bg-panel text-ink">
               Día
             </a>
             <a href={`?week=${weekStartStr}&mode=${mode}&view=semana`} className="px-3 py-1.5 bg-navy text-white">
@@ -128,11 +134,11 @@ export default async function CalendarioPage({
                 {DAY_NAMES[i]} {day.getDate()}
               </p>
               <div className="space-y-2">
-                {dayEvents.map(({ event, lines }) =>
+                {dayEvents.map(({ event, lines, feedback }) =>
                   mode === 'ver' ? (
-                    <EventCompareCard key={event.id} event={event} roster={roster} />
+                    <EventCompareCard key={event.id} event={event} roster={roster} feedback={feedback} />
                   ) : (
-                    <EventCard key={event.id} event={event} lines={lines} roster={roster} />
+                    <EventCard key={event.id} event={event} lines={lines} roster={roster} feedback={feedback} />
                   )
                 )}
                 {dayEvents.length === 0 && <div className="text-[11px] text-gray-300">—</div>}
@@ -191,6 +197,9 @@ async function MonthView({
         </div>
         <div className="flex items-center gap-3 flex-wrap">
           <div className="flex rounded-lg border border-outline overflow-hidden text-xs">
+            <a href={`?mode=${mode}&view=dia`} className="px-3 py-1.5 bg-panel text-ink">
+              Día
+            </a>
             <a href={`?view=semana&mode=${mode}`} className="px-3 py-1.5 bg-panel text-ink">
               Semana
             </a>
