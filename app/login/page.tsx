@@ -1,5 +1,6 @@
 import { loginAction } from './actions'
 import { Logo } from '@/components/logo'
+import { ThemeToggle } from '@/components/ui/theme-toggle'
 
 export default async function LoginPage({
   searchParams,
@@ -9,7 +10,8 @@ export default async function LoginPage({
   const params = await searchParams
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-surface px-4">
+    <div className="min-h-screen flex items-center justify-center bg-surface px-4 relative">
+      <ThemeToggle className="absolute top-4 right-4 text-xl" />
       <form action={loginAction} className="w-full max-w-sm bg-panel rounded-2xl shadow-sm p-8 space-y-4">
         <div className="text-center mb-2">
           <Logo className="w-16 h-16 mx-auto mb-3" />
