@@ -17,22 +17,26 @@ export async function createEventAction(formData: FormData) {
 
   const title = String(formData.get('title') ?? '')
   const date = String(formData.get('date') ?? '')
-  const athleteId = String(formData.get('athleteId') ?? '')
+  const athleteIds = formData.getAll('athleteIds').map(String).filter(Boolean)
   const groupId = String(formData.get('groupId') ?? '')
   const lineTexts = formData.getAll('lineText').map(String)
   const lineSports = formData.getAll('lineSport').map(String) as Array<'Atletismo' | 'Fuerza'>
 
-  if (!title || !date || (!athleteId && !groupId)) {
+  if (!title || !date || (athleteIds.length === 0 && !groupId)) {
     return { error: 'Faltan datos para crear el entrenamiento' }
   }
 
   try {
+    const assignments = [
+      ...athleteIds.map((id) => ({ type: 'person' as const, id })),
+      ...(groupId ? [{ type: 'group' as const, id: groupId }] : []),
+    ]
     const event = await createEventDomain({
       organizationId: membership.organizationId,
       type: 'entrenamiento',
       title,
       date,
-      assignments: groupId ? [{ type: 'group', id: groupId }] : [{ type: 'person', id: athleteId }],
+      assignments,
     })
 
     for (let i = 0; i < lineTexts.length; i++) {

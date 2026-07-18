@@ -4,13 +4,37 @@ import { useState, useTransition } from 'react'
 import { addSessionLineAction, duplicateEventAction, createExceptionAction } from './actions'
 import { Modal } from '@/components/ui/modal'
 import type { Event, SessionExercise } from '@/domains/events/types'
+import type { AthleteSessionFeedback } from '@/domains/observations/session-feedback'
 
 interface RosterOption {
   id: string
   person: { firstName: string; lastName: string } | null
 }
 
-export function EventCard({ event, lines, roster }: { event: Event; lines: SessionExercise[]; roster: RosterOption[] }) {
+const STATUS_LABEL: Record<string, string> = {
+  completado: 'Completado',
+  completado_con_observacion: 'Con observación',
+  no_completado: 'No completado',
+}
+
+function statusDot(status: string | null) {
+  if (status === 'completado') return 'bg-status-positive'
+  if (status === 'completado_con_observacion') return 'bg-status-attention'
+  if (status === 'no_completado') return 'bg-status-critical'
+  return 'bg-outline border border-status-neutral/40'
+}
+
+export function EventCard({
+  event,
+  lines,
+  roster,
+  feedback,
+}: {
+  event: Event
+  lines: SessionExercise[]
+  roster: RosterOption[]
+  feedback: AthleteSessionFeedback[]
+}) {
   const [open, setOpen] = useState(false)
   const [sport, setSport] = useState<'Atletismo' | 'Fuerza'>('Atletismo')
   const [pending, startTransition] = useTransition()
@@ -102,6 +126,28 @@ export function EventCard({ event, lines, roster }: { event: Event; lines: Sessi
               )}
             </div>
           ))}
+
+          {feedback.length > 0 && (
+            <div className="pt-2 border-t border-outline">
+              <p className="text-xs text-status-neutral uppercase tracking-wide mb-1.5">Feedback de los atletas</p>
+              <div className="space-y-1.5">
+                {feedback.map((f) => (
+                  <div key={f.athleteMembershipId} className="flex items-start gap-2">
+                    <span className={`mt-1 w-2 h-2 rounded-full shrink-0 ${statusDot(f.status)}`} />
+                    <div className="min-w-0">
+                      <p className="text-sm text-ink">
+                        {f.athleteName}{' '}
+                        <span className="text-xs text-status-neutral">
+                          — {f.status ? STATUS_LABEL[f.status] : 'sin cargar todavía'}
+                        </span>
+                      </p>
+                      {f.notes && <p className="text-xs text-status-neutral italic">"{f.notes}"</p>}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
           <div className="pt-2 border-t border-outline">
             <p className="text-xs text-status-neutral mb-1">Agregar ejercicio</p>
