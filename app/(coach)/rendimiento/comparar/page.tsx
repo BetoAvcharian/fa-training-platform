@@ -1,7 +1,7 @@
 import { getMyActiveMembership, getAthletesForCoach, getRoster, getGroups, getGroupMembers } from '@/domains/athletes/queries'
 import { getObservables } from '@/domains/catalog/queries'
 import { compareAthletes, computeGroupAverage } from '@/domains/performance/queries'
-import { CompareChart } from '../compare-chart'
+import { CompareChart, DualCompareChart } from '../compare-chart'
 import { FullscreenChart } from '@/components/ui/fullscreen-chart'
 import { compareAction } from './actions'
 
@@ -50,8 +50,56 @@ export default async function CompararPage({
   const showResult = selectedObservableIds.length > 0 && athleteIds.length >= 2
 
   const charts: Array<{ observableName: string; chartData: Array<{ date: string; [key: string]: string | number }>; athleteNames: string[] }> = []
+  let dualChart: {
+    labelA: string
+    labelB: string
+    chartData: Array<{ date: string; [key: string]: string | number }>
+    seriesA: string[]
+    seriesB: string[]
+  } | null = null
 
-  if (showResult) {
+  if (showResult && selectedObservableIds.length === 2) {
+    const [obsA, obsB] = selectedObservableIds
+    const observableA = performanceObservables.find((o) => o.id === obsA)
+    const observableB = performanceObservables.find((o) => o.id === obsB)
+    const [seriesResA, seriesResB] = await Promise.all(
+      [obsA, obsB].map((observableId) =>
+        compareAthletes({
+          organizationId: membership.organizationId,
+          athleteMembershipIds: athleteIds,
+          observableId,
+          from: params.desde || undefined,
+          to: params.hasta || undefined,
+          officialOnly: params.oficiales === '1',
+          sourceTypes: origenesSeleccionados.length > 0 ? origenesSeleccionados : undefined,
+        })
+      )
+    )
+
+    const labelA = observableA?.name ?? '—'
+    const labelB = observableB?.name ?? '—'
+    const seriesA = seriesResA.map((s) => `${s.athleteName} (${labelA})`)
+    const seriesB = seriesResB.map((s) => `${s.athleteName} (${labelB})`)
+
+    const allDates = Array.from(
+      new Set([...seriesResA.flatMap((s) => s.points.map((p) => p.date)), ...seriesResB.flatMap((s) => s.points.map((p) => p.date))])
+    ).sort()
+
+    const chartData = allDates.map((date) => {
+      const row: { date: string; [key: string]: string | number } = { date }
+      for (const s of seriesResA) {
+        const point = s.points.find((p) => p.date === date)
+        if (point) row[`${s.athleteName} (${labelA})`] = point.value
+      }
+      for (const s of seriesResB) {
+        const point = s.points.find((p) => p.date === date)
+        if (point) row[`${s.athleteName} (${labelB})`] = point.value
+      }
+      return row
+    })
+
+    dualChart = { labelA, labelB, chartData, seriesA, seriesB }
+  } else if (showResult) {
     for (const observableId of selectedObservableIds) {
       const observable = performanceObservables.find((o) => o.id === observableId)
       const series = await compareAthletes({
@@ -155,23 +203,47 @@ export default async function CompararPage({
 
       {showResult && (
         <div className="space-y-4">
-          {charts.length === 0 && (
+          {dualChart ? (
             <div className="card p-4">
-              <p className="text-sm text-status-neutral">Sin datos todavía para esta combinación.</p>
-            </div>
-          )}
-          {charts.map((c) => (
-            <div key={c.observableName} className="card p-4">
-              <p className="text-sm font-semibold text-ink mb-2">{c.observableName}</p>
-              {c.chartData.length === 0 ? (
-                <p className="text-sm text-status-neutral">Sin datos todavía para esta prueba.</p>
+              <p className="text-sm font-semibold text-ink mb-2">
+                {dualChart.labelA} <span className="text-status-neutral font-normal">(línea sólida)</span> vs {dualChart.labelB}{' '}
+                <span className="text-status-neutral font-normal">(línea punteada)</span>
+              </p>
+              {dualChart.chartData.length === 0 ? (
+                <p className="text-sm text-status-neutral">Sin datos todavía para esta combinación.</p>
               ) : (
-                <FullscreenChart title={c.observableName}>
-                  <CompareChart data={c.chartData} athleteNames={c.athleteNames} />
+                <FullscreenChart title={`${dualChart.labelA} vs ${dualChart.labelB}`}>
+                  <DualCompareChart
+                    data={dualChart.chartData}
+                    seriesA={dualChart.seriesA}
+                    seriesB={dualChart.seriesB}
+                    labelA={dualChart.labelA}
+                    labelB={dualChart.labelB}
+                  />
                 </FullscreenChart>
               )}
             </div>
-          ))}
+          ) : (
+            <>
+              {charts.length === 0 && (
+                <div className="card p-4">
+                  <p className="text-sm text-status-neutral">Sin datos todavía para esta combinación.</p>
+                </div>
+              )}
+              {charts.map((c) => (
+                <div key={c.observableName} className="card p-4">
+                  <p className="text-sm font-semibold text-ink mb-2">{c.observableName}</p>
+                  {c.chartData.length === 0 ? (
+                    <p className="text-sm text-status-neutral">Sin datos todavía para esta prueba.</p>
+                  ) : (
+                    <FullscreenChart title={c.observableName}>
+                      <CompareChart data={c.chartData} athleteNames={c.athleteNames} />
+                    </FullscreenChart>
+                  )}
+                </div>
+              ))}
+            </>
+          )}
         </div>
       )}
     </div>

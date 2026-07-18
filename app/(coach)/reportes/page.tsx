@@ -44,6 +44,10 @@ export default async function ReportesPage({
     Object.entries(params).filter(([, v]) => v) as [string, string][]
   ).toString()}`
 
+  const trainingsDownloadHref = `/api/reportes/entrenamientos?${new URLSearchParams(
+    Object.entries(params).filter(([k, v]) => v && k !== 'origen') as [string, string][]
+  ).toString()}`
+
   return (
     <div className="space-y-6">
       <div>
@@ -96,6 +100,19 @@ export default async function ReportesPage({
       <div className="flex items-center justify-between">
         <p className="text-sm text-status-neutral">{rows.length} registros</p>
         <a href={downloadHref} className="rounded-lg bg-status-positive text-white px-4 py-2 text-sm font-medium">
+          ⬇ Descargar Excel
+        </a>
+      </div>
+
+      <div className="card p-4 flex items-center justify-between gap-3 flex-wrap">
+        <div>
+          <p className="text-sm font-semibold text-ink">Entrenamientos planificados</p>
+          <p className="text-xs text-status-neutral">
+            Fecha, entrenamiento agendado, feedback y fatiga — de {params.atleta ? 'este atleta' : params.grupo ? 'este grupo' : 'todos'}
+            {params.desde || params.hasta ? ' en el rango elegido arriba' : ''}.
+          </p>
+        </div>
+        <a href={trainingsDownloadHref} className="rounded-lg bg-status-positive text-white px-4 py-2 text-sm font-medium shrink-0">
           ⬇ Descargar Excel
         </a>
       </div>
