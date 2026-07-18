@@ -15,6 +15,7 @@ export type AuditAction =
   | 'health_episode.update'
   | 'health_episode.resolve'
   | 'plan.create'
+  | 'plan.update'
   | 'objective.create'
   | 'objective.achieve'
   | 'group.create'

@@ -1,8 +1,11 @@
+import Link from 'next/link'
 import { getMyActiveMembership, getAthletesForCoach, getRoster } from '@/domains/athletes/queries'
 import { getPlans, getObjectives } from '@/domains/planning/queries'
+import { getEventsForRange } from '@/domains/events/queries'
 import { PlanForm } from './plan-form'
 import { ObjectiveForm } from './objective-form'
 import { AchieveButton } from './achieve-button'
+import { AnnualGrid } from './annual-grid'
 
 export const dynamic = 'force-dynamic'
 
@@ -25,7 +28,12 @@ function formatDate(date: string | null) {
   return new Date(date + 'T00:00:00').toLocaleDateString('es-AR', { day: 'numeric', month: 'short', year: 'numeric' })
 }
 
-export default async function PlanificacionPage() {
+export default async function PlanificacionPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ vista?: string; year?: string }>
+}) {
+  const params = await searchParams
   const membership = await getMyActiveMembership()
   if (!membership) return null
 
@@ -39,12 +47,99 @@ export default async function PlanificacionPage() {
   const pendientes = objectives.filter((o) => !o.achieved)
   const logrados = objectives.filter((o) => o.achieved)
 
+  const vistaAnual = params.vista === 'anual'
+  const year = params.year ? parseInt(params.year, 10) : new Date().getFullYear()
+
+  let annualSection: React.ReactNode = null
+  if (vistaAnual) {
+    const yearFrom = `${year}-01-01`
+    const yearTo = `${year}-12-31`
+
+    const objectivesByPlan = new Map(objectives.map((o) => [o.planId, o]))
+
+    const macrociclos = plans
+      .filter((p) => p.type === 'macrociclo' && p.startDate && p.endDate)
+      .map((p) => ({
+        id: p.id,
+        type: 'macrociclo' as const,
+        title: p.title,
+        startDate: p.startDate!,
+        endDate: p.endDate!,
+        parentPlanId: p.parentPlanId,
+        objectiveText: null,
+      }))
+
+    const mesociclos = plans
+      .filter((p) => p.type === 'mesociclo' && p.startDate && p.endDate)
+      .sort((a, b) => (a.startDate ?? '').localeCompare(b.startDate ?? ''))
+      .map((p) => ({
+        id: p.id,
+        type: 'mesociclo' as const,
+        title: p.title,
+        startDate: p.startDate!,
+        endDate: p.endDate!,
+        parentPlanId: p.parentPlanId,
+        objectiveText: objectivesByPlan.get(p.id)?.description ?? null,
+      }))
+
+    const yearEvents = await getEventsForRange(membership.organizationId, yearFrom, yearTo)
+    const competitions = yearEvents
+      .filter((e) => e.type === 'competencia' && e.date)
+      .map((e) => ({ id: e.id, title: e.title, date: e.date as string }))
+
+    annualSection = (
+      <section className="space-y-3">
+        <div className="flex items-center justify-between flex-wrap gap-2">
+          <h2 className="text-sm font-semibold text-ink">Vista anual {year}</h2>
+          <div className="flex items-center gap-2 text-sm">
+            <Link href={`/planificacion?vista=anual&year=${year - 1}`} className="px-2 py-1 rounded-md border border-outline">
+              ← {year - 1}
+            </Link>
+            <Link href={`/planificacion?vista=anual&year=${year + 1}`} className="px-2 py-1 rounded-md border border-outline">
+              {year + 1} →
+            </Link>
+          </div>
+        </div>
+
+        {macrociclos.length === 0 && mesociclos.length === 0 ? (
+          <div className="rounded-xl border border-outline bg-panel p-4 text-sm text-status-neutral">
+            Todavía no hay macrociclos ni mesociclos con fechas cargadas para {year}. Cargalos abajo en "Árbol de planes" — acá se
+            van a dibujar solos.
+          </div>
+        ) : (
+          <div className="card p-4">
+            <AnnualGrid year={year} macrociclos={macrociclos} mesociclos={mesociclos} competitions={competitions} />
+            <p className="text-[11px] text-status-neutral mt-3">
+              🏁 = competencia · tocá y arrastrá los bordes de un mesociclo (dorado) para mover sus fechas — se guarda solo y se
+              refleja también en la lista de abajo.
+            </p>
+          </div>
+        )}
+      </section>
+    )
+  }
+
   return (
     <div className="space-y-8">
-      <div>
-        <p className="text-xs uppercase tracking-wider text-gold font-medium">Planificación</p>
-        <h1 className="font-display text-2xl font-bold text-ink">Temporadas y objetivos</h1>
+      <div className="flex items-start justify-between flex-wrap gap-3">
+        <div>
+          <p className="text-xs uppercase tracking-wider text-gold font-medium">Planificación</p>
+          <h1 className="font-display text-2xl font-bold text-ink">Temporadas y objetivos</h1>
+        </div>
+        <div className="flex rounded-lg border border-outline overflow-hidden text-xs">
+          <Link href="/planificacion" className={`px-3 py-1.5 ${!vistaAnual ? 'bg-navy text-white' : 'bg-panel text-ink'}`}>
+            Lista
+          </Link>
+          <Link
+            href={`/planificacion?vista=anual&year=${year}`}
+            className={`px-3 py-1.5 ${vistaAnual ? 'bg-navy text-white' : 'bg-panel text-ink'}`}
+          >
+            Anual
+          </Link>
+        </div>
       </div>
+
+      {vistaAnual && annualSection}
 
       <section className="space-y-3">
         <div className="flex items-center justify-between">
