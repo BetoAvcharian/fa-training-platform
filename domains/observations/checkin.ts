@@ -144,3 +144,65 @@ export async function hasCheckinForDate(
   if (error) throw new DomainError('NOT_FOUND', error.message)
   return (count ?? 0) > 0
 }
+
+export interface AthleteCheckinToday {
+  athleteMembershipId: string
+  athleteName: string
+  energia: number | null
+  fatiga: number | null
+  molestia: number | null
+}
+
+/**
+ * Check-in de HOY (o la fecha dada) de todos los atletas del org,
+ * ordenado por energía ascendente — para la tarjeta "menor energía"
+ * del Dashboard del coach. Solo trae a quienes SÍ cargaron algo ese
+ * día (la ausencia se trata aparte, no es "energía 0").
+ */
+export async function getLowestEnergyToday(
+  organizationId: string,
+  date: string,
+  limit?: number,
+  client?: AppSupabaseClient
+): Promise<AthleteCheckinToday[]> {
+  const supabase = client ?? (await createServerClient())
+
+  const { data, error } = await supabase
+    .from('observations')
+    .select('athlete_membership_id, value, observables(name), memberships!observations_athlete_membership_id_fkey(people(first_name, last_name))')
+    .eq('organization_id', organizationId)
+    .eq('date', date)
+    .eq('source_type', 'checkin')
+    .is('superseded_by', null)
+
+  if (error) throw new DomainError('NOT_FOUND', error.message)
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const rows = (data ?? []) as any[]
+  const byAthlete = new Map<string, AthleteCheckinToday>()
+
+  for (const row of rows) {
+    const id = row.athlete_membership_id
+    if (!byAthlete.has(id)) {
+      const person = row.memberships?.people
+      byAthlete.set(id, {
+        athleteMembershipId: id,
+        athleteName: person ? `${person.first_name} ${person.last_name}` : '—',
+        energia: null,
+        fatiga: null,
+        molestia: null,
+      })
+    }
+    const entry = byAthlete.get(id)!
+    const obsName = row.observables?.name
+    if (obsName === 'Energía') entry.energia = row.value
+    else if (obsName === 'Fatiga') entry.fatiga = row.value
+    else if (obsName === 'Molestia') entry.molestia = row.value
+  }
+
+  const list = Array.from(byAthlete.values())
+    .filter((a) => a.energia !== null)
+    .sort((a, b) => (a.energia ?? 99) - (b.energia ?? 99))
+
+  return limit ? list.slice(0, limit) : list
+}
