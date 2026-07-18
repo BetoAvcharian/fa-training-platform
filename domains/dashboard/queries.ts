@@ -373,3 +373,56 @@ function formatName(person: { first_name?: string; last_name?: string } | null |
   if (!person) return '—'
   return `${person.first_name ?? ''} ${person.last_name ?? ''}`.trim()
 }
+
+/**
+ * Cuántos atletas asignados dejaron feedback (de cualquier tipo —
+ * completado, con observación o no completado, no importa cuál) en
+ * cada uno de los últimos entrenamientos — mucho más entendible para
+ * el entrenador que "% con marca concreta registrada", que mezclaba
+ * dos sistemas distintos. Reemplaza al gráfico de rendimiento en el
+ * Dashboard.
+ */
+export async function getFeedbackRateSeries(
+  organizationId: string,
+  limit = 10,
+  client?: AppSupabaseClient
+): Promise<Array<{ date: string; assigned: number; completed: number }>> {
+  const supabase = client ?? (await createServerClient())
+  const today = getTodayISO()
+
+  const { data: events, error } = await supabase
+    .from('events')
+    .select('id, date, event_assignments(assignee_id, assignee_type)')
+    .eq('organization_id', organizationId)
+    .eq('type', 'entrenamiento')
+    .eq('is_template', false)
+    .lte('date', today)
+    .order('date', { ascending: false })
+    .limit(limit)
+
+  if (error) throw new DomainError('NOT_FOUND', error.message)
+
+  const series = []
+  for (const event of (events ?? []).reverse()) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const assignees = ((event as any).event_assignments ?? [])
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      .filter((a: any) => a.assignee_type === 'person')
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      .map((a: any) => a.assignee_id as string)
+
+    let withFeedback = 0
+    if (assignees.length > 0) {
+      const { count } = await supabase
+        .from('session_feedback')
+        .select('athlete_membership_id', { count: 'exact', head: true })
+        .eq('event_id', event.id)
+        .in('athlete_membership_id', assignees)
+      withFeedback = count ?? 0
+    }
+
+    series.push({ date: event.date as string, assigned: assignees.length, completed: withFeedback })
+  }
+
+  return series
+}
