@@ -4,13 +4,15 @@ import { getMyActiveMembership } from '@/domains/athletes/queries'
 import {
   getAthletesWithoutExecutionSince,
   getWellnessAlerts,
-  getUpcomingCompetitions,
   getOrgStats,
   getUpcomingEventsOrg,
   getAttendanceSeries,
 } from '@/domains/dashboard/queries'
+import { getLowestEnergyToday } from '@/domains/observations/checkin'
+import { getDaySchedule } from '@/domains/dashboard/day-schedule'
 import { AttendanceChart } from './attendance-chart'
 import { PerformanceChart } from './performance-chart'
+import { TrainingDayList } from '@/components/ui/training-day-list'
 
 export const dynamic = 'force-dynamic'
 
@@ -38,15 +40,15 @@ export default async function ResumenPage() {
   if (!membership) return null
 
   const today = getTodayISO()
-  const in14Days = new Date(Date.now() + 14 * 86400000).toISOString().slice(0, 10)
 
-  const [withoutExecution, wellness, competitions, stats, upcoming, attendance] = await Promise.all([
+  const [withoutExecution, wellness, stats, upcoming, attendance, lowestEnergy, todaySchedule] = await Promise.all([
     getAthletesWithoutExecutionSince(membership.id, daysAgo(4)),
     getWellnessAlerts(membership.id, today),
-    getUpcomingCompetitions(membership.id, today, in14Days),
     getOrgStats(membership.organizationId),
     getUpcomingEventsOrg(membership.organizationId, 5),
     getAttendanceSeries(membership.organizationId, 10),
+    getLowestEnergyToday(membership.organizationId, today, 3),
+    getDaySchedule(membership.organizationId, today),
   ])
 
   const hasAlerts = withoutExecution.length > 0 || wellness.length > 0
@@ -68,8 +70,10 @@ export default async function ResumenPage() {
               <p className="text-sm font-medium text-status-critical mb-2">🔴 Atención requerida ({withoutExecution.length})</p>
               <ul className="space-y-1">
                 {withoutExecution.map((a) => (
-                  <li key={a.athleteMembershipId} className="text-sm text-ink">
-                    {a.athleteName} — sin registrar hace más de 4 días
+                  <li key={a.athleteMembershipId}>
+                    <Link href={`/atletas/${a.athleteMembershipId}`} className="text-sm text-ink hover:underline">
+                      {a.athleteName} — sin registrar hace más de 4 días
+                    </Link>
                   </li>
                 ))}
               </ul>
@@ -81,8 +85,10 @@ export default async function ResumenPage() {
               <p className="text-sm font-medium text-status-attention mb-2">🟠 Seguimiento ({wellness.length})</p>
               <ul className="space-y-1">
                 {wellness.map((a) => (
-                  <li key={a.athleteMembershipId} className="text-sm text-ink">
-                    {a.athleteName} — energía {a.energia ?? '—'}/5, fatiga {a.fatiga ?? '—'}/5
+                  <li key={a.athleteMembershipId}>
+                    <Link href={`/atletas/${a.athleteMembershipId}`} className="text-sm text-ink hover:underline">
+                      {a.athleteName} — energía {a.energia ?? '—'}/5, fatiga {a.fatiga ?? '—'}/5
+                    </Link>
                   </li>
                 ))}
               </ul>
@@ -91,25 +97,35 @@ export default async function ResumenPage() {
         </div>
       )}
 
-      {competitions.length > 0 && (
+      {lowestEnergy.length > 0 && (
         <div className="card p-4">
-          <p className="text-sm font-medium text-ink mb-2">ℹ️ Próximas competencias</p>
+          <div className="flex items-center justify-between mb-2">
+            <p className="text-sm font-medium text-ink">🔋 Menor energía hoy</p>
+            <Link href="/resumen/energia" className="text-xs text-gold font-medium">
+              Ver todos →
+            </Link>
+          </div>
           <ul className="space-y-1">
-            {competitions.map((c) => (
-              <li key={`${c.eventId}-${c.athleteName}`} className="text-sm text-status-neutral">
-                {c.date} — {c.title} ({c.athleteName})
+            {lowestEnergy.map((a) => (
+              <li key={a.athleteMembershipId}>
+                <Link href={`/atletas/${a.athleteMembershipId}`} className="text-sm text-ink hover:underline flex items-center justify-between">
+                  <span>{a.athleteName}</span>
+                  <span className="text-status-neutral">
+                    energía {a.energia ?? '—'}/10{a.fatiga !== null && ` · fatiga ${a.fatiga}/10`}
+                  </span>
+                </Link>
               </li>
             ))}
           </ul>
         </div>
       )}
 
-      {/* Tarjetas de métricas */}
+      {/* Tarjetas de métricas — clickeables, cada una a su módulo */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        <StatCard label="Ejercicios" value={stats.drills.count} delta={stats.drills.deltaWeek} />
-        <StatCard label="Sesiones" value={stats.sessions.count} delta={stats.sessions.deltaWeek} />
-        <StatCard label="Atletas" value={stats.athletes.count} delta={stats.athletes.deltaWeek} />
-        <StatCard label="Miembros activos" value={stats.activeMembers.count} delta={stats.activeMembers.deltaWeek} />
+        <StatCard label="Ejercicios" value={stats.drills.count} delta={stats.drills.deltaWeek} href="/registros" />
+        <StatCard label="Sesiones" value={stats.sessions.count} delta={stats.sessions.deltaWeek} href="/calendario" />
+        <StatCard label="Atletas" value={stats.athletes.count} delta={stats.athletes.deltaWeek} href="/atletas" />
+        <StatCard label="Miembros activos" value={stats.activeMembers.count} delta={stats.activeMembers.deltaWeek} href="/atletas" />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
@@ -124,7 +140,11 @@ export default async function ResumenPage() {
           {upcoming.length === 0 && <p className="text-sm text-status-neutral">Sin eventos próximos.</p>}
           <div className="divide-y divide-outline">
             {upcoming.map((e) => (
-              <div key={e.id} className="py-3 flex items-center justify-between gap-2">
+              <Link
+                key={e.id}
+                href={`/calendario?week=${e.date}&view=dia`}
+                className="py-3 flex items-center justify-between gap-2 hover:bg-outline/20 -mx-1 px-1 rounded"
+              >
                 <div>
                   <p className="text-xs text-gold font-medium">{TYPE_LABELS[e.type] ?? e.type}</p>
                   <p className="text-sm font-medium text-ink">{e.title}</p>
@@ -135,41 +155,55 @@ export default async function ResumenPage() {
                     {e.completedCount}/{e.assignedCount} hechos
                   </span>
                 )}
-              </div>
+              </Link>
             ))}
           </div>
         </div>
 
         {/* Gráficos */}
         <div className="space-y-4">
-          <div className="card p-4">
+          <Link href="/calendario" className="card p-4 block hover:border-gold/40 transition-colors">
             <p className="text-sm font-semibold text-ink mb-2">Rendimiento (% completado, últimas sesiones)</p>
+            <p className="text-[11px] text-status-neutral mb-2">
+              % de atletas asignados que registraron una marca concreta en esa sesión — no es lo mismo que el feedback de "completado".
+            </p>
             {attendance.length === 0 ? (
               <p className="text-sm text-status-neutral">Sin datos todavía.</p>
             ) : (
               <PerformanceChart data={attendance} />
             )}
-          </div>
-          <div className="card p-4">
+          </Link>
+          <Link href="/calendario" className="card p-4 block hover:border-gold/40 transition-colors">
             <p className="text-sm font-semibold text-ink mb-2">Asistencia (últimas sesiones)</p>
             {attendance.length === 0 ? (
               <p className="text-sm text-status-neutral">Sin datos todavía.</p>
             ) : (
               <AttendanceChart data={attendance} />
             )}
-          </div>
+          </Link>
         </div>
+      </div>
+
+      {/* Vista del día — mismo módulo que Calendario > Día, acá solo hoy */}
+      <div className="card p-4">
+        <div className="flex items-center justify-between mb-3">
+          <p className="text-sm font-semibold text-ink">Hoy — entrenamientos del día</p>
+          <Link href="/calendario?view=dia" className="text-xs text-gold font-medium">
+            Ver calendario por día →
+          </Link>
+        </div>
+        <TrainingDayList trainings={todaySchedule} />
       </div>
     </div>
   )
 }
 
-function StatCard({ label, value, delta }: { label: string; value: number; delta: number }) {
+function StatCard({ label, value, delta, href }: { label: string; value: number; delta: number; href: string }) {
   return (
-    <div className="card p-4">
+    <Link href={href} className="card-hover p-4 block">
       <p className="text-xs text-status-neutral uppercase tracking-wide">{label}</p>
       <p className="font-display text-2xl font-bold text-ink">{value}</p>
       {delta > 0 && <p className="text-xs text-status-positive mt-0.5">+{delta} esta semana</p>}
-    </div>
+    </Link>
   )
 }

@@ -1,6 +1,8 @@
 import { getMyActiveMembership, getAthletesForCoach, getRoster, getGroups } from '@/domains/athletes/queries'
 import { getEventsForRange, getSessionExercises } from '@/domains/events/queries'
-import { getTodayDate } from '@/lib/today'
+import { getDaySchedule } from '@/domains/dashboard/day-schedule'
+import { TrainingDayList } from '@/components/ui/training-day-list'
+import { getTodayDate, getTodayISO } from '@/lib/today'
 import { EventCard } from './event-card'
 import { EventCompareCard } from './event-compare-card'
 import { CopyWeekForm } from './copy-week-form'
@@ -34,12 +36,16 @@ export default async function CalendarioPage({
 }) {
   const params = await searchParams
   const mode = params.mode === 'ver' ? 'ver' : 'planificar'
-  const view = params.view === 'mes' ? 'mes' : 'semana'
+  const view = params.view === 'mes' ? 'mes' : params.view === 'dia' ? 'dia' : 'semana'
   const membership = await getMyActiveMembership()
   if (!membership) return null
 
   if (view === 'mes') {
     return <MonthView monthParam={params.month} mode={mode} organizationId={membership.organizationId} />
+  }
+
+  if (view === 'dia') {
+    return <DayView dateParam={params.week} organizationId={membership.organizationId} />
   }
 
   const base = params.week ? new Date(params.week + 'T00:00:00') : getTodayDate()
@@ -89,6 +95,9 @@ export default async function CalendarioPage({
             </a>
           </div>
           <div className="flex rounded-lg border border-outline overflow-hidden text-xs">
+            <a href={`?week=${weekStartStr}&mode=${mode}&view=dia`} className="px-3 py-1.5 bg-panel text-ink">
+              Día
+            </a>
             <a href={`?week=${weekStartStr}&mode=${mode}&view=semana`} className="px-3 py-1.5 bg-navy text-white">
               Semana
             </a>
@@ -228,6 +237,47 @@ async function MonthView({
           )
         })}
       </div>
+    </div>
+  )
+}
+
+async function DayView({ dateParam, organizationId }: { dateParam?: string; organizationId: string }) {
+  const date = dateParam ?? getTodayISO()
+  const d = new Date(date + 'T00:00:00')
+  const prevDay = new Date(d.getTime() - 86400000).toISOString().slice(0, 10)
+  const nextDay = new Date(d.getTime() + 86400000).toISOString().slice(0, 10)
+  const label = d.toLocaleDateString('es-AR', { weekday: 'long', day: 'numeric', month: 'long' })
+
+  const trainings = await getDaySchedule(organizationId, date)
+
+  return (
+    <div>
+      <div className="flex items-center justify-between mb-6 flex-wrap gap-3">
+        <div>
+          <p className="text-xs uppercase tracking-wider text-gold font-medium">Calendario</p>
+          <h1 className="font-display text-2xl font-bold text-ink capitalize">{label}</h1>
+        </div>
+        <div className="flex items-center gap-3 flex-wrap">
+          <div className="flex rounded-lg border border-outline overflow-hidden text-xs">
+            <a href={`?week=${date}&view=dia`} className="px-3 py-1.5 bg-navy text-white">
+              Día
+            </a>
+            <a href={`?week=${date}&view=semana`} className="px-3 py-1.5 bg-panel text-ink">
+              Semana
+            </a>
+            <a href={`?week=${date}&view=mes`} className="px-3 py-1.5 bg-panel text-ink">
+              Mes
+            </a>
+          </div>
+          <div className="flex items-center gap-2 text-sm">
+            <a href={`?week=${prevDay}&view=dia`} className="px-3 py-1.5 rounded-md border border-outline">◀ Ayer</a>
+            <a href={`?week=${getTodayISO()}&view=dia`} className="px-3 py-1.5 rounded-md border border-outline">Hoy</a>
+            <a href={`?week=${nextDay}&view=dia`} className="px-3 py-1.5 rounded-md border border-outline">Mañana ▶</a>
+          </div>
+        </div>
+      </div>
+
+      <TrainingDayList trainings={trainings} />
     </div>
   )
 }

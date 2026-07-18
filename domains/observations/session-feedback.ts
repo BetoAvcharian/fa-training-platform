@@ -58,3 +58,51 @@ export async function submitSessionFeedback(
     metadata: { status: input.status },
   })
 }
+
+export interface AthleteSessionFeedback {
+  athleteMembershipId: string
+  athleteName: string
+  status: SessionFeedbackStatus | null
+  notes: string | null
+}
+
+/**
+ * El feedback de TODOS los atletas asignados a un entrenamiento —
+ * para que el entrenador vea, al abrir el detalle, quién completó
+ * (verde), quién completó con alguna observación (amarillo) y quién
+ * todavía no cargó nada (blanco/status null). RLS ya limita esto a
+ * manager o coach de la organización del evento.
+ */
+export async function getFeedbackForEvent(
+  eventId: string,
+  assignedAthleteIds: string[],
+  client?: AppSupabaseClient
+): Promise<AthleteSessionFeedback[]> {
+  const supabase = client ?? (await createServerClient())
+  if (assignedAthleteIds.length === 0) return []
+
+  const [{ data: feedbackRows, error: feedbackError }, { data: peopleRows, error: peopleError }] = await Promise.all([
+    supabase.from('session_feedback').select('athlete_membership_id, status, notes').eq('event_id', eventId),
+    supabase
+      .from('memberships')
+      .select('id, people(first_name, last_name)')
+      .in('id', assignedAthleteIds),
+  ])
+
+  if (feedbackError) throw new DomainError('NOT_FOUND', feedbackError.message)
+  if (peopleError) throw new DomainError('NOT_FOUND', peopleError.message)
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const feedbackByAthlete = new Map((feedbackRows ?? []).map((r: any) => [r.athlete_membership_id, r]))
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return (peopleRows ?? []).map((row: any) => {
+    const fb = feedbackByAthlete.get(row.id)
+    return {
+      athleteMembershipId: row.id,
+      athleteName: row.people ? `${row.people.first_name} ${row.people.last_name}` : '—',
+      status: fb ? (fb.status as SessionFeedbackStatus) : null,
+      notes: fb ? fb.notes : null,
+    }
+  })
+}
