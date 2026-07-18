@@ -56,7 +56,12 @@ export default async function AthleteSaludPage({
 
       {cycleStats && (
         <div className="card p-4">
-          <p className="text-sm font-semibold text-ink mb-2">Ciclo menstrual</p>
+          <div className="flex items-center justify-between mb-2">
+            <p className="text-sm font-semibold text-ink">Ciclo menstrual</p>
+            <Link href={`/salud/${athleteId}/ciclo`} className="text-xs text-navy underline">
+              Ver calendario →
+            </Link>
+          </div>
           {cycleStats.currentCycleDay === null ? (
             <p className="text-sm text-status-neutral">Todavía no cargó datos de ciclo.</p>
           ) : (
