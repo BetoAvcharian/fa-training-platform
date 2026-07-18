@@ -6,6 +6,7 @@ import { PlanForm } from './plan-form'
 import { ObjectiveForm } from './objective-form'
 import { AchieveButton } from './achieve-button'
 import { AnnualGrid } from './annual-grid'
+import { FullscreenChart } from '@/components/ui/fullscreen-chart'
 
 export const dynamic = 'force-dynamic'
 
@@ -108,7 +109,9 @@ export default async function PlanificacionPage({
           </div>
         ) : (
           <div className="card p-4">
-            <AnnualGrid year={year} macrociclos={macrociclos} mesociclos={mesociclos} competitions={competitions} />
+            <FullscreenChart title={`Planificación anual ${year}`}>
+              <AnnualGrid year={year} macrociclos={macrociclos} mesociclos={mesociclos} competitions={competitions} />
+            </FullscreenChart>
             <p className="text-[11px] text-status-neutral mt-3">
               🏁 = competencia · tocá y arrastrá los bordes de un mesociclo (dorado) para mover sus fechas — se guarda solo y se
               refleja también en la lista de abajo.
