@@ -7,6 +7,7 @@ import { getCycleStats } from '@/domains/health/cycle'
 import { getAnthropometryHistory } from '@/domains/observations/anthropometry'
 import { getVideosForAthlete } from '@/domains/videos/tags'
 import { getMyActiveMembership } from '@/domains/athletes/queries'
+import { getObjectives } from '@/domains/planning/queries'
 import { formatMark } from '@/lib/format-mark'
 
 export const dynamic = 'force-dynamic'
@@ -60,27 +61,55 @@ export default async function AthleteProfilePage({
   const supabase = await createServerClient()
   const { data: athlete } = await supabase
     .from('memberships')
-    .select('id, status, people(first_name, last_name, email, birth_date, gender, phone, club)')
+    .select('id, status, coach_membership_id, people(first_name, last_name, email, birth_date, gender, phone, club)')
     .eq('id', athleteId)
     .maybeSingle()
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const athleteRow = athlete as any
   const athleteName = athleteRow?.people ? `${athleteRow.people.first_name} ${athleteRow.people.last_name}` : 'Atleta'
+  const initials = athleteRow?.people ? `${athleteRow.people.first_name[0] ?? ''}${athleteRow.people.last_name[0] ?? ''}`.toUpperCase() : '—'
+
+  let coachName: string | null = null
+  if (athleteRow?.coach_membership_id) {
+    const { data: coach } = await supabase
+      .from('memberships')
+      .select('people(first_name, last_name)')
+      .eq('id', athleteRow.coach_membership_id)
+      .maybeSingle()
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const coachRow = coach as any
+    coachName = coachRow?.people ? `${coachRow.people.first_name} ${coachRow.people.last_name}` : null
+  }
+
+  let age: number | null = null
+  if (athleteRow?.people?.birth_date) {
+    const birth = new Date(athleteRow.people.birth_date + 'T00:00:00')
+    const today = new Date()
+    age = today.getFullYear() - birth.getFullYear() - (today < new Date(today.getFullYear(), birth.getMonth(), birth.getDate()) ? 1 : 0)
+  }
 
   return (
     <div className="space-y-6">
-      <div>
-        <Link href="/atletas" className="text-xs text-status-neutral hover:text-ink">
-          ← Volver a atletas
-        </Link>
-        <h1 className="font-display text-2xl font-bold text-ink mt-2">{athleteName}</h1>
-        {athleteRow?.people?.email && <p className="text-xs text-status-neutral">{athleteRow.people.email}</p>}
-        <div className="flex flex-wrap gap-x-4 gap-y-1 mt-2 text-xs text-status-neutral">
-          {athleteRow?.people?.birth_date && <span>Nacimiento: {athleteRow.people.birth_date}</span>}
-          {athleteRow?.people?.gender && <span>Género: {GENDER_LABELS[athleteRow.people.gender] ?? athleteRow.people.gender}</span>}
-          {athleteRow?.people?.phone && <span>Tel: {athleteRow.people.phone}</span>}
-          {athleteRow?.people?.club && <span>Club: {athleteRow.people.club}</span>}
+      <Link href="/atletas" className="text-xs text-status-neutral hover:text-ink">
+        ← Volver a atletas
+      </Link>
+
+      {/* Header ficha premium — todo lo que hace falta saber de un vistazo */}
+      <div className="card p-5 bg-gradient-to-br from-navy/5 to-transparent">
+        <div className="flex items-start gap-4 flex-wrap">
+          <span className="w-16 h-16 rounded-2xl bg-navy text-white flex items-center justify-center text-xl font-bold font-display shrink-0">
+            {initials}
+          </span>
+          <div className="flex-1 min-w-[200px]">
+            <h1 className="font-display text-2xl font-bold text-ink leading-tight">{athleteName}</h1>
+            <div className="flex flex-wrap gap-x-4 gap-y-1 mt-1.5 text-sm text-status-neutral">
+              {age !== null && <span>{age} años</span>}
+              {athleteRow?.people?.gender && <span>{GENDER_LABELS[athleteRow.people.gender] ?? athleteRow.people.gender}</span>}
+              {athleteRow?.people?.club && <span>🏛️ {athleteRow.people.club}</span>}
+              {coachName && <span>👤 Coach: {coachName}</span>}
+            </div>
+          </div>
         </div>
       </div>
 
@@ -109,9 +138,11 @@ export default async function AthleteProfilePage({
 
 async function ResumenTab({ athleteId, organizationId }: { athleteId: string; organizationId: string }) {
   const supabase = await createServerClient()
-  const [events, records, checkins] = await Promise.all([
-    getEventsForAthlete(athleteId, 5),
+  const [events, records, results, objectives, checkins] = await Promise.all([
+    getEventsForAthlete(athleteId, 40),
     getAthleteRecords(athleteId, organizationId),
+    getAthleteResults(athleteId, organizationId, 5),
+    getObjectives(organizationId).then((all) => all.filter((o) => o.athleteMembershipId === athleteId)),
     supabase
       .from('observations')
       .select('date, value, observables!inner(name, tags)')
@@ -123,42 +154,138 @@ async function ResumenTab({ athleteId, organizationId }: { athleteId: string; or
       .then((r) => r.data ?? []),
   ])
 
+  const oficiales = records.filter((r) => r.recordType === 'oficial')
+  const mejorMarca = oficiales[0]
+  const proximaCompetencia = events
+    .filter((e) => e.type === 'competencia' && e.date && e.date >= new Date().toISOString().slice(0, 10))
+    .sort((a, b) => (a.date ?? '').localeCompare(b.date ?? ''))[0]
+  const objetivoPrincipal = objectives.find((o) => !o.achieved)
+  const objetivosLogrados = objectives.filter((o) => o.achieved).length
+  const weekStart = new Date()
+  weekStart.setDate(weekStart.getDate() - weekStart.getDay() + 1)
+  const entrenosSemana = events.filter(
+    (e) => e.type === 'entrenamiento' && e.date && new Date(e.date + 'T00:00:00') >= weekStart
+  ).length
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const ultimoCheckin = (checkins as any[])[0]
+
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-      <div className="card p-4">
-        <p className="text-sm font-semibold text-ink mb-2">Últimos entrenamientos</p>
-        {events.length === 0 && <p className="text-sm text-status-neutral">Sin actividad todavía.</p>}
-        {events.map((e) => (
-          <p key={e.id} className="text-sm text-ink py-1 border-b border-outline last:border-0">
-            {e.date ? formatDate(e.date) : ''} — {e.title}
-          </p>
-        ))}
+    <div className="space-y-5">
+      {/* Panel resumen — todo visible sin scroll */}
+      <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
+        <SummaryCard icon="🏆" label="Mejor marca" value={mejorMarca ? formatMark(mejorMarca.value, mejorMarca.unitSymbol) : '—'} sub={mejorMarca?.observableName} tone="orange" />
+        <SummaryCard
+          icon="📅"
+          label="Próxima competencia"
+          value={proximaCompetencia ? formatDate(proximaCompetencia.date!) : 'Sin agendar'}
+          sub={proximaCompetencia?.title}
+          tone="blue"
+        />
+        <SummaryCard icon="🎯" label="Objetivo principal" value={objetivoPrincipal ? objetivoPrincipal.description ?? '—' : 'Sin pendientes'} tone="green" small />
+        <SummaryCard
+          icon="⚡"
+          label="Estado actual"
+          value={ultimoCheckin ? `${ultimoCheckin.observables?.name}: ${ultimoCheckin.value}` : 'Sin check-in'}
+          sub={ultimoCheckin ? formatDate(ultimoCheckin.date) : undefined}
+          tone="neutral"
+        />
+        <SummaryCard icon="💪" label="Entrenamientos esta semana" value={String(entrenosSemana)} tone="blue" />
       </div>
-      <div className="card p-4">
-        <p className="text-sm font-semibold text-ink mb-2">Récords oficiales</p>
-        {records.filter((r) => r.recordType === 'oficial').length === 0 && (
-          <p className="text-sm text-status-neutral">Sin récords todavía.</p>
-        )}
-        {records
-          .filter((r) => r.recordType === 'oficial')
-          .map((r) => (
-            <p key={r.id} className="text-sm text-ink py-1 border-b border-outline last:border-0">
-              {r.observableName}: <span className="font-medium">{formatMark(r.value, r.unitSymbol)}</span>
-            </p>
-          ))}
-      </div>
-      <div className="card p-4 sm:col-span-2">
-        <p className="text-sm font-semibold text-ink mb-2">Bienestar (check-in diario)</p>
-        {checkins.length === 0 && <p className="text-sm text-status-neutral">Sin check-ins registrados todavía.</p>}
-        <div className="flex flex-wrap gap-2">
-          {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-          {(checkins as any[]).map((c, i) => (
-            <span key={i} className="text-xs bg-outline/40 rounded-full px-2 py-1 text-ink">
-              {formatDate(c.date)} · {c.observables?.name}: <span className="font-medium">{c.value}</span>
-            </span>
-          ))}
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        <div className="card p-4 lg:col-span-1">
+          <p className="text-sm font-semibold text-ink mb-3">Evolución reciente</p>
+          {events.filter((e) => e.type === 'entrenamiento').length === 0 && <p className="text-sm text-status-neutral">Sin actividad todavía.</p>}
+          <div className="space-y-2">
+            {events
+              .filter((e) => e.type === 'entrenamiento')
+              .slice(0, 6)
+              .map((e) => (
+                <div key={e.id} className="flex items-center gap-2 text-sm">
+                  <span className="w-1.5 h-1.5 rounded-full bg-navy shrink-0" />
+                  <span className="text-status-neutral text-xs shrink-0">{e.date ? formatDate(e.date) : ''}</span>
+                  <span className="text-ink truncate">{e.title}</span>
+                </div>
+              ))}
+          </div>
+        </div>
+
+        <div className="card p-4 lg:col-span-1">
+          <p className="text-sm font-semibold text-ink mb-3">Últimas competencias</p>
+          {results.length === 0 && <p className="text-sm text-status-neutral">Sin competencias registradas.</p>}
+          <div className="space-y-3">
+            {results.map((r) => (
+              <div key={r.id} className="flex items-center justify-between gap-2">
+                <div className="min-w-0">
+                  <p className="text-sm text-ink truncate">{r.observableName}</p>
+                  <p className="text-xs text-status-neutral">{formatDate(r.date)}</p>
+                </div>
+                <span className="font-display font-bold text-navy shrink-0">{formatMark(r.value, r.unitSymbol)}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="card p-4 lg:col-span-1">
+          <p className="text-sm font-semibold text-ink mb-3">Progreso de objetivos</p>
+          {objectives.length === 0 ? (
+            <p className="text-sm text-status-neutral">Sin objetivos cargados.</p>
+          ) : (
+            <>
+              <div className="flex items-center gap-2 mb-3">
+                <div className="flex-1 h-2 rounded-full bg-outline overflow-hidden">
+                  <div
+                    className="h-full bg-status-positive rounded-full"
+                    style={{ width: `${Math.round((objetivosLogrados / objectives.length) * 100)}%` }}
+                  />
+                </div>
+                <span className="text-xs text-status-neutral shrink-0">
+                  {objetivosLogrados}/{objectives.length}
+                </span>
+              </div>
+              <div className="space-y-1.5">
+                {objectives.slice(0, 4).map((o) => (
+                  <p key={o.id} className="text-sm text-ink flex items-center gap-1.5">
+                    <span>{o.achieved ? '✅' : '⏳'}</span>
+                    <span className={o.achieved ? 'line-through text-status-neutral' : ''}>{o.description}</span>
+                  </p>
+                ))}
+              </div>
+            </>
+          )}
         </div>
       </div>
+    </div>
+  )
+}
+
+function SummaryCard({
+  icon,
+  label,
+  value,
+  sub,
+  tone,
+  small,
+}: {
+  icon: string
+  label: string
+  value: string
+  sub?: string | null
+  tone: 'blue' | 'green' | 'orange' | 'neutral'
+  small?: boolean
+}) {
+  const toneClasses: Record<string, string> = {
+    blue: 'bg-navy/10 text-navy',
+    green: 'bg-status-positive/10 text-status-positive',
+    orange: 'bg-gold/10 text-gold',
+    neutral: 'bg-status-neutral/10 text-status-neutral',
+  }
+  return (
+    <div className="card p-3.5">
+      <span className={`w-7 h-7 rounded-lg flex items-center justify-center text-xs mb-2 ${toneClasses[tone]}`}>{icon}</span>
+      <p className={`font-display font-bold text-ink leading-tight ${small ? 'text-sm line-clamp-2' : 'text-lg'}`}>{value}</p>
+      <p className="text-[11px] text-status-neutral mt-1">{label}</p>
+      {sub && <p className="text-[11px] text-status-neutral/70 truncate">{sub}</p>}
     </div>
   )
 }

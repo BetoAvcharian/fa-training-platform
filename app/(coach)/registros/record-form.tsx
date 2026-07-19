@@ -51,8 +51,9 @@ export function RecordForm({ roster, observables }: { roster: RosterOption[]; ob
           ))}
         </select>
       </div>
-      <div className="flex gap-2 items-center">
+      <div className="flex gap-2 items-center flex-wrap">
         <MarkValueInput name="value" unitSymbol={selectedUnit} />
+        <input name="waPoints" type="number" min={0} max={1400} placeholder="Puntos WA" className="input-field w-28" title="Puntaje World Athletics de esta marca (opcional) — sacalo de worldathleticsscores.com" />
         <button
           type="submit"
           disabled={pending}

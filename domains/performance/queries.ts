@@ -259,3 +259,66 @@ export function computeGroupAverage(series: AthleteSeries[]): Array<{ date: stri
     .map(([date, values]) => ({ date, average: values.reduce((a, b) => a + b, 0) / values.length }))
     .sort((a, b) => a.date.localeCompare(b.date))
 }
+
+export interface RankingRow {
+  athleteMembershipId: string
+  athleteName: string
+  gender: string | null
+  observableName: string
+  value: number
+  unitSymbol: string | null
+  waPoints: number
+  date: string
+}
+
+/**
+ * Ranking por puntos World Athletics — la mejor marca puntuada de
+ * cada atleta, ordenada de mayor a menor. Solo entran marcas que
+ * tienen wa_points cargado (carga manual por ahora, ver mark-value-input).
+ */
+export async function getWaPointsRanking(
+  input: { organizationId: string; gender?: string; observableId?: string; year?: number },
+  client?: AppSupabaseClient
+): Promise<RankingRow[]> {
+  const supabase = client ?? (await createServerClient())
+  await requireRole(input.organizationId, ['manager', 'coach'], supabase)
+
+  let query = supabase
+    .from('observations')
+    .select(
+      'athlete_membership_id, value, date, wa_points, observables(name, units(symbol)), memberships!observations_athlete_membership_id_fkey(people(first_name, last_name, gender))'
+    )
+    .eq('organization_id', input.organizationId)
+    .not('wa_points', 'is', null)
+    .is('superseded_by', null)
+    .order('wa_points', { ascending: false })
+
+  if (input.observableId) query = query.eq('observable_id', input.observableId)
+  if (input.year) query = query.gte('date', `${input.year}-01-01`).lte('date', `${input.year}-12-31`)
+
+  const { data, error } = await query
+  if (error) throw new DomainError('NOT_FOUND', error.message)
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let rows: RankingRow[] = (data ?? []).map((row: any) => ({
+    athleteMembershipId: row.athlete_membership_id,
+    athleteName: row.memberships?.people ? `${row.memberships.people.first_name} ${row.memberships.people.last_name}` : '—',
+    gender: row.memberships?.people?.gender ?? null,
+    observableName: row.observables?.name ?? '—',
+    value: row.value,
+    unitSymbol: row.observables?.units?.symbol ?? null,
+    waPoints: row.wa_points,
+    date: row.date,
+  }))
+
+  if (input.gender) rows = rows.filter((r) => r.gender === input.gender)
+
+  // Solo la mejor marca puntuada por atleta (el ranking compara personas, no cada marca suelta)
+  const bestByAthlete = new Map<string, RankingRow>()
+  for (const row of rows) {
+    const existing = bestByAthlete.get(row.athleteMembershipId)
+    if (!existing || row.waPoints > existing.waPoints) bestByAthlete.set(row.athleteMembershipId, row)
+  }
+
+  return Array.from(bestByAthlete.values()).sort((a, b) => b.waPoints - a.waPoints)
+}
