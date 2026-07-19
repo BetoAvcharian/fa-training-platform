@@ -132,3 +132,84 @@ export async function updatePlanDates(
     entityId: input.id,
   })
 }
+
+/** Edita título y fechas de un plan — la misma edición completa que falta en el resto de la vista Lista. */
+export async function updatePlan(
+  input: { id: string; organizationId: string; title: string; startDate?: string; endDate?: string },
+  client?: AppSupabaseClient
+): Promise<void> {
+  const supabase = client ?? (await createServerClient())
+  const membership = await getMyActiveMembership(supabase)
+  if (!membership) throw new DomainError('PERMISSION', 'No autenticado')
+
+  const { error } = await supabase
+    .from('plans')
+    .update({ title: input.title, start_date: input.startDate ?? null, end_date: input.endDate ?? null })
+    .eq('id', input.id)
+  if (error) throw new DomainError('CONFLICT', error.message)
+
+  await logAudit({
+    organizationId: input.organizationId,
+    actorMembershipId: membership.id,
+    action: 'plan.update',
+    entityType: 'plan',
+    entityId: input.id,
+  })
+}
+
+export async function deletePlan(id: string, organizationId: string, client?: AppSupabaseClient): Promise<void> {
+  const supabase = client ?? (await createServerClient())
+  const membership = await getMyActiveMembership(supabase)
+  if (!membership) throw new DomainError('PERMISSION', 'No autenticado')
+
+  const { error } = await supabase.from('plans').delete().eq('id', id)
+  if (error) throw new DomainError('CONFLICT', error.message)
+
+  await logAudit({
+    organizationId,
+    actorMembershipId: membership.id,
+    action: 'plan.update',
+    entityType: 'plan',
+    entityId: id,
+  })
+}
+
+export async function updateObjective(
+  input: { id: string; organizationId: string; category: string; description: string; targetDate?: string },
+  client?: AppSupabaseClient
+): Promise<void> {
+  const supabase = client ?? (await createServerClient())
+  const membership = await getMyActiveMembership(supabase)
+  if (!membership) throw new DomainError('PERMISSION', 'No autenticado')
+
+  const { error } = await supabase
+    .from('objectives')
+    .update({ category: input.category, description: input.description, target_date: input.targetDate ?? null })
+    .eq('id', input.id)
+  if (error) throw new DomainError('CONFLICT', error.message)
+
+  await logAudit({
+    organizationId: input.organizationId,
+    actorMembershipId: membership.id,
+    action: 'objective.achieve',
+    entityType: 'objective',
+    entityId: input.id,
+  })
+}
+
+export async function deleteObjective(id: string, organizationId: string, client?: AppSupabaseClient): Promise<void> {
+  const supabase = client ?? (await createServerClient())
+  const membership = await getMyActiveMembership(supabase)
+  if (!membership) throw new DomainError('PERMISSION', 'No autenticado')
+
+  const { error } = await supabase.from('objectives').delete().eq('id', id)
+  if (error) throw new DomainError('CONFLICT', error.message)
+
+  await logAudit({
+    organizationId,
+    actorMembershipId: membership.id,
+    action: 'objective.achieve',
+    entityType: 'objective',
+    entityId: id,
+  })
+}
