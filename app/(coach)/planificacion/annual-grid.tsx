@@ -1,13 +1,16 @@
 'use client'
 
 import { useState, useRef, useTransition } from 'react'
-import { updatePlanDatesAction } from './actions'
+import { updatePlanDatesAction, updatePlanAction, deletePlanAction } from './actions'
 import { Modal } from '@/components/ui/modal'
+import { ObjectiveEditModal } from './objective-edit-modal'
 import { getTodayISO } from '@/lib/today'
 
 interface ObjectiveInfo {
+  id: string
   category: string
   description: string
+  targetDate: string | null
 }
 interface PlanBar {
   id: string
@@ -29,7 +32,6 @@ const MONTH_LABELS = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'S
 const CATEGORY_LABELS: Record<string, string> = { deportivo: 'Deportivo', salud: 'Salud', fisico: 'Físico', personal: 'Personal' }
 const CATEGORY_ICONS: Record<string, string> = { deportivo: '🏃', salud: '❤️', fisico: '💪', personal: '🎯' }
 
-// Paleta de macrociclos — un color distinto por bloque, ciclando.
 const MACRO_PALETTE = [
   { bg: 'bg-[#1E3A5F]/15', border: 'border-[#1E3A5F]/50', text: 'text-[#1E3A5F]', solid: '#1E3A5F' },
   { bg: 'bg-[#0F766E]/15', border: 'border-[#0F766E]/50', text: 'text-[#0F766E]', solid: '#0F766E' },
@@ -84,7 +86,6 @@ export function AnnualGrid({
   return (
     <div className="overflow-x-auto pb-2">
       <div style={{ width: totalWidth, minWidth: totalWidth }} className="relative">
-        {/* Meses — bandas alternadas para dar ritmo visual */}
         <div className="flex text-[10px] text-status-neutral border-b border-outline pb-1 sticky top-0 bg-panel z-10">
           {MONTH_LABELS.map((m, i) => (
             <div
@@ -97,7 +98,6 @@ export function AnnualGrid({
           ))}
         </div>
 
-        {/* Línea de "hoy" */}
         {todayWeek !== null && todayWeek >= 0 && todayWeek < weeks && (
           <div
             className="absolute top-0 bottom-0 w-0.5 bg-gold z-[5] pointer-events-none"
@@ -107,7 +107,6 @@ export function AnnualGrid({
           </div>
         )}
 
-        {/* Macrociclos — colores distintos por bloque */}
         <div className="relative h-9 mt-6">
           {macrociclos.map((p, i) => {
             const s = Math.max(0, weekIndexOf(p.startDate))
@@ -128,7 +127,6 @@ export function AnnualGrid({
           })}
         </div>
 
-        {/* Mesociclos — arrastrables + tocables */}
         <div className="relative mt-3" style={{ height: Math.max(mesociclos.length, 1) * 36 }}>
           {mesociclos.map((p, row) => (
             <MesocicloBar
@@ -143,7 +141,6 @@ export function AnnualGrid({
           ))}
         </div>
 
-        {/* Semanas (grilla de fondo) */}
         <div className="flex mt-2 border-t border-outline pt-1">
           {Array.from({ length: weeks }, (_, i) => (
             <div key={i} className="shrink-0 text-center text-[8px] text-status-neutral/60" style={{ width: WEEK_WIDTH }}>
@@ -152,7 +149,6 @@ export function AnnualGrid({
           ))}
         </div>
 
-        {/* Competencias */}
         <div className="relative h-10 mt-1">
           {competitions.map((c) => {
             const idx = weekIndexOf(c.date)
@@ -184,32 +180,7 @@ export function AnnualGrid({
         <span className="flex items-center gap-1.5 text-[10px] text-status-neutral">🏆 Competencia</span>
       </div>
 
-      {detail && (
-        <Modal open onClose={() => setDetail(null)} title={detail.title}>
-          <div className="space-y-3">
-            <p className="text-xs text-status-neutral">
-              {detail.type === 'macrociclo' ? '🔥 Macrociclo' : '⚙️ Mesociclo'} · {formatDate(detail.startDate)} — {formatDate(detail.endDate)}
-            </p>
-            {detail.objectives.length === 0 ? (
-              <p className="text-sm text-status-neutral">Sin objetivos cargados para este bloque.</p>
-            ) : (
-              <div className="space-y-2">
-                {detail.objectives.map((o, i) => (
-                  <div key={i} className="rounded-xl border border-outline bg-gradient-to-br from-surface to-outline/20 p-3">
-                    <p className="text-[10px] uppercase tracking-wide text-gold font-semibold flex items-center gap-1">
-                      <span>{CATEGORY_ICONS[o.category] ?? '📌'}</span> {CATEGORY_LABELS[o.category] ?? o.category}
-                    </p>
-                    <p className="text-sm text-ink mt-1">{o.description}</p>
-                  </div>
-                ))}
-              </div>
-            )}
-            <p className="text-[11px] text-status-neutral">
-              Para editar el título, las fechas o agregar objetivos, hacelo desde la vista Lista — se refleja acá solo.
-            </p>
-          </div>
-        </Modal>
-      )}
+      {detail && <DetailEditModal plan={detail} onClose={() => setDetail(null)} />}
 
       {compDetail && (
         <Modal open onClose={() => setCompDetail(null)} title={`🏆 ${compDetail.title}`}>
@@ -224,6 +195,98 @@ export function AnnualGrid({
 function weekIndexOfStatic(dateStr: string, yearStart: Date) {
   const d = new Date(dateStr + 'T00:00:00')
   return Math.round((d.getTime() - yearStart.getTime()) / (7 * 86400000))
+}
+
+/** El popup que se abre al tocar un bloque — ahora editable de verdad: título, fechas, y cada objetivo con su propio lápiz. */
+function DetailEditModal({ plan, onClose }: { plan: PlanBar; onClose: () => void }) {
+  const [pending, startTransition] = useTransition()
+  const [error, setError] = useState<string | null>(null)
+  const [editingObjective, setEditingObjective] = useState<ObjectiveInfo | null>(null)
+
+  function handleSubmit(formData: FormData) {
+    startTransition(async () => {
+      const result = await updatePlanAction(formData)
+      if (result?.error) setError(result.error)
+      else {
+        setError(null)
+        onClose()
+      }
+    })
+  }
+
+  function handleDelete() {
+    if (!confirm('¿Borrar este bloque? Si tiene hijos también se van a borrar.')) return
+    startTransition(async () => {
+      const result = await deletePlanAction(plan.id)
+      if (result?.error) setError(result.error)
+      else onClose()
+    })
+  }
+
+  return (
+    <>
+      <Modal open onClose={onClose} title={plan.type === 'macrociclo' ? '🔥 Editar macrociclo' : '⚙️ Editar mesociclo'}>
+        <form action={handleSubmit} className="space-y-3">
+          <input type="hidden" name="id" value={plan.id} />
+          <div>
+            <label className="text-xs text-status-neutral mb-1 block">Título</label>
+            <input name="title" defaultValue={plan.title} required className="input-field" />
+          </div>
+          <div className="grid grid-cols-2 gap-2">
+            <div>
+              <label className="text-xs text-status-neutral mb-1 block">Fecha inicio</label>
+              <input name="startDate" type="date" defaultValue={plan.startDate} className="input-field" />
+            </div>
+            <div>
+              <label className="text-xs text-status-neutral mb-1 block">Fecha fin</label>
+              <input name="endDate" type="date" defaultValue={plan.endDate} className="input-field" />
+            </div>
+          </div>
+          {error && <p className="text-xs text-status-critical">{error}</p>}
+          <div className="flex gap-2">
+            <button type="submit" disabled={pending} className="flex-1 btn-primary py-2 text-sm">
+              Guardar
+            </button>
+            <button type="button" disabled={pending} onClick={handleDelete} className="btn-danger px-3">
+              Borrar
+            </button>
+          </div>
+
+          <div className="pt-3 border-t border-outline">
+            <p className="text-xs text-status-neutral uppercase tracking-wide mb-2">Objetivos</p>
+            {plan.objectives.length === 0 ? (
+              <p className="text-sm text-status-neutral">Sin objetivos cargados para este bloque.</p>
+            ) : (
+              <div className="space-y-2">
+                {plan.objectives.map((o) => (
+                  <div key={o.id} className="rounded-xl border border-outline bg-gradient-to-br from-surface to-outline/20 p-3 flex items-start justify-between gap-2">
+                    <div className="min-w-0">
+                      <p className="text-[10px] uppercase tracking-wide text-gold font-semibold flex items-center gap-1">
+                        <span>{CATEGORY_ICONS[o.category] ?? '📌'}</span> {CATEGORY_LABELS[o.category] ?? o.category}
+                      </p>
+                      <p className="text-sm text-ink mt-1">{o.description}</p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setEditingObjective(o)}
+                      className="text-status-neutral hover:text-gold text-xs shrink-0"
+                      aria-label="Editar objetivo"
+                    >
+                      ✎
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </form>
+      </Modal>
+
+      {editingObjective && (
+        <ObjectiveEditModal objective={editingObjective} open onClose={() => setEditingObjective(null)} />
+      )}
+    </>
+  )
 }
 
 function MesocicloBar({
