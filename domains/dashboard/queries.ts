@@ -102,36 +102,37 @@ export async function getUpcomingEventsOrg(
 
   if (error) throw new DomainError('NOT_FOUND', error.message)
 
-  const results = []
-  for (const event of events ?? []) {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const assignees = ((event as any).event_assignments ?? [])
+  const results = await Promise.all(
+    (events ?? []).map(async (event) => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      .filter((a: any) => a.assignee_type === 'person')
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      .map((a: any) => a.assignee_id as string)
+      const assignees = ((event as any).event_assignments ?? [])
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        .filter((a: any) => a.assignee_type === 'person')
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        .map((a: any) => a.assignee_id as string)
 
-    let completedCount = 0
-    if (assignees.length > 0) {
-      const { count } = await supabase
-        .from('observations')
-        .select('athlete_membership_id', { count: 'exact', head: true })
-        .eq('event_id', event.id)
-        .eq('state', 'ejecutado')
-        .in('athlete_membership_id', assignees)
+      let completedCount = 0
+      if (assignees.length > 0) {
+        const { count } = await supabase
+          .from('observations')
+          .select('athlete_membership_id', { count: 'exact', head: true })
+          .eq('event_id', event.id)
+          .eq('state', 'ejecutado')
+          .in('athlete_membership_id', assignees)
 
-      completedCount = count ?? 0
-    }
+        completedCount = count ?? 0
+      }
 
-    results.push({
-      id: event.id,
-      title: event.title,
-      type: event.type,
-      date: event.date as string,
-      assignedCount: assignees.length,
-      completedCount,
+      return {
+        id: event.id,
+        title: event.title,
+        type: event.type,
+        date: event.date as string,
+        assignedCount: assignees.length,
+        completedCount,
+      }
     })
-  }
+  )
 
   return results
 }
@@ -157,28 +158,29 @@ export async function getAttendanceSeries(
 
   if (error) throw new DomainError('NOT_FOUND', error.message)
 
-  const series = []
-  for (const event of (events ?? []).reverse()) {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const assignees = ((event as any).event_assignments ?? [])
+  const series = await Promise.all(
+    (events ?? []).reverse().map(async (event) => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      .filter((a: any) => a.assignee_type === 'person')
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      .map((a: any) => a.assignee_id as string)
+      const assignees = ((event as any).event_assignments ?? [])
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        .filter((a: any) => a.assignee_type === 'person')
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        .map((a: any) => a.assignee_id as string)
 
-    let completed = 0
-    if (assignees.length > 0) {
-      const { count } = await supabase
-        .from('observations')
-        .select('athlete_membership_id', { count: 'exact', head: true })
-        .eq('event_id', event.id)
-        .eq('state', 'ejecutado')
-        .in('athlete_membership_id', assignees)
-      completed = count ?? 0
-    }
+      let completed = 0
+      if (assignees.length > 0) {
+        const { count } = await supabase
+          .from('observations')
+          .select('athlete_membership_id', { count: 'exact', head: true })
+          .eq('event_id', event.id)
+          .eq('state', 'ejecutado')
+          .in('athlete_membership_id', assignees)
+        completed = count ?? 0
+      }
 
-    series.push({ date: event.date as string, assigned: assignees.length, completed })
-  }
+      return { date: event.date as string, assigned: assignees.length, completed }
+    })
+  )
 
   return series
 }
@@ -402,27 +404,28 @@ export async function getFeedbackRateSeries(
 
   if (error) throw new DomainError('NOT_FOUND', error.message)
 
-  const series = []
-  for (const event of (events ?? []).reverse()) {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const assignees = ((event as any).event_assignments ?? [])
+  const series = await Promise.all(
+    (events ?? []).reverse().map(async (event) => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      .filter((a: any) => a.assignee_type === 'person')
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      .map((a: any) => a.assignee_id as string)
+      const assignees = ((event as any).event_assignments ?? [])
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        .filter((a: any) => a.assignee_type === 'person')
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        .map((a: any) => a.assignee_id as string)
 
-    let withFeedback = 0
-    if (assignees.length > 0) {
-      const { count } = await supabase
-        .from('session_feedback')
-        .select('athlete_membership_id', { count: 'exact', head: true })
-        .eq('event_id', event.id)
-        .in('athlete_membership_id', assignees)
-      withFeedback = count ?? 0
-    }
+      let withFeedback = 0
+      if (assignees.length > 0) {
+        const { count } = await supabase
+          .from('session_feedback')
+          .select('athlete_membership_id', { count: 'exact', head: true })
+          .eq('event_id', event.id)
+          .in('athlete_membership_id', assignees)
+        withFeedback = count ?? 0
+      }
 
-    series.push({ date: event.date as string, assigned: assignees.length, completed: withFeedback })
-  }
+      return { date: event.date as string, assigned: assignees.length, completed: withFeedback }
+    })
+  )
 
   return series
 }
