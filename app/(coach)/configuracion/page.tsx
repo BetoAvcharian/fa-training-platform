@@ -27,18 +27,18 @@ export default async function ConfiguracionPage() {
       </div>
 
       <section className="space-y-2">
-        <h2 className="text-sm font-semibold text-ink">Código de invitación</h2>
+        <h2 className="text-sm font-semibold text-ink flex items-center gap-1.5">🔗 Código de invitación</h2>
         <p className="text-xs text-status-neutral">
           Compartilo con entrenadores y atletas para que se sumen a tu equipo.
         </p>
-        <div className="card p-4">
+        <div className="card p-4 border-2 border-gold/30 bg-gradient-to-br from-gold/5 to-transparent">
           {org && <CopyJoinCode code={org.joinCode} />}
         </div>
       </section>
 
       <section className="space-y-3">
         <div className="flex items-center justify-between">
-          <h2 className="text-sm font-semibold text-ink">Grupos</h2>
+          <h2 className="text-sm font-semibold text-ink flex items-center gap-1.5">👥 Grupos</h2>
           <GroupForm />
         </div>
 
@@ -50,7 +50,7 @@ export default async function ConfiguracionPage() {
 
         <div className="space-y-2">
           {groupsWithMembers.map(({ group: g, members }) => (
-            <div key={g.id} className="rounded-xl border border-outline bg-panel p-4 shadow-sm space-y-2">
+            <div key={g.id} className="card p-4 space-y-2">
               <p className="font-medium text-ink text-sm">{g.name}</p>
               <GroupMembersEditor groupId={g.id} members={members} roster={roster} />
             </div>
@@ -59,9 +59,10 @@ export default async function ConfiguracionPage() {
       </section>
 
       <section className="space-y-2">
-        <h2 className="text-sm font-semibold text-ink">Personas</h2>
-        <a href="/atletas" className="text-sm text-ink underline">
-          Invitar entrenadores/atletas y asignarlos →
+        <h2 className="text-sm font-semibold text-ink flex items-center gap-1.5">🧑‍🤝‍🧑 Personas</h2>
+        <a href="/atletas" className="card-hover p-4 flex items-center justify-between text-sm text-ink">
+          Invitar entrenadores/atletas y asignarlos
+          <span className="text-navy">→</span>
         </a>
       </section>
     </div>
