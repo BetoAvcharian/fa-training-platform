@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from 'react'
 import { createObjectiveAction } from './actions'
+import { Modal } from '@/components/ui/modal'
 
 const CATEGORY_OPTIONS = [
   { value: 'deportivo', label: 'Deportivo' },
@@ -32,59 +33,51 @@ export function ObjectiveForm({ roster }: { roster: RosterOption[] }) {
     })
   }
 
-  if (!open) {
-    return (
+  return (
+    <>
       <button
         onClick={() => setOpen(true)}
         className="rounded-lg border border-dashed border-outline bg-panel px-4 py-2 text-sm font-medium text-ink"
       >
         + Nuevo objetivo
       </button>
-    )
-  }
 
-  return (
-    <form action={handleSubmit} className="rounded-xl border border-outline bg-panel p-4 shadow-sm space-y-3 max-w-md">
-      <select name="athleteMembershipId" className="input-field" required>
-        <option value="">Elegí un atleta</option>
-        {roster.map((r) => (
-          <option key={r.id} value={r.id}>
-            {r.person ? `${r.person.firstName} ${r.person.lastName}` : '—'}
-          </option>
-        ))}
-      </select>
-      <select name="category" className="input-field" required>
-        {CATEGORY_OPTIONS.map((opt) => (
-          <option key={opt.value} value={opt.value}>
-            {opt.label}
-          </option>
-        ))}
-      </select>
-      <textarea
-        name="description"
-        placeholder="Objetivo (ej: Bajar de 55s en 400m para el Provincial)"
-        className="input-field"
-        rows={2}
-        required
-      />
-      <input name="targetDate" type="date" className="input-field" />
-      {error && <p className="text-xs text-status-critical">{error}</p>}
-      <div className="flex gap-2">
-        <button
-          type="submit"
-          disabled={pending}
-          className="flex-1 btn-primary py-2 text-sm"
-        >
-          Guardar
-        </button>
-        <button
-          type="button"
-          onClick={() => setOpen(false)}
-          className="btn-secondary px-4 text-sm"
-        >
-          Cancelar
-        </button>
-      </div>
-    </form>
+      <Modal open={open} onClose={() => setOpen(false)} title="Nuevo objetivo">
+        <form action={handleSubmit} className="space-y-3">
+          <select name="athleteMembershipId" className="input-field" required>
+            <option value="">Elegí un atleta</option>
+            {roster.map((r) => (
+              <option key={r.id} value={r.id}>
+                {r.person ? `${r.person.firstName} ${r.person.lastName}` : '—'}
+              </option>
+            ))}
+          </select>
+          <select name="category" className="input-field" required>
+            {CATEGORY_OPTIONS.map((opt) => (
+              <option key={opt.value} value={opt.value}>
+                {opt.label}
+              </option>
+            ))}
+          </select>
+          <textarea
+            name="description"
+            placeholder="Objetivo (ej: Bajar de 55s en 400m para el Provincial)"
+            className="input-field"
+            rows={2}
+            required
+          />
+          <input name="targetDate" type="date" className="input-field" />
+          {error && <p className="text-xs text-status-critical">{error}</p>}
+          <div className="flex gap-2">
+            <button type="submit" disabled={pending} className="flex-1 btn-primary py-2 text-sm">
+              Guardar
+            </button>
+            <button type="button" onClick={() => setOpen(false)} className="btn-secondary px-4 text-sm">
+              Cancelar
+            </button>
+          </div>
+        </form>
+      </Modal>
+    </>
   )
 }
