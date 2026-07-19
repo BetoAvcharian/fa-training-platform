@@ -66,26 +66,27 @@ export async function getDaySchedule(
     linesByEvent.set(row.event_id, list)
   }
 
-  const result: DayTraining[] = []
-  for (const event of events) {
-    const assigned = assignedByEvent.get(event.id) ?? []
-    const feedback: AthleteFeedbackRow[] =
-      assigned.length > 0
-        ? (await getFeedbackForEvent(event.id, assigned, supabase)).map((f) => ({
-            ...f,
-            energia: energiaByAthlete.get(f.athleteMembershipId) ?? null,
-          }))
-        : []
+  const result: DayTraining[] = await Promise.all(
+    events.map(async (event) => {
+      const assigned = assignedByEvent.get(event.id) ?? []
+      const feedback: AthleteFeedbackRow[] =
+        assigned.length > 0
+          ? (await getFeedbackForEvent(event.id, assigned, supabase)).map((f) => ({
+              ...f,
+              energia: energiaByAthlete.get(f.athleteMembershipId) ?? null,
+            }))
+          : []
 
-    result.push({
-      id: event.id,
-      title: event.title,
-      type: event.type,
-      location: event.location,
-      lines: linesByEvent.get(event.id) ?? [],
-      feedback,
+      return {
+        id: event.id,
+        title: event.title,
+        type: event.type,
+        location: event.location,
+        lines: linesByEvent.get(event.id) ?? [],
+        feedback,
+      }
     })
-  }
+  )
 
   return result
 }
