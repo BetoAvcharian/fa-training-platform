@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { getAssessmentResults } from '@/domains/assessments/queries'
 import { createServerClient } from '@/lib/supabase/server'
 import { formatMark } from '@/lib/format-mark'
+import { WaPointsBadge } from '@/components/ui/wa-points-badge'
 
 export const dynamic = 'force-dynamic'
 
@@ -48,9 +49,12 @@ export default async function AssessmentDetailPage({ params }: { params: Promise
         {results.map((r) => (
           <div key={r.id} className="p-3 flex items-center justify-between text-sm">
             <p className="text-ink">{r.observableName}</p>
-            <p className="font-medium text-ink">
-              {formatMark(r.value, r.unitSymbol)}
-            </p>
+            <div className="flex items-center gap-1.5">
+              <p className="font-medium text-ink">
+                {formatMark(r.value, r.unitSymbol)}
+              </p>
+              <WaPointsBadge points={r.waPoints} />
+            </div>
           </div>
         ))}
       </div>

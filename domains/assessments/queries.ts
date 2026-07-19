@@ -28,6 +28,7 @@ export interface AssessmentResult {
   observableName: string
   unitSymbol: string | null
   value: number
+  waPoints: number | null
 }
 
 export async function getProtocols(organizationId: string, client?: AppSupabaseClient): Promise<Protocol[]> {
@@ -94,7 +95,7 @@ export async function getAssessmentResults(assessmentId: string, client?: AppSup
   const supabase = client ?? (await createServerClient())
   const { data, error } = await supabase
     .from('observations')
-    .select('id, value, observables(name, units(symbol))')
+    .select('id, value, wa_points, observables(name, units(symbol))')
     .eq('assessment_id', assessmentId)
     .is('superseded_by', null)
 
@@ -106,5 +107,6 @@ export async function getAssessmentResults(assessmentId: string, client?: AppSup
     observableName: row.observables?.name ?? '—',
     unitSymbol: row.observables?.units?.symbol ?? null,
     value: row.value,
+    waPoints: row.wa_points,
   }))
 }

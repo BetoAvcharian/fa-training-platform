@@ -12,6 +12,7 @@ export interface MyRecord {
   recordType: 'oficial' | 'entrenamiento'
   value: number
   achievedDate: string
+  waPoints: number | null
 }
 
 export interface MyResultRow {
@@ -24,6 +25,7 @@ export interface MyResultRow {
   sourceType: string
   validationStatus: string
   wasCorrected: boolean
+  waPoints: number | null
 }
 
 /**
@@ -38,11 +40,17 @@ export async function getMyRecords(client?: AppSupabaseClient): Promise<MyRecord
 
   const { data, error } = await supabase
     .from('personal_records')
-    .select('id, observable_id, record_type, value, achieved_date, observables(name, higher_is_better, units(symbol))')
+    .select('id, observable_id, record_type, value, achieved_date, best_observation_id, observables(name, higher_is_better, units(symbol))')
     .eq('athlete_membership_id', membership.id)
     .order('achieved_date', { ascending: false })
 
   if (error) throw new DomainError('NOT_FOUND', error.message)
+
+  const obsIds = (data ?? []).map((row: any) => row.best_observation_id).filter(Boolean)
+  const { data: obsRows } = obsIds.length
+    ? await supabase.from('observations').select('id, wa_points').in('id', obsIds)
+    : { data: [] }
+  const pointsById = new Map((obsRows ?? []).map((r: any) => [r.id, r.wa_points]))
 
   return (data ?? []).map((row: any) => ({
     id: row.id,
@@ -53,6 +61,7 @@ export async function getMyRecords(client?: AppSupabaseClient): Promise<MyRecord
     recordType: row.record_type,
     value: row.value,
     achievedDate: row.achieved_date,
+    waPoints: pointsById.get(row.best_observation_id) ?? null,
   }))
 }
 
@@ -77,7 +86,7 @@ export async function getMyResults(
   const { data, error } = await supabase
     .from('observations')
     .select(
-      'id, observable_id, value, date, source_type, validation_status, observables!inner(name, is_performance, units(symbol))'
+      'id, observable_id, value, date, source_type, validation_status, wa_points, observables!inner(name, is_performance, units(symbol))'
     )
     .eq('athlete_membership_id', membership.id)
     .eq('state', 'ejecutado')
@@ -98,6 +107,7 @@ export async function getMyResults(
     sourceType: row.source_type,
     validationStatus: row.validation_status,
     wasCorrected: false,
+    waPoints: row.wa_points,
   }))
 }
 
@@ -117,11 +127,17 @@ export async function getAthleteRecords(
 
   const { data, error } = await supabase
     .from('personal_records')
-    .select('id, observable_id, record_type, value, achieved_date, observables(name, higher_is_better, units(symbol))')
+    .select('id, observable_id, record_type, value, achieved_date, best_observation_id, observables(name, higher_is_better, units(symbol))')
     .eq('athlete_membership_id', athleteMembershipId)
     .order('achieved_date', { ascending: false })
 
   if (error) throw new DomainError('NOT_FOUND', error.message)
+
+  const obsIds2 = (data ?? []).map((row: any) => row.best_observation_id).filter(Boolean)
+  const { data: obsRows2 } = obsIds2.length
+    ? await supabase.from('observations').select('id, wa_points').in('id', obsIds2)
+    : { data: [] }
+  const pointsById2 = new Map((obsRows2 ?? []).map((r: any) => [r.id, r.wa_points]))
 
   return (data ?? []).map((row: any) => ({
     id: row.id,
@@ -132,6 +148,7 @@ export async function getAthleteRecords(
     recordType: row.record_type,
     value: row.value,
     achievedDate: row.achieved_date,
+    waPoints: pointsById2.get(row.best_observation_id) ?? null,
   }))
 }
 
@@ -148,7 +165,7 @@ export async function getAthleteResults(
   const { data, error } = await supabase
     .from('observations')
     .select(
-      'id, observable_id, value, date, source_type, validation_status, observables!inner(name, is_performance, units(symbol))'
+      'id, observable_id, value, date, source_type, validation_status, wa_points, observables!inner(name, is_performance, units(symbol))'
     )
     .eq('athlete_membership_id', athleteMembershipId)
     .eq('state', 'ejecutado')
@@ -169,6 +186,7 @@ export async function getAthleteResults(
     sourceType: row.source_type,
     validationStatus: row.validation_status,
     wasCorrected: false,
+    waPoints: row.wa_points,
   }))
 }
 

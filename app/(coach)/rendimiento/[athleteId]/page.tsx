@@ -4,6 +4,7 @@ import { getAthleteRecords, getAthleteResults } from '@/domains/performance/quer
 import { createServerClient } from '@/lib/supabase/server'
 import { formatMark } from '@/lib/format-mark'
 import { EditableRecordRow } from '@/components/ui/editable-record-row'
+import { WaPointsBadge } from '@/components/ui/wa-points-badge'
 import { editResultAction, deleteResultAction } from './actions'
 
 export const dynamic = 'force-dynamic'
@@ -73,9 +74,12 @@ export default async function AthleteRendimientoPage({
                 <p className="font-medium text-ink text-sm">{r.observableName}</p>
                 <p className="text-xs text-status-neutral">{formatDate(r.achievedDate)}</p>
               </div>
-              <p className="font-display font-bold text-ink">
-                {formatMark(r.value, r.unitSymbol)}
-              </p>
+              <div className="flex items-center gap-2">
+                <p className="font-display font-bold text-ink">
+                  {formatMark(r.value, r.unitSymbol)}
+                </p>
+                <WaPointsBadge points={r.waPoints} />
+              </div>
             </div>
           ))}
         </div>
@@ -97,6 +101,7 @@ export default async function AthleteRendimientoPage({
               subtitle={`${formatDate(row.date)} · ${SOURCE_LABELS[row.sourceType] ?? row.sourceType}`}
               value={row.value}
               unitSymbol={row.unitSymbol}
+              waPoints={row.waPoints}
               onEdit={editResultAction}
               onDelete={deleteResultAction}
             />
