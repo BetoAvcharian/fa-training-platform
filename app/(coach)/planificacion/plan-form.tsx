@@ -11,7 +11,20 @@ const TYPE_OPTIONS = [
   { value: 'microciclo', label: 'Microciclo' },
 ]
 
-export function PlanForm({ plans }: { plans: Array<{ id: string; title: string; type: string }> }) {
+interface RosterOption {
+  id: string
+  person: { firstName: string; lastName: string } | null
+}
+
+export function PlanForm({
+  plans,
+  roster,
+  defaultAthleteId,
+}: {
+  plans: Array<{ id: string; title: string; type: string }>
+  roster: RosterOption[]
+  defaultAthleteId?: string
+}) {
   const [open, setOpen] = useState(false)
   const [pending, startTransition] = useTransition()
   const [error, setError] = useState<string | null>(null)
@@ -39,6 +52,17 @@ export function PlanForm({ plans }: { plans: Array<{ id: string; title: string; 
 
       <Modal open={open} onClose={() => setOpen(false)} title="Nuevo plan">
         <form action={handleSubmit} className="space-y-3">
+          <div>
+            <label className="text-xs text-status-neutral mb-1 block">Atleta</label>
+            <select name="athleteMembershipId" defaultValue={defaultAthleteId ?? ''} className="input-field" required>
+              <option value="">Elegí un atleta</option>
+              {roster.map((r) => (
+                <option key={r.id} value={r.id}>
+                  {r.person ? `${r.person.firstName} ${r.person.lastName}` : '—'}
+                </option>
+              ))}
+            </select>
+          </div>
           <select name="type" className="input-field" required>
             {TYPE_OPTIONS.map((opt) => (
               <option key={opt.value} value={opt.value}>

@@ -16,7 +16,7 @@ interface RosterOption {
   person: { firstName: string; lastName: string } | null
 }
 
-export function ObjectiveForm({ roster }: { roster: RosterOption[] }) {
+export function ObjectiveForm({ roster, defaultAthleteId }: { roster: RosterOption[]; defaultAthleteId?: string }) {
   const [open, setOpen] = useState(false)
   const [pending, startTransition] = useTransition()
   const [error, setError] = useState<string | null>(null)
@@ -44,7 +44,7 @@ export function ObjectiveForm({ roster }: { roster: RosterOption[] }) {
 
       <Modal open={open} onClose={() => setOpen(false)} title="Nuevo objetivo">
         <form action={handleSubmit} className="space-y-3">
-          <select name="athleteMembershipId" className="input-field" required>
+          <select name="athleteMembershipId" defaultValue={defaultAthleteId ?? ''} className="input-field" required>
             <option value="">Elegí un atleta</option>
             {roster.map((r) => (
               <option key={r.id} value={r.id}>

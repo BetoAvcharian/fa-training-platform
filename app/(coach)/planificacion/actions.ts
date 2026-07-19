@@ -12,8 +12,10 @@ export async function createPlanAction(formData: FormData) {
   const type = String(formData.get('type') ?? '')
   const title = String(formData.get('title') ?? '')
   const parentPlanId = String(formData.get('parentPlanId') ?? '') || undefined
+  const athleteMembershipId = String(formData.get('athleteMembershipId') ?? '') || undefined
 
   if (!title.trim()) return { error: 'Falta el título' }
+  if (!athleteMembershipId) return { error: 'Falta elegir atleta' }
   if (!['temporada', 'macrociclo', 'mesociclo', 'microciclo'].includes(type)) {
     return { error: 'Tipo inválido' }
   }
@@ -24,6 +26,7 @@ export async function createPlanAction(formData: FormData) {
       type: type as never,
       title,
       parentPlanId,
+      athleteMembershipId,
     })
   } catch (e) {
     return { error: e instanceof DomainError ? e.message : 'No se pudo guardar' }

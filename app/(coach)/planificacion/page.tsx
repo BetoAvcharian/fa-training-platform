@@ -34,24 +34,38 @@ function formatDate(date: string | null) {
 export default async function PlanificacionPage({
   searchParams,
 }: {
-  searchParams: Promise<{ vista?: string; year?: string }>
+  searchParams: Promise<{ vista?: string; year?: string; atleta?: string }>
 }) {
   const params = await searchParams
   const membership = await getMyActiveMembership()
   if (!membership) return null
 
-  const [plans, objectives, roster] = await Promise.all([
+  const [allPlans, allObjectives, roster] = await Promise.all([
     getPlans(membership.organizationId),
     getObjectives(membership.organizationId),
     (membership.role === 'manager' ? getRoster(membership.organizationId) : getAthletesForCoach(membership.id)),
   ])
 
   const rosterById = new Map(roster.map((r) => [r.id, r]))
+
+  // Cada atleta puede tener un programa de entrenamiento distinto —
+  // por eso Planificación siempre muestra el plan de UN atleta a la
+  // vez, nunca todos mezclados en la misma grilla/árbol. Si no eligió
+  // ninguno todavía, arranca con el primero de la lista.
+  const selectedAthleteId = params.atleta || roster[0]?.id
+  const plans = selectedAthleteId ? allPlans.filter((p) => p.athleteMembershipId === selectedAthleteId) : []
+  const objectives = selectedAthleteId ? allObjectives.filter((o) => o.athleteMembershipId === selectedAthleteId) : []
+
   const pendientes = objectives.filter((o) => !o.achieved)
   const logrados = objectives.filter((o) => o.achieved)
 
   const vistaAnual = params.vista === 'anual'
   const year = params.year ? parseInt(params.year, 10) : new Date().getFullYear()
+
+  function withAthlete(href: string) {
+    if (!selectedAthleteId) return href
+    return `${href}${href.includes('?') ? '&' : '?'}atleta=${selectedAthleteId}`
+  }
 
   let annualSection: React.ReactNode = null
   if (vistaAnual) {
@@ -75,7 +89,12 @@ export default async function PlanificacionPage({
         startDate: p.startDate!,
         endDate: p.endDate!,
         parentPlanId: p.parentPlanId,
-        objectives: (objectivesByPlanArr.get(p.id) ?? []).map((o) => ({ category: o.category, description: o.description ?? '' })),
+        objectives: (objectivesByPlanArr.get(p.id) ?? []).map((o) => ({
+          id: o.id,
+          category: o.category,
+          description: o.description ?? '',
+          targetDate: o.targetDate,
+        })),
       }))
 
     const mesociclos = plans
@@ -88,10 +107,15 @@ export default async function PlanificacionPage({
         startDate: p.startDate!,
         endDate: p.endDate!,
         parentPlanId: p.parentPlanId,
-        objectives: (objectivesByPlanArr.get(p.id) ?? []).map((o) => ({ category: o.category, description: o.description ?? '' })),
+        objectives: (objectivesByPlanArr.get(p.id) ?? []).map((o) => ({
+          id: o.id,
+          category: o.category,
+          description: o.description ?? '',
+          targetDate: o.targetDate,
+        })),
       }))
 
-    const yearEvents = await getEventsForRange(membership.organizationId, yearFrom, yearTo)
+    const yearEvents = selectedAthleteId ? await getEventsForRange(membership.organizationId, yearFrom, yearTo) : []
     const competitions = yearEvents
       .filter((e) => e.type === 'competencia' && e.date)
       .map((e) => ({ id: e.id, title: e.title, date: e.date as string }))
@@ -101,10 +125,10 @@ export default async function PlanificacionPage({
         <div className="flex items-center justify-between flex-wrap gap-2">
           <h2 className="text-sm font-semibold text-ink">Vista anual {year}</h2>
           <div className="flex items-center gap-2 text-sm">
-            <Link href={`/planificacion?vista=anual&year=${year - 1}`} className="px-2 py-1 rounded-md border border-outline">
+            <Link href={withAthlete(`/planificacion?vista=anual&year=${year - 1}`)} className="px-2 py-1 rounded-md border border-outline">
               ← {year - 1}
             </Link>
-            <Link href={`/planificacion?vista=anual&year=${year + 1}`} className="px-2 py-1 rounded-md border border-outline">
+            <Link href={withAthlete(`/planificacion?vista=anual&year=${year + 1}`)} className="px-2 py-1 rounded-md border border-outline">
               {year + 1} →
             </Link>
           </div>
@@ -112,8 +136,8 @@ export default async function PlanificacionPage({
 
         {macrociclos.length === 0 && mesociclos.length === 0 ? (
           <div className="rounded-xl border border-outline bg-panel p-4 text-sm text-status-neutral">
-            Todavía no hay macrociclos ni mesociclos con fechas cargadas para {year}. Cargalos abajo en "Árbol de planes" — acá se
-            van a dibujar solos.
+            Todavía no hay macrociclos ni mesociclos con fechas cargadas para este atleta en {year}. Cargalos abajo en "Árbol de
+            planes" — acá se van a dibujar solos.
           </div>
         ) : (
           <div className="card p-4">
@@ -121,8 +145,8 @@ export default async function PlanificacionPage({
               <AnnualGrid year={year} macrociclos={macrociclos} mesociclos={mesociclos} competitions={competitions} />
             </FullscreenChart>
             <p className="text-[11px] text-status-neutral mt-3">
-              🏁 = competencia · tocá y arrastrá los bordes de un mesociclo (dorado) para mover sus fechas — se guarda solo y se
-              refleja también en la lista de abajo.
+              🏁 = competencia · tocá y arrastrá los bordes de un mesociclo (dorado) para mover sus fechas, o tocá el bloque para
+              editarlo del todo.
             </p>
           </div>
         )}
@@ -138,11 +162,11 @@ export default async function PlanificacionPage({
           <h1 className="font-display text-2xl font-bold text-ink">Temporadas y objetivos</h1>
         </div>
         <div className="flex rounded-lg border border-outline overflow-hidden text-xs">
-          <Link href="/planificacion" className={`px-3 py-1.5 ${!vistaAnual ? 'bg-navy text-white' : 'bg-panel text-ink'}`}>
+          <Link href={withAthlete('/planificacion')} className={`px-3 py-1.5 ${!vistaAnual ? 'bg-navy text-white' : 'bg-panel text-ink'}`}>
             Lista
           </Link>
           <Link
-            href={`/planificacion?vista=anual&year=${year}`}
+            href={withAthlete(`/planificacion?vista=anual&year=${year}`)}
             className={`px-3 py-1.5 ${vistaAnual ? 'bg-navy text-white' : 'bg-panel text-ink'}`}
           >
             Anual
@@ -150,17 +174,39 @@ export default async function PlanificacionPage({
         </div>
       </div>
 
+      {/* Cada atleta tiene su propio programa — este selector define de
+          cuál se ve el plan/diagrama, nunca se mezclan varios juntos. */}
+      <div className="max-w-xs">
+        <label className="text-xs text-status-neutral mb-1 block">Atleta</label>
+        <form>
+          {vistaAnual && <input type="hidden" name="vista" value="anual" />}
+          <select
+            name="atleta"
+            defaultValue={selectedAthleteId ?? ''}
+            onChange={(e) => e.currentTarget.form?.requestSubmit()}
+            className="input-field"
+          >
+            {roster.length === 0 && <option value="">Sin atletas</option>}
+            {roster.map((r) => (
+              <option key={r.id} value={r.id}>
+                {r.person ? `${r.person.firstName} ${r.person.lastName}` : '—'}
+              </option>
+            ))}
+          </select>
+        </form>
+      </div>
+
       {vistaAnual && annualSection}
 
       <section className="space-y-3">
         <div className="flex items-center justify-between">
           <h2 className="text-sm font-semibold text-ink">Árbol de planes</h2>
-          <PlanForm plans={plans.map((p) => ({ id: p.id, title: p.title, type: p.type }))} />
+          <PlanForm plans={plans.map((p) => ({ id: p.id, title: p.title, type: p.type }))} roster={roster} defaultAthleteId={selectedAthleteId} />
         </div>
 
         {plans.length === 0 && (
           <div className="rounded-xl border border-outline bg-panel p-4 text-sm text-status-neutral">
-            Todavía no hay temporadas ni ciclos cargados.
+            Todavía no hay temporadas ni ciclos cargados para este atleta.
           </div>
         )}
 
@@ -201,12 +247,12 @@ export default async function PlanificacionPage({
       <section className="space-y-3">
         <div className="flex items-center justify-between">
           <h2 className="text-sm font-semibold text-ink">Objetivos</h2>
-          <ObjectiveForm roster={roster} />
+          <ObjectiveForm roster={roster} defaultAthleteId={selectedAthleteId} />
         </div>
 
         {pendientes.length === 0 && (
           <div className="rounded-xl border border-outline bg-panel p-4 text-sm text-status-neutral">
-            Sin objetivos pendientes.
+            Sin objetivos pendientes para este atleta.
           </div>
         )}
 

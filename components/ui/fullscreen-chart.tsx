@@ -4,17 +4,23 @@ import { useState, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 
 /**
- * Envuelve un gráfico con un botón de pantalla completa. En pantalla
- * completa lo gira 90° (como si rotaras el teléfono) y lo agranda,
- * para que se pueda leer con muchos puntos de datos sin tener que
- * girar el dispositivo de verdad.
+ * Envuelve un gráfico con un botón de pantalla completa, afuera del
+ * contenido (no tapa nada). En celular lo gira 90° para aprovechar
+ * el ancho — en PC no tiene sentido girar nada, así que ahí solo
+ * agranda sin rotar.
  */
 export function FullscreenChart({ title, children }: { title?: string; children: React.ReactNode }) {
   const [open, setOpen] = useState(false)
   const [mounted, setMounted] = useState(false)
+  const [isMobile, setIsMobile] = useState(false)
 
   useEffect(() => {
     setMounted(true)
+    const mq = window.matchMedia('(max-width: 768px)')
+    setIsMobile(mq.matches)
+    const onChange = (e: MediaQueryListEvent) => setIsMobile(e.matches)
+    mq.addEventListener('change', onChange)
+    return () => mq.removeEventListener('change', onChange)
   }, [])
 
   useEffect(() => {
@@ -35,24 +41,33 @@ export function FullscreenChart({ title, children }: { title?: string; children:
       >
         ×
       </button>
-      <div className="rotate-90 origin-center" style={{ width: '100vh', maxWidth: '100vh' }}>
-        <div className="bg-panel rounded-xl p-4 mx-auto" style={{ width: '92vh' }}>
-          {title && <p className="text-sm font-semibold text-ink mb-2">{title}</p>}
+      {isMobile ? (
+        <div className="rotate-90 origin-center" style={{ width: '100vh', maxWidth: '100vh' }}>
+          <div className="bg-panel rounded-xl p-4 mx-auto" style={{ width: '92vh' }}>
+            {title && <p className="text-sm font-semibold text-ink mb-2">{title}</p>}
+            {children}
+          </div>
+        </div>
+      ) : (
+        <div className="bg-panel rounded-xl p-6 max-h-[90vh] max-w-[92vw] overflow-auto">
+          {title && <p className="text-base font-semibold text-ink mb-3">{title}</p>}
           {children}
         </div>
-      </div>
+      )}
     </div>
   )
 
   return (
-    <div className="relative">
-      <button
-        type="button"
-        onClick={() => setOpen(true)}
-        className="absolute top-0 right-0 z-20 text-xs text-status-neutral hover:text-ink flex items-center gap-1 px-2 py-1 bg-panel rounded"
-      >
-        ⛶ Pantalla completa
-      </button>
+    <div>
+      <div className="flex justify-end mb-1">
+        <button
+          type="button"
+          onClick={() => setOpen(true)}
+          className="text-xs text-status-neutral hover:text-ink flex items-center gap-1 px-2 py-1"
+        >
+          ⛶ Pantalla completa
+        </button>
+      </div>
       {children}
       {open && mounted && createPortal(overlay, document.body)}
     </div>
