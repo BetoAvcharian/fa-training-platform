@@ -27,6 +27,15 @@ const TYPE_LABELS: Record<string, string> = {
   microciclo: 'Microciclo',
 }
 
+const ROADMAP_PALETTE = [
+  { bg: 'bg-[#1E3A5F]/10', border: 'border-[#1E3A5F]/40', text: 'text-[#1E3A5F]', icon: '🔥' },
+  { bg: 'bg-[#0F766E]/10', border: 'border-[#0F766E]/40', text: 'text-[#0F766E]', icon: '⚡' },
+  { bg: 'bg-[#C2570B]/10', border: 'border-[#C2570B]/40', text: 'text-[#C2570B]', icon: '🏆' },
+  { bg: 'bg-[#7C3AED]/10', border: 'border-[#7C3AED]/40', text: 'text-[#7C3AED]', icon: '🌊' },
+  { bg: 'bg-[#4D7C4D]/10', border: 'border-[#4D7C4D]/40', text: 'text-[#4D7C4D]', icon: '🌿' },
+  { bg: 'bg-[#BE185D]/10', border: 'border-[#BE185D]/40', text: 'text-[#BE185D]', icon: '✨' },
+]
+
 function formatDate(date: string | null) {
   if (!date) return ''
   return new Date(date + 'T00:00:00').toLocaleDateString('es-AR', { day: 'numeric', month: 'short', year: 'numeric' })
@@ -186,7 +195,7 @@ export default async function PlanificacionPage({
 
       <section className="space-y-3">
         <div className="flex items-center justify-between">
-          <h2 className="text-sm font-semibold text-ink">Árbol de planes</h2>
+          <h2 className="text-sm font-semibold text-ink">Hoja de ruta de la temporada</h2>
           <PlanForm plans={plans.map((p) => ({ id: p.id, title: p.title, type: p.type }))} roster={roster} defaultAthleteId={selectedAthleteId} />
         </div>
 
@@ -196,37 +205,85 @@ export default async function PlanificacionPage({
           </div>
         )}
 
-        <div className="space-y-2">
+        <div className="space-y-6">
           {plans
             .filter((p) => !p.parentPlanId)
-            .map((root) => (
-              <div key={root.id} className="card p-4">
-                <div className="flex items-start justify-between gap-2">
-                  <div>
-                    <p className="text-xs uppercase tracking-wide text-gold font-semibold">{TYPE_LABELS[root.type]}</p>
-                    <p className="font-medium text-ink">{root.title}</p>
-                    {(root.startDate || root.endDate) && (
-                      <p className="text-xs text-status-neutral">
-                        {formatDate(root.startDate)} — {formatDate(root.endDate)}
-                      </p>
-                    )}
-                  </div>
-                  <PlanEditButton plan={{ id: root.id, title: root.title, startDate: root.startDate, endDate: root.endDate }} />
-                </div>
-                <div className="mt-2 space-y-1 pl-3 border-l-2 border-outline">
-                  {plans
-                    .filter((p) => p.parentPlanId === root.id)
-                    .map((child) => (
-                      <div key={child.id} className="flex items-center justify-between gap-2">
-                        <p className="text-sm text-ink">
-                          <span className="text-xs text-status-neutral">{TYPE_LABELS[child.type]}</span> {child.title}
+            .map((root) => {
+              const macrociclos = plans
+                .filter((p) => p.parentPlanId === root.id && p.type === 'macrociclo')
+                .sort((a, b) => (a.startDate ?? '').localeCompare(b.startDate ?? ''))
+              const otherChildren = plans.filter((p) => p.parentPlanId === root.id && p.type !== 'macrociclo')
+
+              return (
+                <div key={root.id}>
+                  <div className="flex items-center justify-between mb-3">
+                    <div>
+                      <p className="text-xs uppercase tracking-wide text-gold font-semibold">{TYPE_LABELS[root.type]}</p>
+                      <p className="font-display text-lg font-bold text-ink">{root.title}</p>
+                      {(root.startDate || root.endDate) && (
+                        <p className="text-xs text-status-neutral">
+                          {formatDate(root.startDate)} — {formatDate(root.endDate)}
                         </p>
-                        <PlanEditButton plan={{ id: child.id, title: child.title, startDate: child.startDate, endDate: child.endDate }} />
+                      )}
+                    </div>
+                    <PlanEditButton plan={{ id: root.id, title: root.title, startDate: root.startDate, endDate: root.endDate }} />
+                  </div>
+
+                  {macrociclos.length > 0 ? (
+                    <div className="overflow-x-auto pb-2">
+                      <div className="flex items-stretch gap-0 min-w-max">
+                        {macrociclos.map((m, i) => {
+                          const palette = ROADMAP_PALETTE[i % ROADMAP_PALETTE.length]
+                          const mesociclos = plans.filter((p) => p.parentPlanId === m.id)
+                          return (
+                            <div key={m.id} className="flex items-stretch">
+                              <div className={`w-56 rounded-2xl border-2 ${palette.border} ${palette.bg} p-4 flex flex-col`}>
+                                <div className="flex items-start justify-between gap-1">
+                                  <span className="text-2xl">{palette.icon}</span>
+                                  <PlanEditButton plan={{ id: m.id, title: m.title, startDate: m.startDate, endDate: m.endDate }} />
+                                </div>
+                                <p className={`font-display font-bold mt-1 ${palette.text}`}>{m.title}</p>
+                                <p className="text-[11px] text-status-neutral mt-0.5">
+                                  {formatDate(m.startDate)} — {formatDate(m.endDate)}
+                                </p>
+                                {mesociclos.length > 0 && (
+                                  <div className="mt-2 pt-2 border-t border-outline/60 space-y-1">
+                                    {mesociclos.map((meso) => (
+                                      <div key={meso.id} className="flex items-center justify-between gap-1">
+                                        <p className="text-[11px] text-ink truncate">⚙️ {meso.title}</p>
+                                        <PlanEditButton plan={{ id: meso.id, title: meso.title, startDate: meso.startDate, endDate: meso.endDate }} />
+                                      </div>
+                                    ))}
+                                  </div>
+                                )}
+                              </div>
+                              {i < macrociclos.length - 1 && (
+                                <div className="flex items-center px-1 text-status-neutral text-lg">→</div>
+                              )}
+                            </div>
+                          )
+                        })}
                       </div>
-                    ))}
+                    </div>
+                  ) : (
+                    <p className="text-sm text-status-neutral">Sin macrociclos cargados todavía — agregalos con "+ Nuevo plan".</p>
+                  )}
+
+                  {otherChildren.length > 0 && (
+                    <div className="mt-2 flex flex-wrap gap-2">
+                      {otherChildren.map((child) => (
+                        <div key={child.id} className="flex items-center gap-1.5 rounded-full border border-outline bg-panel px-3 py-1">
+                          <span className="text-xs text-ink">
+                            {TYPE_LABELS[child.type]}: {child.title}
+                          </span>
+                          <PlanEditButton plan={{ id: child.id, title: child.title, startDate: child.startDate, endDate: child.endDate }} />
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
-              </div>
-            ))}
+              )
+            })}
         </div>
       </section>
 
