@@ -49,7 +49,7 @@ export function FullscreenChart({ title, children }: { title?: string; children:
           </div>
         </div>
       ) : (
-        <div className="bg-panel rounded-xl p-6 max-h-[90vh] max-w-[92vw] overflow-auto">
+        <div className="bg-panel rounded-xl p-6 max-h-[90vh] overflow-auto" style={{ width: '85vw', maxWidth: 1100 }}>
           {title && <p className="text-base font-semibold text-ink mb-3">{title}</p>}
           {children}
         </div>

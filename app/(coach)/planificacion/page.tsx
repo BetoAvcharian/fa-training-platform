@@ -3,6 +3,7 @@ import { getMyActiveMembership, getAthletesForCoach, getRoster } from '@/domains
 import { getPlans, getObjectives } from '@/domains/planning/queries'
 import { getEventsForRange } from '@/domains/events/queries'
 import { PlanForm } from './plan-form'
+import { AthleteFilter } from './athlete-filter'
 import { PlanEditButton } from './plan-edit-button'
 import { ObjectiveForm } from './objective-form'
 import { ObjectiveEditButton } from './objective-edit-button'
@@ -178,22 +179,7 @@ export default async function PlanificacionPage({
           cuál se ve el plan/diagrama, nunca se mezclan varios juntos. */}
       <div className="max-w-xs">
         <label className="text-xs text-status-neutral mb-1 block">Atleta</label>
-        <form>
-          {vistaAnual && <input type="hidden" name="vista" value="anual" />}
-          <select
-            name="atleta"
-            defaultValue={selectedAthleteId ?? ''}
-            onChange={(e) => e.currentTarget.form?.requestSubmit()}
-            className="input-field"
-          >
-            {roster.length === 0 && <option value="">Sin atletas</option>}
-            {roster.map((r) => (
-              <option key={r.id} value={r.id}>
-                {r.person ? `${r.person.firstName} ${r.person.lastName}` : '—'}
-              </option>
-            ))}
-          </select>
-        </form>
+        <AthleteFilter roster={roster} selectedAthleteId={selectedAthleteId} vistaAnual={vistaAnual} />
       </div>
 
       {vistaAnual && annualSection}
