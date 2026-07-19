@@ -63,6 +63,7 @@ export default async function CoachLayout({ children }: { children: React.ReactN
             <SideDrawer items={NAV_ITEMS} />
           </div>
         </div>
+        <div className="h-0.5 bg-gradient-to-r from-gold via-gold/40 to-transparent" />
       </header>
 
       <nav className="md:hidden fixed bottom-4 left-1/2 -translate-x-1/2 z-10 bg-navy rounded-full px-2 py-2 flex items-center gap-1 shadow-lg">

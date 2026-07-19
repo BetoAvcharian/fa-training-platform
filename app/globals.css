@@ -20,6 +20,9 @@
 
 body {
   @apply bg-surface text-ink;
+  background-image: radial-gradient(circle at 15% 0%, rgb(var(--color-ink) / 0.035), transparent 40%),
+    radial-gradient(circle at 100% 20%, rgb(198 165 92 / 0.05), transparent 45%);
+  background-attachment: fixed;
   transition: background-color 200ms ease, color 200ms ease;
 }
 
@@ -44,17 +47,21 @@ body {
   }
 
   .btn-primary {
-    @apply bg-navy text-white rounded-lg font-medium shadow-sm
-      hover:bg-navy/90 hover:shadow-md
-      active:scale-[0.98]
+    @apply text-white rounded-lg font-medium shadow-sm
+      hover:shadow-lg hover:-translate-y-0.5
+      active:scale-[0.98] active:translate-y-0
       disabled:opacity-50 disabled:pointer-events-none
       transition-all duration-150;
+    background-image: linear-gradient(135deg, rgb(var(--color-ink)) 0%, #12294f 100%);
+  }
+  .dark .btn-primary {
+    background-image: linear-gradient(135deg, #1a3760 0%, #0d1e3f 100%);
   }
 
   .btn-secondary {
     @apply bg-panel text-ink border border-outline rounded-lg font-medium
-      hover:border-gold/50 hover:bg-gold/5
-      active:scale-[0.98]
+      hover:border-gold/50 hover:bg-gold/5 hover:-translate-y-0.5
+      active:scale-[0.98] active:translate-y-0
       disabled:opacity-50 disabled:pointer-events-none
       transition-all duration-150;
   }
@@ -76,7 +83,7 @@ body {
   }
 
   .card-hover {
-    @apply card hover:border-gold/40 hover:shadow-md transition-all duration-150;
+    @apply card hover:border-gold/40 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-150;
   }
 
   .badge {

@@ -64,6 +64,7 @@ export default async function AthleteLayout({ children }: { children: React.Reac
           </form>
         </div>
       </header>
+      <div className="h-0.5 bg-gradient-to-r from-gold via-gold/40 to-transparent -mt-2 mb-2" />
 
       <main className="max-w-md mx-auto px-5 pt-2 pb-6">{children}</main>
 
