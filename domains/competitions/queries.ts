@@ -94,3 +94,33 @@ export async function getCompetitionEntries(
     }
   })
 }
+
+export interface CompetitionWithCount extends Competition {
+  participantCount: number
+}
+
+/** Las competencias con cuántos atletas están anotados en cada una — para la vista timeline. */
+export async function getCompetitionsWithCounts(
+  organizationId: string,
+  client?: AppSupabaseClient
+): Promise<CompetitionWithCount[]> {
+  const supabase = client ?? (await createServerClient())
+  const competitions = await getCompetitions(organizationId, supabase)
+  if (competitions.length === 0) return []
+
+  const { data: assignments } = await supabase
+    .from('event_assignments')
+    .select('event_id')
+    .in(
+      'event_id',
+      competitions.map((c) => c.id)
+    )
+    .eq('assignee_type', 'person')
+
+  const countByEvent = new Map<string, number>()
+  for (const row of assignments ?? []) {
+    countByEvent.set(row.event_id, (countByEvent.get(row.event_id) ?? 0) + 1)
+  }
+
+  return competitions.map((c) => ({ ...c, participantCount: countByEvent.get(c.id) ?? 0 }))
+}
