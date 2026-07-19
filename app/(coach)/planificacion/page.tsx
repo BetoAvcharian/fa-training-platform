@@ -3,7 +3,9 @@ import { getMyActiveMembership, getAthletesForCoach, getRoster } from '@/domains
 import { getPlans, getObjectives } from '@/domains/planning/queries'
 import { getEventsForRange } from '@/domains/events/queries'
 import { PlanForm } from './plan-form'
+import { PlanEditButton } from './plan-edit-button'
 import { ObjectiveForm } from './objective-form'
+import { ObjectiveEditButton } from './objective-edit-button'
 import { AchieveButton } from './achieve-button'
 import { AnnualGrid } from './annual-grid'
 import { FullscreenChart } from '@/components/ui/fullscreen-chart'
@@ -167,15 +169,28 @@ export default async function PlanificacionPage({
             .filter((p) => !p.parentPlanId)
             .map((root) => (
               <div key={root.id} className="card p-4">
-                <p className="text-xs uppercase tracking-wide text-gold font-semibold">{TYPE_LABELS[root.type]}</p>
-                <p className="font-medium text-ink">{root.title}</p>
+                <div className="flex items-start justify-between gap-2">
+                  <div>
+                    <p className="text-xs uppercase tracking-wide text-gold font-semibold">{TYPE_LABELS[root.type]}</p>
+                    <p className="font-medium text-ink">{root.title}</p>
+                    {(root.startDate || root.endDate) && (
+                      <p className="text-xs text-status-neutral">
+                        {formatDate(root.startDate)} — {formatDate(root.endDate)}
+                      </p>
+                    )}
+                  </div>
+                  <PlanEditButton plan={{ id: root.id, title: root.title, startDate: root.startDate, endDate: root.endDate }} />
+                </div>
                 <div className="mt-2 space-y-1 pl-3 border-l-2 border-outline">
                   {plans
                     .filter((p) => p.parentPlanId === root.id)
                     .map((child) => (
-                      <p key={child.id} className="text-sm text-ink">
-                        <span className="text-xs text-status-neutral">{TYPE_LABELS[child.type]}</span> {child.title}
-                      </p>
+                      <div key={child.id} className="flex items-center justify-between gap-2">
+                        <p className="text-sm text-ink">
+                          <span className="text-xs text-status-neutral">{TYPE_LABELS[child.type]}</span> {child.title}
+                        </p>
+                        <PlanEditButton plan={{ id: child.id, title: child.title, startDate: child.startDate, endDate: child.endDate }} />
+                      </div>
                     ))}
                 </div>
               </div>
@@ -208,7 +223,10 @@ export default async function PlanificacionPage({
                   <p className="text-sm text-ink mt-0.5">{o.description}</p>
                   {o.targetDate && <p className="text-xs text-status-neutral mt-0.5">Meta: {formatDate(o.targetDate)}</p>}
                 </div>
-                <AchieveButton id={o.id} />
+                <div className="flex items-center gap-2 shrink-0">
+                  <ObjectiveEditButton objective={{ id: o.id, category: o.category, description: o.description, targetDate: o.targetDate }} />
+                  <AchieveButton id={o.id} />
+                </div>
               </div>
             )
           })}
@@ -218,8 +236,9 @@ export default async function PlanificacionPage({
           <div className="space-y-2 pt-2">
             <p className="text-xs text-status-neutral uppercase tracking-wide">Logrados</p>
             {logrados.map((o) => (
-              <div key={o.id} className="rounded-xl border border-outline bg-panel p-4 opacity-60">
+              <div key={o.id} className="rounded-xl border border-outline bg-panel p-4 opacity-60 flex items-center justify-between gap-2">
                 <p className="text-sm text-ink">{o.description}</p>
+                <ObjectiveEditButton objective={{ id: o.id, category: o.category, description: o.description, targetDate: o.targetDate }} />
               </div>
             ))}
           </div>
