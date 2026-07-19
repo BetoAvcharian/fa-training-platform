@@ -97,25 +97,20 @@ export default async function ReportesPage({
         </button>
       </form>
 
-      <div className="flex items-center justify-between">
-        <p className="text-sm text-status-neutral">{rows.length} registros</p>
-        <a href={downloadHref} className="rounded-lg bg-status-positive text-white px-4 py-2 text-sm font-medium">
-          ⬇ Descargar Excel
-        </a>
-      </div>
-
-      <div className="card p-4 flex items-center justify-between gap-3 flex-wrap">
-        <div>
-          <p className="text-sm font-semibold text-ink">Entrenamientos planificados</p>
-          <p className="text-xs text-status-neutral">
-            Fecha, entrenamiento agendado, feedback y fatiga — de {params.atleta ? 'este atleta' : params.grupo ? 'este grupo' : 'todos'}
-            {params.desde || params.hasta ? ' en el rango elegido arriba' : ''}.
-          </p>
+      <div className="flex items-center justify-between flex-wrap gap-3">
+        <p className="text-sm text-status-neutral">{rows.length} registros de marcas</p>
+        <div className="flex gap-2 flex-wrap">
+          <a href={downloadHref} className="rounded-lg bg-status-positive text-white px-4 py-2 text-sm font-medium">
+            ⬇ Marcas (Excel)
+          </a>
+          <a href={trainingsDownloadHref} className="rounded-lg bg-status-positive text-white px-4 py-2 text-sm font-medium">
+            ⬇ Entrenamientos planificados (Excel)
+          </a>
         </div>
-        <a href={trainingsDownloadHref} className="rounded-lg bg-status-positive text-white px-4 py-2 text-sm font-medium shrink-0">
-          ⬇ Descargar Excel
-        </a>
       </div>
+      <p className="text-xs text-status-neutral -mt-4">
+        Los dos botones usan los mismos filtros de arriba (Atleta, Grupo, Desde, Hasta) — "Origen" solo aplica al de Marcas.
+      </p>
 
       <div className="rounded-xl border border-outline bg-panel overflow-x-auto">
         <table className="w-full text-sm">
