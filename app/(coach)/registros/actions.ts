@@ -13,10 +13,13 @@ export async function recordObservationAction(formData: FormData) {
   const athleteMembershipId = String(formData.get('athleteMembershipId') ?? '')
   const observableId = String(formData.get('observableId') ?? '')
   const value = Number(formData.get('value'))
+  const waPointsRaw = String(formData.get('waPoints') ?? '')
+  const waPoints = waPointsRaw ? Number(waPointsRaw) : undefined
 
   if (!athleteMembershipId) return { error: 'Falta elegir atleta' }
   if (!observableId) return { error: 'Falta elegir qué registrar' }
   if (!value || Number.isNaN(value)) return { error: 'Valor inválido' }
+  if (waPointsRaw && Number.isNaN(waPoints)) return { error: 'Puntos inválidos' }
 
   try {
     await recordObservation({
@@ -24,6 +27,7 @@ export async function recordObservationAction(formData: FormData) {
       organizationId: membership.organizationId,
       observableId,
       value,
+      waPoints,
     })
   } catch (e) {
     return { error: e instanceof DomainError ? e.message : 'No se pudo guardar' }

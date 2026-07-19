@@ -76,6 +76,7 @@ export default async function RegistrosPage() {
               subtitle={`${r.observableName} · ${formatDate(r.date)}`}
               value={r.value}
               unitSymbol={r.unitSymbol}
+              waPoints={r.waPoints}
               onEdit={editRecordAction}
               onDelete={deleteRecordAction}
             />

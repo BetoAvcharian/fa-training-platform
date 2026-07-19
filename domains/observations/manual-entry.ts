@@ -18,6 +18,7 @@ export async function recordObservation(
     value: number
     date?: string
     notes?: string
+    waPoints?: number
   },
   client?: AppSupabaseClient
 ): Promise<{ id: string }> {
@@ -40,6 +41,13 @@ export async function recordObservation(
   })
 
   if (error || !data) throw new DomainError('CONFLICT', error?.message ?? 'No se pudo guardar')
+
+  // El puntaje World Athletics es un campo aparte (wa_points) que no
+  // pasa por el RPC — se carga con un update chico después de crear la
+  // marca, así no se toca la transacción que ya calcula récords.
+  if (input.waPoints !== undefined) {
+    await supabase.from('observations').update({ wa_points: input.waPoints }).eq('id', data as string)
+  }
 
   await logAudit({
     organizationId: input.organizationId,
@@ -66,13 +74,14 @@ export async function getRecentRecords(
     unitSymbol: string | null
     value: number
     date: string
+    waPoints: number | null
   }>
 > {
   const supabase = client ?? (await createServerClient())
   const { data, error } = await supabase
     .from('observations')
     .select(
-      'id, value, date, source_type, observables(name, units(symbol)), memberships!observations_athlete_membership_id_fkey(people(first_name, last_name))'
+      'id, value, date, source_type, wa_points, observables(name, units(symbol)), memberships!observations_athlete_membership_id_fkey(people(first_name, last_name))'
     )
     .eq('organization_id', organizationId)
     .eq('source_type', 'manual')
@@ -92,6 +101,7 @@ export async function getRecentRecords(
     unitSymbol: row.observables?.units?.symbol ?? null,
     value: row.value,
     date: row.date,
+    waPoints: row.wa_points,
   }))
 }
 

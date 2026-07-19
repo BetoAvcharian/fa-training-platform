@@ -20,9 +20,14 @@ export default async function RendimientoRosterPage() {
           <p className="text-xs uppercase tracking-wider text-gold font-medium">Rendimiento</p>
           <h1 className="font-display text-2xl font-bold text-ink">Elegí un atleta</h1>
         </div>
-        <Link href="/rendimiento/comparar" className="text-sm text-ink underline">
-          Comparar atletas/grupo →
-        </Link>
+        <div className="flex gap-3">
+          <Link href="/rendimiento/ranking" className="text-sm text-ink underline">
+            Ranking por puntos WA →
+          </Link>
+          <Link href="/rendimiento/comparar" className="text-sm text-ink underline">
+            Comparar atletas/grupo →
+          </Link>
+        </div>
       </div>
 
       {roster.length === 0 && (

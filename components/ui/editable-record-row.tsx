@@ -9,6 +9,7 @@ export function EditableRecordRow({
   subtitle,
   value,
   unitSymbol,
+  waPoints,
   onEdit,
   onDelete,
 }: {
@@ -17,6 +18,7 @@ export function EditableRecordRow({
   subtitle: string
   value: number
   unitSymbol: string | null
+  waPoints?: number | null
   onEdit: (id: string, value: number) => Promise<{ error: string | null } | undefined>
   onDelete: (id: string) => Promise<void>
 }) {
@@ -108,6 +110,11 @@ export function EditableRecordRow({
       </div>
       <div className="flex items-center gap-3">
         <p className="font-semibold text-ink">{formatMark(value, unitSymbol)}</p>
+        {!!waPoints && (
+          <span className="text-[10px] font-bold bg-gold/15 text-gold px-1.5 py-0.5 rounded-full" title="Puntos World Athletics">
+            {waPoints} pts
+          </span>
+        )}
         <div className="flex gap-2">
           <button onClick={() => setEditing(true)} className="text-xs text-ink underline">
             Editar
