@@ -2,6 +2,7 @@ import { getTodayISO } from '@/lib/today'
 import { createServerClient, type AppSupabaseClient } from '@/lib/supabase/server'
 import { DomainError } from '@/types/errors'
 import { getMyActiveMembership } from '@/domains/athletes/queries'
+import { calculateWaPoints } from '@/domains/performance/wa-points'
 import { logAudit } from '@/domains/audit/mutations'
 
 export async function createCompetition(
@@ -107,6 +108,20 @@ export async function recordCompetitionResult(
 
   if (input.windMs !== undefined) {
     await supabase.from('observations').update({ wind_ms: input.windMs }).eq('id', data as string)
+  }
+
+  // Puntaje World Athletics automático — el lugar donde más importa,
+  // porque acá es donde se cargan las marcas de competencia de verdad.
+  const { data: athleteRow } = await supabase
+    .from('memberships')
+    .select('people(gender)')
+    .eq('id', input.athleteMembershipId)
+    .maybeSingle()
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const gender = (athleteRow as any)?.people?.gender ?? null
+  const waPoints = await calculateWaPoints(input.observableId, gender, input.value, supabase)
+  if (waPoints !== null) {
+    await supabase.from('observations').update({ wa_points: waPoints }).eq('id', data as string)
   }
 
   await logAudit({
