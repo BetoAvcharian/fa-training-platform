@@ -10,6 +10,7 @@ import {
 } from '@/domains/dashboard/queries'
 import { getLowestEnergyToday } from '@/domains/observations/checkin'
 import { getDaySchedule } from '@/domains/dashboard/day-schedule'
+import { getObjectives } from '@/domains/planning/queries'
 import { AttendanceChart } from './attendance-chart'
 import { PerformanceChart } from './performance-chart'
 import { TrainingDayList } from '@/components/ui/training-day-list'
@@ -41,7 +42,7 @@ export default async function ResumenPage() {
 
   const today = getTodayISO()
 
-  const [withoutExecution, stats, upcoming, attendance, feedbackRate, lowestEnergy, todaySchedule] = await Promise.all([
+  const [withoutExecution, stats, upcoming, attendance, feedbackRate, lowestEnergy, todaySchedule, objectives] = await Promise.all([
     getAthletesWithoutExecutionSince(membership.id, daysAgo(4)),
     getOrgStats(membership.organizationId),
     getUpcomingEventsOrg(membership.organizationId, 5),
@@ -49,77 +50,61 @@ export default async function ResumenPage() {
     getFeedbackRateSeries(membership.organizationId, 10),
     getLowestEnergyToday(membership.organizationId, today, 3),
     getDaySchedule(membership.organizationId, today),
+    getObjectives(membership.organizationId),
   ])
 
-  const hasAlerts = withoutExecution.length > 0
+  const upcomingCompetitions = upcoming.filter((e) => e.type === 'competencia').length
+  const objectivesAchieved = objectives.filter((o) => o.achieved).length
+  const hasAlerts = withoutExecution.length > 0 || lowestEnergy.length > 0
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-7">
       <div>
-        <p className="text-xs uppercase tracking-wider text-gold font-medium">Resumen</p>
-        <h1 className="font-display text-2xl font-bold text-ink">
+        <p className="text-xs uppercase tracking-wider text-gold font-semibold">Resumen</p>
+        <h1 className="font-display text-[26px] font-bold text-ink tracking-tight">
           {new Date(today + 'T00:00:00').toLocaleDateString('es-AR', { weekday: 'long', day: 'numeric', month: 'long' })}
         </h1>
       </div>
 
-      {/* Jerarquía: alertas primero, siempre */}
-      {hasAlerts && (
-        <div className="space-y-3">
-          {withoutExecution.length > 0 && (
-            <div className="rounded-xl border border-status-critical/20 bg-status-critical/5 p-4">
-              <p className="text-sm font-medium text-status-critical mb-2">🔴 Atención requerida ({withoutExecution.length})</p>
-              <ul className="space-y-1">
-                {withoutExecution.map((a) => (
-                  <li key={a.athleteMembershipId}>
-                    <Link href={`/atletas/${a.athleteMembershipId}`} className="text-sm text-ink hover:underline">
-                      {a.athleteName} — sin registrar hace más de 4 días
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-        </div>
-      )}
-
-      {lowestEnergy.length > 0 && (
-        <div className="card p-4">
-          <div className="flex items-center justify-between mb-2">
-            <p className="text-sm font-medium text-ink">🔋 Menor energía hoy</p>
-            <Link href="/resumen/energia" className="text-xs text-gold font-medium">
-              Ver todos →
-            </Link>
-          </div>
-          <ul className="space-y-1">
-            {lowestEnergy.map((a) => (
-              <li key={a.athleteMembershipId}>
-                <Link href={`/atletas/${a.athleteMembershipId}`} className="text-sm text-ink hover:underline flex items-center justify-between">
-                  <span>{a.athleteName}</span>
-                  <span className="text-status-neutral">
-                    energía {a.energia ?? '—'}/10{a.fatiga !== null && ` · fatiga ${a.fatiga}/10`}
-                  </span>
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
-
-      {/* Tarjetas de métricas — clickeables, cada una a su módulo */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        <StatCard label="Ejercicios" value={stats.drills.count} delta={stats.drills.deltaWeek} href="/registros" />
-        <StatCard label="Sesiones" value={stats.sessions.count} delta={stats.sessions.deltaWeek} href="/calendario" />
-        <StatCard label="Atletas" value={stats.athletes.count} delta={stats.athletes.deltaWeek} href="/atletas" />
-        <StatCard label="Miembros activos" value={stats.activeMembers.count} delta={stats.activeMembers.deltaWeek} href="/atletas" />
+      {/* Fila superior — KPIs, lo primero que se ve */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+        <KpiCard icon="🏃" label="Atletas activos" value={stats.athletes.count} delta={stats.athletes.deltaWeek} href="/atletas" tone="blue" />
+        <KpiCard icon="💪" label="Entrenamientos" value={stats.sessions.count} delta={stats.sessions.deltaWeek} href="/calendario" tone="neutral" />
+        <KpiCard icon="🏆" label="Próximas competencias" value={upcomingCompetitions} href="/competencias" tone="orange" />
+        <KpiCard icon="🎯" label="Objetivos cumplidos" value={objectivesAchieved} href="/planificacion" tone="green" />
       </div>
 
+      {/* Fila central — carga y evolución */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        {/* Próximos eventos */}
-        <div className="card p-4">
+        <Link href="/calendario" className="card p-5 block hover:border-navy/30 transition-colors">
+          <p className="text-sm font-semibold text-ink mb-1">Carga semanal (asistencia)</p>
+          <p className="text-[11px] text-status-neutral mb-3">Atletas asignados vs. atletas que completaron, últimas sesiones.</p>
+          {attendance.length === 0 ? <p className="text-sm text-status-neutral">Sin datos todavía.</p> : <AttendanceChart data={attendance} />}
+        </Link>
+        <Link href="/calendario?view=dia" className="card p-5 block hover:border-navy/30 transition-colors">
+          <p className="text-sm font-semibold text-ink mb-1">Evolución del feedback</p>
+          <p className="text-[11px] text-status-neutral mb-3">% de atletas que te contaron cómo les fue en cada entrenamiento.</p>
+          {feedbackRate.length === 0 ? <p className="text-sm text-status-neutral">Sin datos todavía.</p> : <PerformanceChart data={feedbackRate} />}
+        </Link>
+      </div>
+
+      {/* Fila inferior — actividad, tareas y alertas */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        <div className="card p-5">
           <div className="flex items-center justify-between mb-3">
-            <p className="text-sm font-semibold text-ink">Próximos eventos</p>
-            <Link href="/calendario" className="text-xs text-gold font-medium">
-              Ver todos →
+            <p className="text-sm font-semibold text-ink">Actividad de hoy</p>
+            <Link href="/calendario?view=dia" className="text-xs text-navy font-medium">
+              Ver día →
+            </Link>
+          </div>
+          <TrainingDayList trainings={todaySchedule} />
+        </div>
+
+        <div className="card p-5">
+          <div className="flex items-center justify-between mb-3">
+            <p className="text-sm font-semibold text-ink">Próximas tareas</p>
+            <Link href="/calendario" className="text-xs text-navy font-medium">
+              Ver todas →
             </Link>
           </div>
           {upcoming.length === 0 && <p className="text-sm text-status-neutral">Sin eventos próximos.</p>}
@@ -128,16 +113,16 @@ export default async function ResumenPage() {
               <Link
                 key={e.id}
                 href={`/calendario?week=${e.date}&view=dia`}
-                className="py-3 flex items-center justify-between gap-2 hover:bg-outline/20 -mx-1 px-1 rounded"
+                className="py-2.5 flex items-center justify-between gap-2 hover:bg-outline/20 -mx-1 px-1 rounded"
               >
-                <div>
-                  <p className="text-xs text-gold font-medium">{TYPE_LABELS[e.type] ?? e.type}</p>
-                  <p className="text-sm font-medium text-ink">{e.title}</p>
+                <div className="min-w-0">
+                  <p className="text-[11px] text-gold font-semibold">{TYPE_LABELS[e.type] ?? e.type}</p>
+                  <p className="text-sm font-medium text-ink truncate">{e.title}</p>
                   <p className="text-xs text-status-neutral">{formatEventDate(e.date)}</p>
                 </div>
                 {e.assignedCount > 0 && (
                   <span className="text-xs text-status-neutral shrink-0">
-                    {e.completedCount}/{e.assignedCount} hechos
+                    {e.completedCount}/{e.assignedCount}
                   </span>
                 )}
               </Link>
@@ -145,50 +130,84 @@ export default async function ResumenPage() {
           </div>
         </div>
 
-        {/* Gráficos */}
-        <div className="space-y-4">
-          <Link href="/calendario?view=dia" className="card p-4 block hover:border-gold/40 transition-colors">
-            <p className="text-sm font-semibold text-ink mb-2">Feedback recibido (últimas sesiones)</p>
-            <p className="text-[11px] text-status-neutral mb-2">
-              % de atletas asignados que te contaron cómo les fue en cada entrenamiento.
-            </p>
-            {feedbackRate.length === 0 ? (
-              <p className="text-sm text-status-neutral">Sin datos todavía.</p>
-            ) : (
-              <PerformanceChart data={feedbackRate} />
-            )}
-          </Link>
-          <Link href="/calendario" className="card p-4 block hover:border-gold/40 transition-colors">
-            <p className="text-sm font-semibold text-ink mb-2">Asistencia (últimas sesiones)</p>
-            {attendance.length === 0 ? (
-              <p className="text-sm text-status-neutral">Sin datos todavía.</p>
-            ) : (
-              <AttendanceChart data={attendance} />
-            )}
-          </Link>
+        <div className="card p-5">
+          <p className="text-sm font-semibold text-ink mb-3">Alertas importantes</p>
+          {!hasAlerts ? (
+            <p className="text-sm text-status-neutral">Sin alertas — todo al día.</p>
+          ) : (
+            <div className="space-y-4">
+              {withoutExecution.length > 0 && (
+                <div>
+                  <p className="text-xs font-semibold text-status-critical mb-1.5">🔴 Sin registrar hace 4+ días</p>
+                  <ul className="space-y-1">
+                    {withoutExecution.map((a) => (
+                      <li key={a.athleteMembershipId}>
+                        <Link href={`/atletas/${a.athleteMembershipId}`} className="text-sm text-ink hover:underline">
+                          {a.athleteName}
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+              {lowestEnergy.length > 0 && (
+                <div>
+                  <div className="flex items-center justify-between mb-1.5">
+                    <p className="text-xs font-semibold text-status-attention">🔋 Menor energía hoy</p>
+                    <Link href="/resumen/energia" className="text-[11px] text-navy font-medium">
+                      Ver todos →
+                    </Link>
+                  </div>
+                  <ul className="space-y-1">
+                    {lowestEnergy.map((a) => (
+                      <li key={a.athleteMembershipId}>
+                        <Link href={`/atletas/${a.athleteMembershipId}`} className="text-sm text-ink hover:underline flex items-center justify-between">
+                          <span>{a.athleteName}</span>
+                          <span className="text-status-neutral text-xs">{a.energia ?? '—'}/10</span>
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
+          )}
         </div>
-      </div>
-
-      {/* Vista del día — mismo módulo que Calendario > Día, acá solo hoy */}
-      <div className="card p-4">
-        <div className="flex items-center justify-between mb-3">
-          <p className="text-sm font-semibold text-ink">Hoy — entrenamientos del día</p>
-          <Link href="/calendario?view=dia" className="text-xs text-gold font-medium">
-            Ver calendario por día →
-          </Link>
-        </div>
-        <TrainingDayList trainings={todaySchedule} />
       </div>
     </div>
   )
 }
 
-function StatCard({ label, value, delta, href }: { label: string; value: number; delta: number; href: string }) {
+const TONE_STYLES: Record<string, string> = {
+  blue: 'bg-navy/10 text-navy',
+  green: 'bg-status-positive/10 text-status-positive',
+  orange: 'bg-gold/10 text-gold',
+  neutral: 'bg-status-neutral/10 text-status-neutral',
+}
+
+function KpiCard({
+  icon,
+  label,
+  value,
+  delta,
+  href,
+  tone,
+}: {
+  icon: string
+  label: string
+  value: number
+  delta?: number
+  href: string
+  tone: string
+}) {
   return (
     <Link href={href} className="card-hover p-4 block">
-      <p className="text-xs text-status-neutral uppercase tracking-wide">{label}</p>
-      <p className="font-display text-2xl font-bold text-ink">{value}</p>
-      {delta > 0 && <p className="text-xs text-status-positive mt-0.5">+{delta} esta semana</p>}
+      <div className="flex items-start justify-between mb-2">
+        <span className={`w-8 h-8 rounded-lg flex items-center justify-center text-sm ${TONE_STYLES[tone]}`}>{icon}</span>
+        {!!delta && delta > 0 && <span className="text-[11px] font-medium text-status-positive">+{delta}</span>}
+      </div>
+      <p className="font-display text-2xl font-bold text-ink leading-none">{value}</p>
+      <p className="text-xs text-status-neutral mt-1.5">{label}</p>
     </Link>
   )
 }

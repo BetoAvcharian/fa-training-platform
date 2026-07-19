@@ -6,6 +6,7 @@ import { SignOutButton } from '@/components/ui/sign-out-button'
 import { ThemeToggle } from '@/components/ui/theme-toggle'
 import { Logo } from '@/components/logo'
 import { SideDrawer } from '@/app/(athlete)/side-drawer'
+import { SidebarNav } from './sidebar-nav'
 
 // Los ítems de navegación. Desktop: sidebar fijo con todo. Mobile:
 // drawer lateral (☰) con todo + 4 accesos rápidos fijos abajo — antes
@@ -90,32 +91,8 @@ export default async function CoachLayout({ children }: { children: React.ReactN
             </p>
           </div>
         </div>
-        <nav className="flex flex-col gap-1 flex-1">
-          {NAV_ITEMS.map((item) =>
-            item.ready ? (
-              <Link
-                key={item.href}
-                href={item.href}
-                className="text-sm rounded-lg px-3 py-2.5 text-white/70 hover:bg-panel/10 hover:text-white transition-colors flex items-center justify-between"
-              >
-                {item.label}
-                {item.href === '/notificaciones' && unreadCount > 0 && (
-                  <span className="bg-gold text-navy rounded-full px-1.5 text-[10px] font-bold">{unreadCount}</span>
-                )}
-              </Link>
-            ) : (
-              <span
-                key={item.href}
-                className="text-sm rounded-lg px-3 py-2.5 text-white/30 cursor-default flex items-center justify-between"
-                title="Todavía no construido"
-              >
-                {item.label}
-                <span className="text-[10px]">pronto</span>
-              </span>
-            )
-          )}
-        </nav>
-        <div className="flex items-center justify-between px-1 mb-2">
+        <SidebarNav items={NAV_ITEMS} unreadCount={unreadCount} />
+        <div className="flex items-center justify-between px-3 py-2 mt-2 mb-1 border-t border-white/10 pt-4">
           <span className="text-xs text-white/50">Tema</span>
           <ThemeToggle className="text-lg leading-none text-white" />
         </div>
