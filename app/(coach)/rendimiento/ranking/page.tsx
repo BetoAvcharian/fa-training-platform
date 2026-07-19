@@ -76,11 +76,8 @@ export default async function RankingPage({
 
       {ranking.length === 0 ? (
         <div className="rounded-xl border border-outline bg-panel p-6 text-sm text-status-neutral text-center">
-          Sin marcas con puntos World Athletics cargados todavía para este filtro. Cargalos desde Registros — sacá el puntaje en{' '}
-          <a href="https://worldathleticsscores.com/es/" target="_blank" rel="noreferrer" className="underline">
-            worldathleticsscores.com
-          </a>{' '}
-          y agregalo al lado de la marca.
+          Sin marcas con puntos World Athletics todavía para este filtro. Se calcula solo al cargar 100m, 200m, 400m, 800m,
+          1500m, lanzamiento de bala o salto en largo — el resto de las pruebas todavía no tiene coeficiente cargado.
         </div>
       ) : (
         <div className="rounded-xl border border-outline bg-panel divide-y divide-outline overflow-hidden">

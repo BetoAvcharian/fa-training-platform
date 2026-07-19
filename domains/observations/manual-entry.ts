@@ -3,6 +3,7 @@ import { createServerClient, type AppSupabaseClient } from '@/lib/supabase/serve
 import { DomainError } from '@/types/errors'
 import { getMyActiveMembership } from '@/domains/athletes/queries'
 import { logAudit } from '@/domains/audit/mutations'
+import { calculateWaPoints } from '@/domains/performance/wa-points'
 
 /**
  * Carga manual de un valor para cualquier Observable del catálogo — el
@@ -42,11 +43,22 @@ export async function recordObservation(
 
   if (error || !data) throw new DomainError('CONFLICT', error?.message ?? 'No se pudo guardar')
 
-  // El puntaje World Athletics es un campo aparte (wa_points) que no
-  // pasa por el RPC — se carga con un update chico después de crear la
-  // marca, así no se toca la transacción que ya calcula récords.
-  if (input.waPoints !== undefined) {
-    await supabase.from('observations').update({ wa_points: input.waPoints }).eq('id', data as string)
+  // Puntaje World Athletics: se calcula solo cuando hay coeficiente
+  // para esa prueba/género (ver domains/performance/wa-points.ts). El
+  // campo manual queda como respaldo únicamente para pruebas que
+  // todavía no tienen coeficiente cargado.
+  const { data: athleteRow } = await supabase
+    .from('memberships')
+    .select('people(gender)')
+    .eq('id', input.athleteMembershipId)
+    .maybeSingle()
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const gender = (athleteRow as any)?.people?.gender ?? null
+  const autoPoints = await calculateWaPoints(input.observableId, gender, input.value, supabase)
+  const finalPoints = autoPoints ?? input.waPoints
+
+  if (finalPoints !== undefined && finalPoints !== null) {
+    await supabase.from('observations').update({ wa_points: finalPoints }).eq('id', data as string)
   }
 
   await logAudit({
@@ -145,6 +157,18 @@ export async function editObservation(
   if (error || !newId) throw new DomainError('CONFLICT', error?.message ?? 'No se pudo corregir')
 
   await supabase.from('observations').update({ superseded_by: newId }).eq('id', input.observationId)
+
+  const { data: athleteRow } = await supabase
+    .from('memberships')
+    .select('people(gender)')
+    .eq('id', original.athlete_membership_id)
+    .maybeSingle()
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const gender = (athleteRow as any)?.people?.gender ?? null
+  const autoPoints = await calculateWaPoints(original.observable_id, gender, input.value, supabase)
+  if (autoPoints !== null) {
+    await supabase.from('observations').update({ wa_points: autoPoints }).eq('id', newId as string)
+  }
 
   return { id: newId as string }
 }
