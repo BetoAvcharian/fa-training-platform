@@ -55,7 +55,13 @@ export default async function ResumenPage() {
 
   const upcomingCompetitions = upcoming.filter((e) => e.type === 'competencia').length
   const objectivesAchieved = objectives.filter((o) => o.achieved).length
-  const hasAlerts = withoutExecution.length > 0 || lowestEnergy.length > 0
+  const in14days = new Date()
+  in14days.setDate(in14days.getDate() + 14)
+  const objectivesDueSoon = objectives
+    .filter((o) => !o.achieved && o.targetDate && o.targetDate <= in14days.toISOString().slice(0, 10) && o.targetDate >= today)
+    .sort((a, b) => (a.targetDate ?? '').localeCompare(b.targetDate ?? ''))
+    .slice(0, 4)
+  const hasAlerts = withoutExecution.length > 0 || lowestEnergy.length > 0 || objectivesDueSoon.length > 0
 
   return (
     <div className="space-y-7">
@@ -164,6 +170,28 @@ export default async function ResumenPage() {
                         <Link href={`/atletas/${a.athleteMembershipId}`} className="text-sm text-ink hover:underline flex items-center justify-between">
                           <span>{a.athleteName}</span>
                           <span className="text-status-neutral text-xs">{a.energia ?? '—'}/10</span>
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+              {objectivesDueSoon.length > 0 && (
+                <div>
+                  <div className="flex items-center justify-between mb-1.5">
+                    <p className="text-xs font-semibold text-gold">🎯 Objetivos con fecha cerca</p>
+                    <Link href="/planificacion" className="text-[11px] text-navy font-medium">
+                      Ver todos →
+                    </Link>
+                  </div>
+                  <ul className="space-y-1">
+                    {objectivesDueSoon.map((o) => (
+                      <li key={o.id} className="text-sm">
+                        <Link href={`/atletas/${o.athleteMembershipId}`} className="text-ink hover:underline flex items-center justify-between gap-2">
+                          <span className="truncate">{o.description}</span>
+                          <span className="text-status-neutral text-xs shrink-0">
+                            {new Date(o.targetDate + 'T00:00:00').toLocaleDateString('es-AR', { day: 'numeric', month: 'short' })}
+                          </span>
                         </Link>
                       </li>
                     ))}
