@@ -76,8 +76,8 @@ export default async function RankingPage({
 
       {ranking.length === 0 ? (
         <div className="rounded-xl border border-outline bg-panel p-6 text-sm text-status-neutral text-center">
-          Sin marcas con puntos World Athletics todavía para este filtro. Se calcula solo al cargar 100m, 200m, 400m, 800m,
-          1500m, lanzamiento de bala o salto en largo — el resto de las pruebas todavía no tiene coeficiente cargado.
+          Sin marcas con puntos World Athletics todavía para este filtro. Se calcula solo en las pruebas estándar de pista y
+          campo (todas menos sentadilla y peso muerto, que no son pruebas de World Athletics).
         </div>
       ) : (
         <div className="rounded-xl border border-outline bg-panel divide-y divide-outline overflow-hidden">
