@@ -1,3 +1,4 @@
+import { cache } from 'react'
 import { createServerClient, createServiceClient, type AppSupabaseClient } from '@/lib/supabase/server'
 import { DomainError } from '@/types/errors'
 import type { RosterEntry, CoachDirectoryEntry, Group } from './types'
@@ -76,7 +77,7 @@ export async function getAllMembers(organizationId: string, client?: AppSupabase
 }
 
 
-export async function getRoster(
+export const getRoster = cache(async function getRoster(
   organizationId: string,
   client?: AppSupabaseClient
 ): Promise<RosterEntry[]> {
@@ -93,10 +94,10 @@ export async function getRoster(
   }
 
   return mapRoster(data ?? [])
-}
+})
 
 /** Atletas que reportan a un coach puntual. */
-export async function getAthletesForCoach(
+export const getAthletesForCoach = cache(async function getAthletesForCoach(
   coachMembershipId: string,
   client?: AppSupabaseClient
 ): Promise<RosterEntry[]> {
@@ -113,7 +114,7 @@ export async function getAthletesForCoach(
   }
 
   return mapRoster(data ?? [])
-}
+})
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function mapRoster(rows: any[]): RosterEntry[] {
@@ -183,7 +184,15 @@ export async function getMyProfile(client?: AppSupabaseClient) {
 }
 
 
-export async function getMyActiveMembership(
+/**
+ * "Quién soy" — se llama desde ~30 lugares distintos en un mismo árbol
+ * de render (layout + página + cada componente de pestaña), y sin
+ * memoizar eso significaba repetir la misma consulta a Auth + a la
+ * base varias veces por click. cache() de React memoiza por request:
+ * la primera llamada hace el trabajo real, el resto (mismo request,
+ * sin argumentos) devuelve el mismo resultado al instante.
+ */
+export const getMyActiveMembership = cache(async function getMyActiveMembership(
   client?: AppSupabaseClient
 ): Promise<{ id: string; organizationId: string; role: string } | null> {
   const supabase = client ?? (await createServerClient())
@@ -206,7 +215,7 @@ export async function getMyActiveMembership(
 
   if (error || !data) return null
   return { id: data.id, organizationId: data.organization_id, role: data.role }
-}
+})
 
 /**
  * Lista de coaches disponibles para que un atleta elija al registrarse —
