@@ -28,13 +28,14 @@ export async function GET(request: NextRequest) {
     Prueba: r.observableName,
     Valor: r.value,
     Unidad: r.unitSymbol ?? '',
+    'Puntos WA': r.waPoints ?? '',
     Origen: r.sourceType,
     Estado: r.validationStatus,
   }))
 
   const worksheet = XLSX.utils.json_to_sheet(sheetData)
   worksheet['!cols'] = [
-    { wch: 12 }, { wch: 22 }, { wch: 14 }, { wch: 24 }, { wch: 10 }, { wch: 8 }, { wch: 14 }, { wch: 16 },
+    { wch: 12 }, { wch: 22 }, { wch: 14 }, { wch: 24 }, { wch: 10 }, { wch: 8 }, { wch: 10 }, { wch: 14 }, { wch: 16 },
   ]
   const workbook = XLSX.utils.book_new()
   XLSX.utils.book_append_sheet(workbook, worksheet, 'Reporte')

@@ -1,6 +1,7 @@
 import { getMyActiveMembership, getAthletesForCoach, getRoster, getGroups } from '@/domains/athletes/queries'
 import { getReportData } from '@/domains/reports/queries'
 import { formatMark } from '@/lib/format-mark'
+import { WaPointsBadge } from '@/components/ui/wa-points-badge'
 import { AthleteSearchPicker } from '@/components/ui/athlete-search-picker'
 
 export const dynamic = 'force-dynamic'
@@ -132,6 +133,7 @@ export default async function ReportesPage({
               <th className="px-4 py-3 text-[11px] uppercase tracking-wide text-status-neutral font-semibold">Atleta</th>
               <th className="px-4 py-3 text-[11px] uppercase tracking-wide text-status-neutral font-semibold">Prueba</th>
               <th className="px-4 py-3 text-[11px] uppercase tracking-wide text-status-neutral font-semibold">Valor</th>
+              <th className="px-4 py-3 text-[11px] uppercase tracking-wide text-status-neutral font-semibold">Puntos</th>
               <th className="px-4 py-3 text-[11px] uppercase tracking-wide text-status-neutral font-semibold">Origen</th>
             </tr>
           </thead>
@@ -143,6 +145,9 @@ export default async function ReportesPage({
                 <td className="px-4 py-3 text-ink">{r.observableName}</td>
                 <td className="px-4 py-3 font-semibold text-ink">
                   {formatMark(r.value, r.unitSymbol)}
+                </td>
+                <td className="px-4 py-3">
+                  <WaPointsBadge points={r.waPoints} />
                 </td>
                 <td className="px-4 py-3">
                   <span className="badge bg-outline/60 text-status-neutral">{SOURCE_LABELS[r.sourceType] ?? r.sourceType}</span>

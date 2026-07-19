@@ -4,6 +4,7 @@ import { getCompetitionEntries } from '@/domains/competitions/queries'
 import { getObservables, getUnits } from '@/domains/catalog/queries'
 import { createServerClient } from '@/lib/supabase/server'
 import { formatMark } from '@/lib/format-mark'
+import { WaPointsBadge } from '@/components/ui/wa-points-badge'
 import { SelfEnrollButton, MyResultForm } from './forms'
 
 export const dynamic = 'force-dynamic'
@@ -67,8 +68,9 @@ export default async function CompetitionDetailPage({ params }: { params: Promis
         {isEnrolled && myEntry && myEntry.results.length > 0 && (
           <div className="mt-3 space-y-1">
             {myEntry.results.map((r) => (
-              <p key={r.id} className="text-xs text-status-neutral">
+              <p key={r.id} className="text-xs text-status-neutral flex items-center gap-1.5 flex-wrap">
                 {r.observableName}: <span className="font-medium text-ink">{formatMark(r.value, r.unitSymbol)}</span>
+                <WaPointsBadge points={r.waPoints} />
                 {r.windMs !== null && <span> (viento {r.windMs > 0 ? '+' : ''}{r.windMs} m/s)</span>}
               </p>
             ))}
@@ -85,8 +87,9 @@ export default async function CompetitionDetailPage({ params }: { params: Promis
               {entry.results.length > 0 && (
                 <div className="mt-1 space-y-1">
                   {entry.results.map((r) => (
-                    <p key={r.id} className="text-xs text-status-neutral">
+                    <p key={r.id} className="text-xs text-status-neutral flex items-center gap-1.5">
                       {r.observableName}: <span className="font-medium text-ink">{formatMark(r.value, r.unitSymbol)}</span>
+                      <WaPointsBadge points={r.waPoints} />
                     </p>
                   ))}
                 </div>

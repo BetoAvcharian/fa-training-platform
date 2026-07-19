@@ -9,6 +9,7 @@ import { getVideosForAthlete } from '@/domains/videos/tags'
 import { getMyActiveMembership } from '@/domains/athletes/queries'
 import { getObjectives } from '@/domains/planning/queries'
 import { formatMark } from '@/lib/format-mark'
+import { WaPointsBadge } from '@/components/ui/wa-points-badge'
 
 export const dynamic = 'force-dynamic'
 
@@ -173,7 +174,14 @@ async function ResumenTab({ athleteId, organizationId }: { athleteId: string; or
     <div className="space-y-5">
       {/* Panel resumen — todo visible sin scroll */}
       <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
-        <SummaryCard icon="🏆" label="Mejor marca" value={mejorMarca ? formatMark(mejorMarca.value, mejorMarca.unitSymbol) : '—'} sub={mejorMarca?.observableName} tone="orange" />
+        <SummaryCard
+          icon="🏆"
+          label="Mejor marca"
+          value={mejorMarca ? formatMark(mejorMarca.value, mejorMarca.unitSymbol) : '—'}
+          sub={mejorMarca?.observableName}
+          tone="orange"
+          badge={<WaPointsBadge points={mejorMarca?.waPoints} />}
+        />
         <SummaryCard
           icon="📅"
           label="Próxima competencia"
@@ -220,7 +228,10 @@ async function ResumenTab({ athleteId, organizationId }: { athleteId: string; or
                   <p className="text-sm text-ink truncate">{r.observableName}</p>
                   <p className="text-xs text-status-neutral">{formatDate(r.date)}</p>
                 </div>
-                <span className="font-display font-bold text-navy shrink-0">{formatMark(r.value, r.unitSymbol)}</span>
+                <span className="font-display font-bold text-navy shrink-0 flex items-center gap-1.5">
+                  {formatMark(r.value, r.unitSymbol)}
+                  <WaPointsBadge points={r.waPoints} />
+                </span>
               </div>
             ))}
           </div>
@@ -266,6 +277,7 @@ function SummaryCard({
   sub,
   tone,
   small,
+  badge,
 }: {
   icon: string
   label: string
@@ -273,6 +285,7 @@ function SummaryCard({
   sub?: string | null
   tone: 'blue' | 'green' | 'orange' | 'neutral'
   small?: boolean
+  badge?: React.ReactNode
 }) {
   const toneClasses: Record<string, string> = {
     blue: 'bg-navy/10 text-navy',
@@ -282,7 +295,10 @@ function SummaryCard({
   }
   return (
     <div className="card p-3.5">
-      <span className={`w-7 h-7 rounded-lg flex items-center justify-center text-xs mb-2 ${toneClasses[tone]}`}>{icon}</span>
+      <div className="flex items-center justify-between mb-2">
+        <span className={`w-7 h-7 rounded-lg flex items-center justify-center text-xs ${toneClasses[tone]}`}>{icon}</span>
+        {badge}
+      </div>
       <p className={`font-display font-bold text-ink leading-tight ${small ? 'text-sm line-clamp-2' : 'text-lg'}`}>{value}</p>
       <p className="text-[11px] text-status-neutral mt-1">{label}</p>
       {sub && <p className="text-[11px] text-status-neutral/70 truncate">{sub}</p>}
@@ -323,7 +339,8 @@ async function ResultadosTab({ athleteId, organizationId }: { athleteId: string;
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
           {records.map((r) => (
             <div key={r.id} className="text-sm text-ink border border-outline rounded-lg p-2">
-              {r.observableName}: <span className="font-medium">{formatMark(r.value, r.unitSymbol)}</span>
+              {r.observableName}: <span className="font-medium">{formatMark(r.value, r.unitSymbol)}</span>{' '}
+              <WaPointsBadge points={r.waPoints} />
               <span className="text-xs text-status-neutral"> ({r.recordType})</span>
             </div>
           ))}
@@ -338,7 +355,10 @@ async function ResultadosTab({ athleteId, organizationId }: { athleteId: string;
               <p className="text-ink">{r.observableName}</p>
               <p className="text-xs text-status-neutral">{formatDate(r.date)}</p>
             </div>
-            <p className="font-medium text-ink">{formatMark(r.value, r.unitSymbol)}</p>
+            <div className="flex items-center gap-1.5">
+              <p className="font-medium text-ink">{formatMark(r.value, r.unitSymbol)}</p>
+              <WaPointsBadge points={r.waPoints} />
+            </div>
           </div>
         ))}
       </div>

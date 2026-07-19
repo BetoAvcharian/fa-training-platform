@@ -10,6 +10,7 @@ export interface ReportRow {
   unitSymbol: string | null
   sourceType: string
   validationStatus: string
+  waPoints: number | null
 }
 
 export interface ReportFilters {
@@ -42,7 +43,7 @@ export async function getReportData(filters: ReportFilters, client?: AppSupabase
   let query = supabase
     .from('observations')
     .select(
-      'date, value, source_type, validation_status, athlete_membership_id, observables(name, sports(name), units(symbol))'
+      'date, value, source_type, validation_status, athlete_membership_id, wa_points, observables(name, sports(name), units(symbol))'
     )
     .eq('organization_id', filters.organizationId)
     .eq('state', 'ejecutado')
@@ -77,6 +78,7 @@ export async function getReportData(filters: ReportFilters, client?: AppSupabase
     unitSymbol: row.observables?.units?.symbol ?? null,
     sourceType: row.source_type,
     validationStatus: row.validation_status,
+    waPoints: row.wa_points,
   }))
 }
 

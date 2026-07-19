@@ -34,7 +34,7 @@ export async function getCompetitions(organizationId: string, client?: AppSupaba
 export interface CompetitionEntry {
   athleteMembershipId: string
   athleteName: string
-  results: Array<{ id: string; observableName: string; unitSymbol: string | null; value: number; windMs: number | null }>
+  results: Array<{ id: string; observableName: string; unitSymbol: string | null; value: number; windMs: number | null; waPoints: number | null }>
 }
 
 /** Inscriptos en la competencia, con sus resultados ya cargados (si los hay). */
@@ -63,7 +63,7 @@ export async function getCompetitionEntries(
 
   const { data: observations, error: obsError } = await supabase
     .from('observations')
-    .select('id, athlete_membership_id, value, wind_ms, observables(name, units(symbol))')
+    .select('id, athlete_membership_id, value, wind_ms, wa_points, observables(name, units(symbol))')
     .eq('event_id', eventId)
     .eq('state', 'ejecutado')
     .is('superseded_by', null)
@@ -85,6 +85,7 @@ export async function getCompetitionEntries(
         unitSymbol: o.observables?.units?.symbol ?? null,
         value: o.value,
         windMs: o.wind_ms,
+        waPoints: o.wa_points,
       }))
 
     return {

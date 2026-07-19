@@ -6,7 +6,7 @@ import type { SessionExercise } from '@/domains/events/types'
 
 export interface ResolvedLine {
   line: SessionExercise
-  executed: { value: number; date: string; notes: string | null } | null
+  executed: { value: number; date: string; notes: string | null; waPoints: number | null } | null
 }
 
 /**
@@ -58,7 +58,7 @@ async function attachExecuted(
 
   const { data: executions, error } = await supabase
     .from('observations')
-    .select('observable_id, value, date, notes')
+    .select('observable_id, value, date, notes, wa_points')
     .eq('athlete_membership_id', athleteMembershipId)
     .eq('state', 'ejecutado')
     .is('superseded_by', null)
@@ -72,7 +72,9 @@ async function attachExecuted(
     const execution = line.observableId ? byObservable.get(line.observableId) : undefined
     return {
       line,
-      executed: execution ? { value: execution.value, date: execution.date, notes: execution.notes } : null,
+      executed: execution
+        ? { value: execution.value, date: execution.date, notes: execution.notes, waPoints: execution.wa_points }
+        : null,
     }
   })
 }

@@ -1,5 +1,6 @@
 import { getMyRecords, getMyResults } from '@/domains/performance/queries'
 import { formatMark } from '@/lib/format-mark'
+import { WaPointsBadge } from '@/components/ui/wa-points-badge'
 import { EditableRecordRow } from '@/components/ui/editable-record-row'
 import { editResultAction, deleteResultAction } from './actions'
 import { MyPerformanceChart } from './performance-chart'
@@ -59,7 +60,7 @@ export default async function MiRendimientoPage() {
                 <p className="font-medium text-ink">{r.observableName}</p>
                 <p className="text-xs text-status-neutral">{formatDate(r.achievedDate)}</p>
               </div>
-              <p className="font-display font-bold text-ink tabular-nums">{formatMark(r.value, r.unitSymbol)}</p>
+              <div className="flex items-center gap-1.5"><p className="font-display font-bold text-ink tabular-nums">{formatMark(r.value, r.unitSymbol)}</p><WaPointsBadge points={r.waPoints} /></div>
             </div>
           ))}
         </div>
@@ -75,7 +76,7 @@ export default async function MiRendimientoPage() {
                   <p className="font-medium text-ink">{r.observableName}</p>
                   <p className="text-xs text-status-neutral">{formatDate(r.achievedDate)}</p>
                 </div>
-                <p className="font-display font-bold text-ink tabular-nums">{formatMark(r.value, r.unitSymbol)}</p>
+                <div className="flex items-center gap-1.5"><p className="font-display font-bold text-ink tabular-nums">{formatMark(r.value, r.unitSymbol)}</p><WaPointsBadge points={r.waPoints} /></div>
               </div>
             ))}
           </div>

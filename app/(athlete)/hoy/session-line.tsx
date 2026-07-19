@@ -3,12 +3,13 @@
 import { useState, useTransition } from 'react'
 import { completeSessionLineAction } from './actions'
 import { MarkValueInput } from '@/components/ui/mark-value-input'
+import { WaPointsBadge } from '@/components/ui/wa-points-badge'
 import { formatMark } from '@/lib/format-mark'
 import type { SessionExercise } from '@/domains/events/types'
 
 interface Props {
   line: SessionExercise
-  executed: { value: number; date: string; notes: string | null } | null
+  executed: { value: number; date: string; notes: string | null; waPoints: number | null } | null
 }
 
 export function SessionLine({ line, executed }: Props) {
@@ -30,7 +31,9 @@ export function SessionLine({ line, executed }: Props) {
           <p className="text-[11px] text-status-attention mt-0.5">Sin estructurar — tocá para completar igual</p>
         )}
         {executed && (
-          <p className="text-[11px] text-status-positive mt-0.5">✓ Completado — real: {formatMark(executed.value, line.unitSymbol)}</p>
+          <p className="text-[11px] text-status-positive mt-0.5 flex items-center gap-1.5">
+            ✓ Completado — real: {formatMark(executed.value, line.unitSymbol)} <WaPointsBadge points={executed.waPoints} />
+          </p>
         )}
       </div>
 
