@@ -16,6 +16,7 @@ const NAV_ITEMS = [
   { href: '/resumen', label: 'Resumen', icon: '🏠', ready: true },
   { href: '/atletas', label: 'Atletas', icon: '🏃', ready: true },
   { href: '/calendario', label: 'Calendario', icon: '📅', ready: true },
+  { href: '/plantillas', label: 'Plantillas', icon: '🗂️', ready: true },
   { href: '/rendimiento', label: 'Rendimiento', icon: '📈', ready: true },
   { href: '/salud', label: 'Salud', icon: '❤️', ready: true },
   { href: '/planificacion', label: 'Planificación', icon: '📋', ready: true },

@@ -16,7 +16,8 @@ export async function createEvent(input: CreateEventInput, client?: AppSupabaseC
       organization_id: input.organizationId,
       type: input.type,
       title: input.title,
-      date: input.date,
+      date: input.date ?? null,
+      is_template: input.isTemplate ?? false,
       created_by_membership_id: actor.id,
     })
     .select('id')

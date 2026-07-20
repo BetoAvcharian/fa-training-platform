@@ -121,7 +121,12 @@ export default async function CalendarioPage({
       </div>
 
       {mode === 'planificar' && (
-        <NewTrainingForm roster={roster} groups={groups} defaultDate={weekStartStr} />
+        <div className="flex items-center gap-3 flex-wrap">
+          <NewTrainingForm roster={roster} groups={groups} defaultDate={weekStartStr} />
+          <a href="/plantillas" className="text-sm text-navy underline">
+            🗂️ Usar una plantilla →
+          </a>
+        </div>
       )}
 
       <div className="grid grid-cols-1 md:grid-cols-7 gap-3">

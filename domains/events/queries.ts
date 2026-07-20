@@ -148,3 +148,43 @@ function mapSessionExercise(row: any): SessionExercise {
     replacesId: row.replaces_id,
   }
 }
+
+export interface TrainingTemplate {
+  id: string
+  title: string
+  lines: string[]
+}
+
+/** Plantillas de entrenamiento — sin fecha, para reutilizar sin tener que tipear los ejercicios de nuevo cada vez. */
+export async function getTrainingTemplates(organizationId: string, client?: AppSupabaseClient): Promise<TrainingTemplate[]> {
+  const supabase = client ?? (await createServerClient())
+
+  const { data: templates, error } = await supabase
+    .from('events')
+    .select('id, title')
+    .eq('organization_id', organizationId)
+    .eq('type', 'entrenamiento')
+    .eq('is_template', true)
+    .order('title')
+
+  if (error) throw new DomainError('NOT_FOUND', error.message)
+  if (!templates || templates.length === 0) return []
+
+  const { data: lines } = await supabase
+    .from('session_exercises')
+    .select('event_id, raw_text, order_index')
+    .in(
+      'event_id',
+      templates.map((t) => t.id)
+    )
+    .order('order_index')
+
+  const linesByEvent = new Map<string, string[]>()
+  for (const row of lines ?? []) {
+    const list = linesByEvent.get(row.event_id) ?? []
+    list.push(row.raw_text)
+    linesByEvent.set(row.event_id, list)
+  }
+
+  return templates.map((t) => ({ id: t.id, title: t.title, lines: linesByEvent.get(t.id) ?? [] }))
+}

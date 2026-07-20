@@ -60,8 +60,9 @@ export interface CreateEventInput {
   organizationId: string
   type: EventType
   title: string
-  date: string
+  date?: string
   assignments: Array<{ type: AssigneeType; id: string }>
+  isTemplate?: boolean
 }
 
 export interface AddSessionLineInput {
