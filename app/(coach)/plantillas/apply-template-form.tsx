@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useTransition, useMemo } from 'react'
-import { applyTemplateAction, deleteTemplateAction } from './actions'
+import { applyTemplateAction, deleteTemplateAction, updateTemplateAction } from './actions'
 import { Modal } from '@/components/ui/modal'
 import { getTodayISO } from '@/lib/today'
 
@@ -24,6 +24,12 @@ export function TemplateCard({
   groups: GroupOption[]
 }) {
   const [open, setOpen] = useState(false)
+  const [editOpen, setEditOpen] = useState(false)
+  const [editLines, setEditLines] = useState<Array<{ text: string; sport: 'Atletismo' | 'Fuerza' }>>(
+    template.lines.length > 0 ? template.lines.map((l) => ({ text: l, sport: 'Atletismo' as const })) : [{ text: '', sport: 'Atletismo' }]
+  )
+  const [editError, setEditError] = useState<string | null>(null)
+  const [propagatedMsg, setPropagatedMsg] = useState<string | null>(null)
   const [pending, startTransition] = useTransition()
   const [error, setError] = useState<string | null>(null)
   const [okMessage, setOkMessage] = useState<string | null>(null)
@@ -103,6 +109,35 @@ export function TemplateCard({
     })
   }
 
+  function updateEditLine(i: number, patch: Partial<{ text: string; sport: 'Atletismo' | 'Fuerza' }>) {
+    setEditLines((prev) => prev.map((l, idx) => (idx === i ? { ...l, ...patch } : l)))
+  }
+
+  function handleEditSubmit(formData: FormData) {
+    formData.set('templateId', template.id)
+    for (const l of editLines) {
+      if (l.text.trim()) {
+        formData.append('lineText', l.text)
+        formData.append('lineSport', l.sport)
+      }
+    }
+    startTransition(async () => {
+      const result = await updateTemplateAction(formData)
+      if (result?.error) {
+        setEditError(result.error)
+      } else {
+        setEditError(null)
+        setEditOpen(false)
+        setPropagatedMsg(
+          result?.propagatedCount
+            ? `Guardado — se actualizaron ${result.propagatedCount} entrenamiento${result.propagatedCount > 1 ? 's' : ''} futuro${result.propagatedCount > 1 ? 's' : ''} que ya estaban aplicados.`
+            : 'Guardado.'
+        )
+        setTimeout(() => setPropagatedMsg(null), 6000)
+      }
+    })
+  }
+
   return (
     <div className="card p-4">
       <div className="flex items-start justify-between gap-2">
@@ -118,6 +153,9 @@ export function TemplateCard({
             </ul>
           )}
         </div>
+        <button onClick={() => setEditOpen(true)} className="text-status-neutral hover:text-gold text-xs shrink-0" aria-label="Editar">
+          ✎
+        </button>
         <button onClick={handleDelete} className="text-status-neutral hover:text-status-critical text-xs shrink-0" aria-label="Borrar">
           ✕
         </button>
@@ -126,6 +164,50 @@ export function TemplateCard({
         Usar esta plantilla
       </button>
       {okMessage && <p className="text-xs text-status-positive mt-1.5 text-center">{okMessage}</p>}
+      {propagatedMsg && <p className="text-xs text-status-positive mt-1.5 text-center">{propagatedMsg}</p>}
+
+      <Modal open={editOpen} onClose={() => setEditOpen(false)} title={`Editar "${template.title}"`}>
+        <form action={handleEditSubmit} className="space-y-3">
+          <div>
+            <label className="text-xs text-status-neutral mb-1 block">Título</label>
+            <input name="title" defaultValue={template.title} required className="input-field" />
+          </div>
+          <div>
+            <label className="text-xs text-status-neutral mb-1 block">Ejercicios</label>
+            <div className="space-y-2">
+              {editLines.map((line, i) => (
+                <div key={i} className="flex gap-2">
+                  <select value={line.sport} onChange={(e) => updateEditLine(i, { sport: e.target.value as 'Atletismo' | 'Fuerza' })} className="input-field w-24">
+                    <option value="Atletismo">Atl.</option>
+                    <option value="Fuerza">Fza.</option>
+                  </select>
+                  <input
+                    value={line.text}
+                    onChange={(e) => updateEditLine(i, { text: e.target.value })}
+                    className="flex-1 min-w-0 input-field"
+                  />
+                </div>
+              ))}
+            </div>
+            <button type="button" onClick={() => setEditLines((prev) => [...prev, { text: '', sport: 'Atletismo' }])} className="text-xs text-navy underline mt-2">
+              + Agregar otro ejercicio
+            </button>
+          </div>
+          <p className="text-[11px] text-status-neutral">
+            Si esta plantilla ya se aplicó antes, los entrenamientos futuros que nadie completó todavía se actualizan solos —
+            los que ya pasaron o que un atleta ya completó quedan como estaban.
+          </p>
+          {editError && <p className="text-xs text-status-critical">{editError}</p>}
+          <div className="flex gap-2 pt-1">
+            <button type="submit" disabled={pending} className="flex-1 btn-primary py-2 text-sm">
+              Guardar cambios
+            </button>
+            <button type="button" onClick={() => setEditOpen(false)} className="btn-secondary px-4 text-sm">
+              Cancelar
+            </button>
+          </div>
+        </form>
+      </Modal>
 
       <Modal open={open} onClose={() => setOpen(false)} title={`Aplicar "${template.title}"`}>
         <form action={handleSubmit} className="space-y-3">
