@@ -105,3 +105,74 @@ export async function applyTemplateAction(formData: FormData) {
   revalidatePath('/plantillas')
   return { error: null, count: dates.length }
 }
+
+export async function updateTemplateAction(formData: FormData) {
+  const membership = await getMyActiveMembership()
+  if (!membership) return { error: 'No autenticado' }
+
+  const templateId = String(formData.get('templateId') ?? '')
+  const title = String(formData.get('title') ?? '')
+  const lineTexts = formData.getAll('lineText').map(String)
+  const lineSports = formData.getAll('lineSport').map(String) as Array<'Atletismo' | 'Fuerza'>
+
+  if (!templateId || !title.trim()) return { error: 'Falta el título' }
+
+  const supabase = await createServerClient()
+
+  // Confirmar que es una plantilla de esta organización antes de tocar nada.
+  const { data: template, error: templateError } = await supabase
+    .from('events')
+    .select('id')
+    .eq('id', templateId)
+    .eq('organization_id', membership.organizationId)
+    .eq('is_template', true)
+    .maybeSingle()
+
+  if (templateError || !template) return { error: 'Plantilla no encontrada' }
+
+  try {
+    // 1) Actualizar la plantilla en sí: título + reemplazar sus ejercicios.
+    await supabase.from('events').update({ title }).eq('id', templateId)
+    await supabase.from('session_exercises').delete().eq('event_id', templateId)
+    for (let i = 0; i < lineTexts.length; i++) {
+      if (lineTexts[i].trim()) {
+        await addSessionLine({ eventId: templateId, sportName: lineSports[i] ?? 'Atletismo', rawText: lineTexts[i] })
+      }
+    }
+
+    // 2) Propagar a los entrenamientos que ya se aplicaron desde esta
+    // plantilla, pero SOLO si todavía no pasaron y nadie dejó feedback
+    // — un entrenamiento que un atleta ya completó no se toca.
+    const today = new Date().toISOString().slice(0, 10)
+    const { data: futureEvents } = await supabase
+      .from('events')
+      .select('id')
+      .eq('source_template_id', templateId)
+      .gte('date', today)
+
+    let propagatedCount = 0
+    for (const ev of futureEvents ?? []) {
+      const { count: feedbackCount } = await supabase
+        .from('session_feedback')
+        .select('id', { count: 'exact', head: true })
+        .eq('event_id', ev.id)
+
+      if ((feedbackCount ?? 0) > 0) continue // alguien ya completó este — no se toca
+
+      await supabase.from('events').update({ title }).eq('id', ev.id)
+      await supabase.from('session_exercises').delete().eq('event_id', ev.id)
+      for (let i = 0; i < lineTexts.length; i++) {
+        if (lineTexts[i].trim()) {
+          await addSessionLine({ eventId: ev.id, sportName: lineSports[i] ?? 'Atletismo', rawText: lineTexts[i] })
+        }
+      }
+      propagatedCount++
+    }
+
+    revalidatePath('/plantillas')
+    revalidatePath('/calendario')
+    return { error: null, propagatedCount }
+  } catch (e) {
+    return { error: e instanceof DomainError ? e.message : 'No se pudo guardar' }
+  }
+}

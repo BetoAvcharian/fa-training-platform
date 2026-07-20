@@ -220,7 +220,7 @@ export async function cloneEvent(
 
   const { data: source, error: sourceError } = await supabase
     .from('events')
-    .select('organization_id, type, title, created_by_membership_id')
+    .select('organization_id, type, title, created_by_membership_id, is_template')
     .eq('id', input.sourceEventId)
     .single()
 
@@ -238,6 +238,10 @@ export async function cloneEvent(
       title: source.title,
       date: input.newDate,
       created_by_membership_id: actor.id,
+      // Si el origen es una plantilla, guardamos el link — así editar la
+      // plantilla más adelante puede propagar el cambio a este entrenamiento
+      // (si todavía no pasó y nadie lo completó).
+      source_template_id: source.is_template ? input.sourceEventId : null,
     })
     .select('id')
     .single()
