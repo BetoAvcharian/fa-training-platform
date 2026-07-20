@@ -26,9 +26,31 @@ export function TemplateCard({
   const [open, setOpen] = useState(false)
   const [pending, startTransition] = useTransition()
   const [error, setError] = useState<string | null>(null)
+  const [okMessage, setOkMessage] = useState<string | null>(null)
+  const [mode, setMode] = useState<'single' | 'range'>('single')
+  const [weekdays, setWeekdays] = useState<Set<number>>(new Set())
   const [athleteIds, setAthleteIds] = useState<Set<string>>(new Set())
   const [athleteSearch, setAthleteSearch] = useState('')
   const [groupId, setGroupId] = useState('')
+
+  const WEEKDAY_LABELS = [
+    { value: 1, label: 'L' },
+    { value: 2, label: 'M' },
+    { value: 3, label: 'X' },
+    { value: 4, label: 'J' },
+    { value: 5, label: 'V' },
+    { value: 6, label: 'S' },
+    { value: 0, label: 'D' },
+  ]
+
+  function toggleWeekday(day: number) {
+    setWeekdays((prev) => {
+      const next = new Set(prev)
+      if (next.has(day)) next.delete(day)
+      else next.add(day)
+      return next
+    })
+  }
 
   const filteredRoster = useMemo(() => {
     const q = athleteSearch.trim().toLowerCase()
@@ -50,16 +72,26 @@ export function TemplateCard({
 
   function handleSubmit(formData: FormData) {
     formData.set('templateId', template.id)
+    formData.set('mode', mode)
     for (const id of athleteIds) formData.append('athleteIds', id)
     formData.set('groupId', groupId)
+    if (mode === 'range') {
+      for (const d of weekdays) formData.append('weekdays', String(d))
+    }
     startTransition(async () => {
       const result = await applyTemplateAction(formData)
-      if (result?.error) setError(result.error)
-      else {
+      if (result?.error) {
+        setError(result.error)
+        setOkMessage(null)
+      } else {
         setError(null)
+        setOkMessage(result?.count ? `Creados ${result.count} entrenamientos ✓` : null)
         setOpen(false)
         setAthleteIds(new Set())
         setGroupId('')
+        setWeekdays(new Set())
+        setMode('single')
+        setTimeout(() => setOkMessage(null), 4000)
       }
     })
   }
@@ -93,13 +125,65 @@ export function TemplateCard({
       <button onClick={() => setOpen(true)} className="btn-primary w-full py-2 text-sm mt-3">
         Usar esta plantilla
       </button>
+      {okMessage && <p className="text-xs text-status-positive mt-1.5 text-center">{okMessage}</p>}
 
       <Modal open={open} onClose={() => setOpen(false)} title={`Aplicar "${template.title}"`}>
         <form action={handleSubmit} className="space-y-3">
-          <div>
-            <label className="text-xs text-status-neutral mb-1 block">Fecha</label>
-            <input name="date" type="date" required defaultValue={getTodayISO()} className="input-field" />
+          <div className="flex rounded-lg border border-outline overflow-hidden text-xs">
+            <button
+              type="button"
+              onClick={() => setMode('single')}
+              className={`flex-1 py-1.5 ${mode === 'single' ? 'bg-navy text-white' : 'bg-panel text-ink'}`}
+            >
+              Un día
+            </button>
+            <button
+              type="button"
+              onClick={() => setMode('range')}
+              className={`flex-1 py-1.5 ${mode === 'range' ? 'bg-navy text-white' : 'bg-panel text-ink'}`}
+            >
+              Varios días (rango)
+            </button>
           </div>
+
+          {mode === 'single' ? (
+            <div>
+              <label className="text-xs text-status-neutral mb-1 block">Fecha</label>
+              <input name="date" type="date" required defaultValue={getTodayISO()} className="input-field" />
+            </div>
+          ) : (
+            <div className="space-y-2">
+              <div>
+                <label className="text-xs text-status-neutral mb-1 block">Qué días de la semana</label>
+                <div className="flex gap-1.5">
+                  {WEEKDAY_LABELS.map((d) => {
+                    const checked = weekdays.has(d.value)
+                    return (
+                      <button
+                        type="button"
+                        key={d.value}
+                        onClick={() => toggleWeekday(d.value)}
+                        className={`w-8 h-8 rounded-lg text-xs font-medium border ${checked ? 'bg-gold border-gold text-navy' : 'border-outline text-ink'}`}
+                      >
+                        {d.label}
+                      </button>
+                    )
+                  })}
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-2">
+                <div>
+                  <label className="text-xs text-status-neutral mb-1 block">Desde</label>
+                  <input name="startDate" type="date" required defaultValue={getTodayISO()} className="input-field" />
+                </div>
+                <div>
+                  <label className="text-xs text-status-neutral mb-1 block">Hasta</label>
+                  <input name="endDate" type="date" required className="input-field" />
+                </div>
+              </div>
+              <p className="text-[11px] text-status-neutral">Crea un entrenamiento por cada día que coincida en ese rango.</p>
+            </div>
+          )}
 
           <div>
             <div className="flex items-center justify-between mb-1">
