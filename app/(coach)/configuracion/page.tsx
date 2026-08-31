@@ -1,4 +1,5 @@
-import { getMyActiveMembership, getOrganization, getGroups, getRoster, getGroupMembers, getAthletesForCoach } from '@/domains/athletes/queries'
+import { getMyActiveMembership, getMyActiveMemberships, getOrganization, getGroups, getRoster, getGroupMembers, getAthletesForCoach } from '@/domains/athletes/queries'
+import { switchProfileAction } from '@/app/elegir-perfil/actions'
 import { GroupForm } from './group-form'
 import { CopyJoinCode } from './copy-join-code'
 import { GroupMembersEditor } from './group-members-editor'
@@ -9,10 +10,11 @@ export default async function ConfiguracionPage() {
   const membership = await getMyActiveMembership()
   if (!membership) return null
 
-  const [org, groups, roster] = await Promise.all([
+  const [org, groups, roster, myProfiles] = await Promise.all([
     getOrganization(membership.organizationId),
     getGroups(membership.organizationId),
     (membership.role === 'manager' ? getRoster(membership.organizationId) : getAthletesForCoach(membership.id)),
+    getMyActiveMemberships(),
   ])
 
   const groupsWithMembers = await Promise.all(
@@ -25,6 +27,22 @@ export default async function ConfiguracionPage() {
         <p className="text-xs uppercase tracking-wider text-gold font-medium">Configuración</p>
         <h1 className="font-display text-2xl font-bold text-ink">{org?.name ?? 'Organización'}</h1>
       </div>
+
+      {myProfiles.length > 1 && (
+        <section className="space-y-2">
+          <h2 className="text-sm font-semibold text-ink flex items-center gap-1.5">👤 Tu perfil</h2>
+          <div className="card p-4 flex items-center justify-between gap-3">
+            <p className="text-sm text-ink">
+              Estás usando este perfil ({myProfiles.find((p) => p.id === membership.id)?.role === 'manager' ? 'Manager' : 'Entrenador'}) — tenés {myProfiles.length} perfiles activos con este mail.
+            </p>
+            <form action={switchProfileAction}>
+              <button type="submit" className="btn-secondary px-3 py-1.5 text-xs shrink-0">
+                Cambiar de perfil
+              </button>
+            </form>
+          </div>
+        </section>
+      )}
 
       <section className="space-y-2">
         <h2 className="text-sm font-semibold text-ink flex items-center gap-1.5">🔗 Código de invitación</h2>

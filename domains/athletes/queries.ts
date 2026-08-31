@@ -210,12 +210,52 @@ export const getMyActiveMembership = cache(async function getMyActiveMembership(
     .select('id, organization_id, role, people!inner(auth_user_id)')
     .eq('status', 'activo')
     .eq('people.auth_user_id', user.id)
-    .limit(1)
-    .maybeSingle()
 
-  if (error || !data) return null
-  return { id: data.id, organizationId: data.organization_id, role: data.role }
+  if (error || !data || data.length === 0) return null
+
+  // Caso normal — un solo perfil activo, sin ambigüedad.
+  if (data.length === 1) {
+    return { id: data[0].id, organizationId: data[0].organization_id, role: data[0].role }
+  }
+
+  // Más de un perfil (ej. coach en un club y manager en otro, mismo mail) —
+  // se necesita que haya elegido cuál usar. Se guarda esa elección en una
+  // cookie al elegir en /elegir-perfil; acá se respeta esa elección si es
+  // válida para este usuario. Si no eligió todavía, devuelve null — las
+  // páginas que dependen de esto ya tratan null como "no resuelto todavía"
+  // y app/page.tsx manda a elegir perfil en vez de a login en ese caso.
+  const { cookies } = await import('next/headers')
+  const cookieStore = await cookies()
+  const chosenId = cookieStore.get('active_membership_id')?.value
+  const chosen = chosenId ? data.find((m) => m.id === chosenId) : undefined
+  if (!chosen) return null
+
+  return { id: chosen.id, organizationId: chosen.organization_id, role: chosen.role }
 })
+
+export interface MyProfileOption {
+  id: string
+  role: string
+  organizationName: string
+}
+
+/** Todos los perfiles activos de la persona logueada — para /elegir-perfil. */
+export async function getMyActiveMemberships(client?: AppSupabaseClient): Promise<MyProfileOption[]> {
+  const supabase = client ?? (await createServerClient())
+  const { data: userData } = await supabase.auth.getUser()
+  if (!userData.user) return []
+
+  const { data, error } = await supabase
+    .from('memberships')
+    .select('id, role, organizations(name), people!inner(auth_user_id)')
+    .eq('status', 'activo')
+    .eq('people.auth_user_id', userData.user.id)
+
+  if (error || !data) return []
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return (data as any[]).map((m) => ({ id: m.id, role: m.role, organizationName: m.organizations?.name ?? '—' }))
+}
 
 /**
  * Lista de coaches disponibles para que un atleta elija al registrarse —
