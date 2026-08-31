@@ -1,7 +1,7 @@
 import { getMyActiveMembership, getAthletesForCoach, getRoster, getGroups, getGroupMembers } from '@/domains/athletes/queries'
 import { getObservables } from '@/domains/catalog/queries'
 import { compareAthletes, computeGroupAverage } from '@/domains/performance/queries'
-import { CompareChart, DualCompareChart } from '../compare-chart'
+import { CompareChart, DualCompareChart } from '../compare-chart-lazy'
 import { FullscreenChart } from '@/components/ui/fullscreen-chart'
 import { compareAction } from './actions'
 
