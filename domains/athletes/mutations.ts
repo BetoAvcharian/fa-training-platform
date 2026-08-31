@@ -22,13 +22,29 @@ import type {
  * la contraseña no coincide, se rechaza como mail ya en uso (no se filtra si
  * el mail existe o no a alguien que no puede probar que es suyo).
  */
+interface ExistingPersonCheck {
+  id: string
+  /** true = ya tiene login real, se verificó la contraseña. false = fila
+      vieja sin auth_user_id (huérfana, de pruebas viejas) — no hay
+      contraseña que verificar porque nunca hubo cuenta real detrás. */
+  hasAuth: boolean
+}
+
 async function findOrVerifyExistingPerson(
   admin: ReturnType<typeof createServiceClient>,
   email: string,
   password: string
-): Promise<{ id: string } | null> {
-  const { data: existingPerson } = await admin.from('people').select('id').eq('email', email).maybeSingle()
+): Promise<ExistingPersonCheck | null> {
+  const { data: existingPerson } = await admin.from('people').select('id, auth_user_id').eq('email', email).maybeSingle()
   if (!existingPerson) return null
+
+  if (!existingPerson.auth_user_id) {
+    // Fila huérfana — nunca tuvo cuenta real, no hay nada que verificar.
+    // Se trata como si no existiera para la verificación, pero se devuelve
+    // para que el que llama la reutilice (adoptarla) en vez de crear otra
+    // fila duplicada con el mismo mail.
+    return { id: existingPerson.id, hasAuth: false }
+  }
 
   const check = await createServerClient()
   const { error: signInError } = await check.auth.signInWithPassword({ email, password })
@@ -36,7 +52,55 @@ async function findOrVerifyExistingPerson(
     throw new DomainError('CONFLICT', 'Ese mail ya tiene una cuenta. Si es tuya, iniciá sesión en vez de crear una nueva.')
   }
 
-  return existingPerson
+  return { id: existingPerson.id, hasAuth: true }
+}
+
+/**
+ * Resuelve el person_id a usar para una nueva membership, cubriendo los 3
+ * casos: mail nuevo (crea todo), mail con cuenta real ya verificada
+ * (reusa el person_id), o mail que solo existe como fila huérfana vieja
+ * (crea la cuenta real y ADOPTA esa fila en vez de duplicarla).
+ */
+async function getOrCreatePersonForSignup(
+  admin: ReturnType<typeof createServiceClient>,
+  input: { email: string; password: string; firstName: string; lastName: string }
+): Promise<string> {
+  const existingPerson = await findOrVerifyExistingPerson(admin, input.email, input.password)
+
+  if (existingPerson?.hasAuth) {
+    return existingPerson.id
+  }
+
+  const { data: authData, error: authError } = await admin.auth.admin.createUser({
+    email: input.email,
+    password: input.password,
+    email_confirm: true,
+  })
+  if (authError || !authData.user) {
+    throw new DomainError('CONFLICT', authError?.message ?? 'No se pudo crear la cuenta')
+  }
+
+  if (existingPerson) {
+    // Fila huérfana — adoptarla en vez de insertar otra con el mismo mail.
+    const { error: updateError } = await admin
+      .from('people')
+      .update({ auth_user_id: authData.user.id, first_name: input.firstName, last_name: input.lastName })
+      .eq('id', existingPerson.id)
+    if (updateError) {
+      throw new DomainError('CONFLICT', updateError.message)
+    }
+    return existingPerson.id
+  }
+
+  const { data: person, error: personError } = await admin
+    .from('people')
+    .insert({ auth_user_id: authData.user.id, first_name: input.firstName, last_name: input.lastName, email: input.email })
+    .select('id')
+    .single()
+  if (personError || !person) {
+    throw new DomainError('CONFLICT', personError?.message ?? 'No se pudo crear la persona')
+  }
+  return person.id
 }
 
 export async function addAthleteToGroup(
@@ -220,31 +284,7 @@ function generateJoinCode(): string {
 export async function signUpManager(input: SignUpManagerInput) {
   const admin = createServiceClient()
 
-  const existingPerson = await findOrVerifyExistingPerson(admin, input.email, input.password)
-
-  let personId: string
-  if (existingPerson) {
-    personId = existingPerson.id
-  } else {
-    const { data: authData, error: authError } = await admin.auth.admin.createUser({
-      email: input.email,
-      password: input.password,
-      email_confirm: true,
-    })
-    if (authError || !authData.user) {
-      throw new DomainError('CONFLICT', authError?.message ?? 'No se pudo crear la cuenta')
-    }
-
-    const { data: person, error: personError } = await admin
-      .from('people')
-      .insert({ auth_user_id: authData.user.id, first_name: input.firstName, last_name: input.lastName, email: input.email })
-      .select('id')
-      .single()
-    if (personError || !person) {
-      throw new DomainError('CONFLICT', personError?.message ?? 'No se pudo crear la persona')
-    }
-    personId = person.id
-  }
+  const personId = await getOrCreatePersonForSignup(admin, input)
 
   const { data: org, error: orgError } = await admin
     .from('organizations')
@@ -284,31 +324,8 @@ export async function signUpCoach(input: SignUpCoachInput) {
     throw new DomainError('VALIDATION', 'Ese código de equipo no existe', 'joinCode')
   }
 
-  const existingPerson = await findOrVerifyExistingPerson(admin, input.email, input.password)
+  const personId = await getOrCreatePersonForSignup(admin, input)
 
-  let personId: string
-  if (existingPerson) {
-    personId = existingPerson.id
-  } else {
-    const { data: authData, error: authError } = await admin.auth.admin.createUser({
-      email: input.email,
-      password: input.password,
-      email_confirm: true,
-    })
-    if (authError || !authData.user) {
-      throw new DomainError('CONFLICT', authError?.message ?? 'No se pudo crear la cuenta')
-    }
-
-    const { data: person, error: personError } = await admin
-      .from('people')
-      .insert({ auth_user_id: authData.user.id, first_name: input.firstName, last_name: input.lastName, email: input.email })
-      .select('id')
-      .single()
-    if (personError || !person) {
-      throw new DomainError('CONFLICT', personError?.message ?? 'No se pudo crear la persona')
-    }
-    personId = person.id
-  }
 
   const { error: membershipError } = await admin
     .from('memberships')
@@ -336,31 +353,8 @@ export async function signUpAthlete(input: SignUpAthleteInput) {
     throw new DomainError('VALIDATION', 'Entrenador inválido', 'coachMembershipId')
   }
 
-  const existingPerson = await findOrVerifyExistingPerson(admin, input.email, input.password)
+  const personId = await getOrCreatePersonForSignup(admin, input)
 
-  let personId: string
-  if (existingPerson) {
-    personId = existingPerson.id
-  } else {
-    const { data: authData, error: authError } = await admin.auth.admin.createUser({
-      email: input.email,
-      password: input.password,
-      email_confirm: true,
-    })
-    if (authError || !authData.user) {
-      throw new DomainError('CONFLICT', authError?.message ?? 'No se pudo crear la cuenta')
-    }
-
-    const { data: person, error: personError } = await admin
-      .from('people')
-      .insert({ auth_user_id: authData.user.id, first_name: input.firstName, last_name: input.lastName, email: input.email })
-      .select('id')
-      .single()
-    if (personError || !person) {
-      throw new DomainError('CONFLICT', personError?.message ?? 'No se pudo crear la persona')
-    }
-    personId = person.id
-  }
 
   const { error: membershipError } = await admin.from('memberships').insert({
     organization_id: coachMembership.organization_id,
