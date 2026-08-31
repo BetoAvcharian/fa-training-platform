@@ -12,6 +12,33 @@ import type {
   CreateGroupInput,
 } from './types'
 
+/**
+ * Segundo perfil con el mismo mail (ej. alguien que es coach en un club y
+ * manager en otro): Supabase Auth no deja crear un auth.users nuevo con un
+ * email que ya existe, así que no se puede simplemente "crear otra cuenta".
+ * En cambio: si el mail ya tiene una cuenta, se verifica la contraseña que
+ * mandó — si coincide, es la misma persona pidiendo un perfil nuevo, y se le
+ * suma una membership más sin tocar su auth.users ni su fila de people. Si
+ * la contraseña no coincide, se rechaza como mail ya en uso (no se filtra si
+ * el mail existe o no a alguien que no puede probar que es suyo).
+ */
+async function findOrVerifyExistingPerson(
+  admin: ReturnType<typeof createServiceClient>,
+  email: string,
+  password: string
+): Promise<{ id: string } | null> {
+  const { data: existingPerson } = await admin.from('people').select('id').eq('email', email).maybeSingle()
+  if (!existingPerson) return null
+
+  const check = await createServerClient()
+  const { error: signInError } = await check.auth.signInWithPassword({ email, password })
+  if (signInError) {
+    throw new DomainError('CONFLICT', 'Ese mail ya tiene una cuenta. Si es tuya, iniciá sesión en vez de crear una nueva.')
+  }
+
+  return existingPerson
+}
+
 export async function addAthleteToGroup(
   input: { groupId: string; athleteMembershipId: string; organizationId: string },
   client?: AppSupabaseClient
@@ -193,22 +220,30 @@ function generateJoinCode(): string {
 export async function signUpManager(input: SignUpManagerInput) {
   const admin = createServiceClient()
 
-  const { data: authData, error: authError } = await admin.auth.admin.createUser({
-    email: input.email,
-    password: input.password,
-    email_confirm: true,
-  })
-  if (authError || !authData.user) {
-    throw new DomainError('CONFLICT', authError?.message ?? 'No se pudo crear la cuenta')
-  }
+  const existingPerson = await findOrVerifyExistingPerson(admin, input.email, input.password)
 
-  const { data: person, error: personError } = await admin
-    .from('people')
-    .insert({ auth_user_id: authData.user.id, first_name: input.firstName, last_name: input.lastName, email: input.email })
-    .select('id')
-    .single()
-  if (personError || !person) {
-    throw new DomainError('CONFLICT', personError?.message ?? 'No se pudo crear la persona')
+  let personId: string
+  if (existingPerson) {
+    personId = existingPerson.id
+  } else {
+    const { data: authData, error: authError } = await admin.auth.admin.createUser({
+      email: input.email,
+      password: input.password,
+      email_confirm: true,
+    })
+    if (authError || !authData.user) {
+      throw new DomainError('CONFLICT', authError?.message ?? 'No se pudo crear la cuenta')
+    }
+
+    const { data: person, error: personError } = await admin
+      .from('people')
+      .insert({ auth_user_id: authData.user.id, first_name: input.firstName, last_name: input.lastName, email: input.email })
+      .select('id')
+      .single()
+    if (personError || !person) {
+      throw new DomainError('CONFLICT', personError?.message ?? 'No se pudo crear la persona')
+    }
+    personId = person.id
   }
 
   const { data: org, error: orgError } = await admin
@@ -222,7 +257,7 @@ export async function signUpManager(input: SignUpManagerInput) {
 
   const { error: membershipError } = await admin
     .from('memberships')
-    .insert({ organization_id: org.id, person_id: person.id, role: 'manager', status: 'activo' })
+    .insert({ organization_id: org.id, person_id: personId, role: 'manager', status: 'activo' })
   if (membershipError) {
     throw new DomainError('CONFLICT', membershipError.message)
   }
@@ -249,27 +284,35 @@ export async function signUpCoach(input: SignUpCoachInput) {
     throw new DomainError('VALIDATION', 'Ese código de equipo no existe', 'joinCode')
   }
 
-  const { data: authData, error: authError } = await admin.auth.admin.createUser({
-    email: input.email,
-    password: input.password,
-    email_confirm: true,
-  })
-  if (authError || !authData.user) {
-    throw new DomainError('CONFLICT', authError?.message ?? 'No se pudo crear la cuenta')
-  }
+  const existingPerson = await findOrVerifyExistingPerson(admin, input.email, input.password)
 
-  const { data: person, error: personError } = await admin
-    .from('people')
-    .insert({ auth_user_id: authData.user.id, first_name: input.firstName, last_name: input.lastName, email: input.email })
-    .select('id')
-    .single()
-  if (personError || !person) {
-    throw new DomainError('CONFLICT', personError?.message ?? 'No se pudo crear la persona')
+  let personId: string
+  if (existingPerson) {
+    personId = existingPerson.id
+  } else {
+    const { data: authData, error: authError } = await admin.auth.admin.createUser({
+      email: input.email,
+      password: input.password,
+      email_confirm: true,
+    })
+    if (authError || !authData.user) {
+      throw new DomainError('CONFLICT', authError?.message ?? 'No se pudo crear la cuenta')
+    }
+
+    const { data: person, error: personError } = await admin
+      .from('people')
+      .insert({ auth_user_id: authData.user.id, first_name: input.firstName, last_name: input.lastName, email: input.email })
+      .select('id')
+      .single()
+    if (personError || !person) {
+      throw new DomainError('CONFLICT', personError?.message ?? 'No se pudo crear la persona')
+    }
+    personId = person.id
   }
 
   const { error: membershipError } = await admin
     .from('memberships')
-    .insert({ organization_id: org.id, person_id: person.id, role: 'coach', status: 'activo' })
+    .insert({ organization_id: org.id, person_id: personId, role: 'coach', status: 'activo' })
   if (membershipError) {
     throw new DomainError('CONFLICT', membershipError.message)
   }
@@ -293,27 +336,35 @@ export async function signUpAthlete(input: SignUpAthleteInput) {
     throw new DomainError('VALIDATION', 'Entrenador inválido', 'coachMembershipId')
   }
 
-  const { data: authData, error: authError } = await admin.auth.admin.createUser({
-    email: input.email,
-    password: input.password,
-    email_confirm: true,
-  })
-  if (authError || !authData.user) {
-    throw new DomainError('CONFLICT', authError?.message ?? 'No se pudo crear la cuenta')
-  }
+  const existingPerson = await findOrVerifyExistingPerson(admin, input.email, input.password)
 
-  const { data: person, error: personError } = await admin
-    .from('people')
-    .insert({ auth_user_id: authData.user.id, first_name: input.firstName, last_name: input.lastName, email: input.email })
-    .select('id')
-    .single()
-  if (personError || !person) {
-    throw new DomainError('CONFLICT', personError?.message ?? 'No se pudo crear la persona')
+  let personId: string
+  if (existingPerson) {
+    personId = existingPerson.id
+  } else {
+    const { data: authData, error: authError } = await admin.auth.admin.createUser({
+      email: input.email,
+      password: input.password,
+      email_confirm: true,
+    })
+    if (authError || !authData.user) {
+      throw new DomainError('CONFLICT', authError?.message ?? 'No se pudo crear la cuenta')
+    }
+
+    const { data: person, error: personError } = await admin
+      .from('people')
+      .insert({ auth_user_id: authData.user.id, first_name: input.firstName, last_name: input.lastName, email: input.email })
+      .select('id')
+      .single()
+    if (personError || !person) {
+      throw new DomainError('CONFLICT', personError?.message ?? 'No se pudo crear la persona')
+    }
+    personId = person.id
   }
 
   const { error: membershipError } = await admin.from('memberships').insert({
     organization_id: coachMembership.organization_id,
-    person_id: person.id,
+    person_id: personId,
     role: 'athlete',
     status: 'activo',
     coach_membership_id: input.coachMembershipId,
