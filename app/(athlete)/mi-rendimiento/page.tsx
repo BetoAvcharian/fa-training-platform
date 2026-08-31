@@ -3,7 +3,7 @@ import { formatMark } from '@/lib/format-mark'
 import { WaPointsBadge } from '@/components/ui/wa-points-badge'
 import { EditableRecordRow } from '@/components/ui/editable-record-row'
 import { editResultAction, deleteResultAction } from './actions'
-import { MyPerformanceChart } from './performance-chart'
+import { MyPerformanceChart } from './performance-chart-lazy'
 
 export const dynamic = 'force-dynamic'
 

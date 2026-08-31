@@ -11,8 +11,8 @@ import {
 import { getLowestEnergyToday } from '@/domains/observations/checkin'
 import { getDaySchedule } from '@/domains/dashboard/day-schedule'
 import { getObjectives } from '@/domains/planning/queries'
-import { AttendanceChart } from './attendance-chart'
-import { PerformanceChart } from './performance-chart'
+import { AttendanceChart } from './attendance-chart-lazy'
+import { PerformanceChart } from './performance-chart-lazy'
 import { TrainingDayList } from '@/components/ui/training-day-list'
 
 export const dynamic = 'force-dynamic'
