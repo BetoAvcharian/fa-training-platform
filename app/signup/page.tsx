@@ -1,3 +1,4 @@
+import { getPublicCoachDirectory } from '@/domains/athletes/queries'
 import { SignupForm } from './signup-form'
 
 export default async function SignupPage({
@@ -6,6 +7,7 @@ export default async function SignupPage({
   searchParams: Promise<{ role?: string; error?: string }>
 }) {
   const params = await searchParams
+  const coaches = await getPublicCoachDirectory()
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-surface px-4 py-8">
@@ -15,7 +17,7 @@ export default async function SignupPage({
           <p className="text-sm text-status-neutral mt-1">ENTRENAME</p>
         </div>
 
-        <SignupForm defaultRole={params.role} errorMessage={params.error} />
+        <SignupForm coaches={coaches} defaultRole={params.role} errorMessage={params.error} />
 
         <p className="text-center text-xs text-status-neutral mt-4">
           ¿Ya tenés cuenta? <a href="/login" className="text-ink underline">Ingresá acá</a>

@@ -262,38 +262,21 @@ export async function getMyActiveMemberships(client?: AppSupabaseClient): Promis
  * ANTES de tener sesión (por eso usa service_role, no el cliente normal
  * que depende de auth). Solo expone nombre + organización, nada sensible.
  */
-/**
- * Los entrenadores de UN equipo puntual, a partir de su código —
- * reemplaza al viejo directorio público (mostraba TODOS los coaches de
- * TODOS los clubes juntos, sin escalar y sin sentido de privacidad). El
- * atleta ahora entra con el mismo código que usa un coach para sumarse,
- * y de ahí elige su entrenador solo entre los de ESE equipo.
- */
-export async function getCoachesForJoinCode(joinCode: string): Promise<CoachDirectoryEntry[]> {
-  const admin = createServiceClient()
+export async function getPublicCoachDirectory(): Promise<CoachDirectoryEntry[]> {
+  const supabase = createServiceClient()
 
-  const { data: org } = await admin
-    .from('organizations')
-    .select('id, name')
-    .eq('join_code', joinCode.toUpperCase().trim())
-    .maybeSingle()
-
-  if (!org) return []
-
-  const { data, error } = await admin
+  const { data, error } = await supabase
     .from('memberships')
-    .select('id, people(first_name, last_name)')
-    .eq('organization_id', org.id)
+    .select('id, organization_id, people(first_name, last_name), organizations(name)')
     .eq('role', 'coach')
     .eq('status', 'activo')
 
   if (error) throw new DomainError('NOT_FOUND', error.message)
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return (data ?? []).map((row: any) => ({
     membershipId: row.id,
     name: `${row.people?.first_name ?? ''} ${row.people?.last_name ?? ''}`.trim(),
-    organizationName: org.name,
+    organizationName: row.organizations?.name ?? '—',
   }))
 }
 

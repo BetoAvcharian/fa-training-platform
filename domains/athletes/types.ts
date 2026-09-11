@@ -70,10 +70,6 @@ export interface SignUpAthleteInput {
   firstName: string
   lastName: string
   coachMembershipId: string
-  birthDate?: string
-  gender?: string
-  phone?: string
-  club?: string
 }
 
 export interface Group {

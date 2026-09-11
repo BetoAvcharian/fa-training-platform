@@ -355,14 +355,6 @@ export async function signUpAthlete(input: SignUpAthleteInput) {
 
   const personId = await getOrCreatePersonForSignup(admin, input)
 
-  const profilePatch: Record<string, unknown> = {}
-  if (input.birthDate) profilePatch.birth_date = input.birthDate
-  if (input.gender) profilePatch.gender = input.gender
-  if (input.phone) profilePatch.phone = input.phone
-  if (input.club) profilePatch.club = input.club
-  if (Object.keys(profilePatch).length > 0) {
-    await admin.from('people').update(profilePatch).eq('id', personId)
-  }
 
   const { error: membershipError } = await admin.from('memberships').insert({
     organization_id: coachMembership.organization_id,
