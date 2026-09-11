@@ -2,6 +2,8 @@
 
 import { redirect } from 'next/navigation'
 import { signUpManager, signUpCoach, signUpAthlete } from '@/domains/athletes/mutations'
+import { getCoachesForJoinCode } from '@/domains/athletes/queries'
+import type { CoachDirectoryEntry } from '@/domains/athletes/types'
 import { DomainError } from '@/types/errors'
 
 function readCommon(formData: FormData) {
@@ -42,12 +44,25 @@ export async function signUpCoachAction(formData: FormData) {
 export async function signUpAthleteAction(formData: FormData) {
   const common = readCommon(formData)
   const coachMembershipId = String(formData.get('coachMembershipId') ?? '')
+  const birthDate = String(formData.get('birthDate') ?? '')
+  const gender = String(formData.get('gender') ?? '')
+  const phone = String(formData.get('phone') ?? '')
+  const club = String(formData.get('club') ?? '')
 
   try {
-    await signUpAthlete({ ...common, coachMembershipId })
+    await signUpAthlete({ ...common, coachMembershipId, birthDate, gender, phone, club })
   } catch (e) {
     const message = e instanceof DomainError ? e.message : 'No se pudo crear la cuenta'
     redirect(`/signup?role=athlete&error=${encodeURIComponent(message)}`)
   }
   redirect('/')
+}
+
+export async function lookupCoachesByJoinCodeAction(joinCode: string): Promise<CoachDirectoryEntry[]> {
+  if (!joinCode || joinCode.trim().length < 4) return []
+  try {
+    return await getCoachesForJoinCode(joinCode)
+  } catch {
+    return []
+  }
 }
